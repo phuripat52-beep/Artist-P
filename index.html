@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtSpace - ตลาดซื้อขายงานศิลปะ</title>
+    <style>
+        /* ส่วนของ CSS: ตกแต่งหน้าเว็บให้สวยงาม */
+        body {
+            font-family: 'Sarabun', sans-serif; /* ใช้ฟอนต์ที่อ่านง่าย */
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        /* กล่องสำหรับฟอร์มลงขาย */
+        .upload-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box; /* ให้ padding ไม่กระทบความกว้าง */
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        /* ส่วนแสดงผลแกลเลอรี (Grid Layout) */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .art-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .art-card:hover {
+            transform: translateY(-5px); /* ขยับขึ้นเล็กน้อยเมื่อเอาเมาส์ชี้ */
+        }
+
+        .art-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover; /* ตัดภาพให้พอดีกรอบโดยไม่เสียสัดส่วน */
+        }
+
+        .art-info {
+            padding: 15px;
+        }
+
+        .art-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 0 10px 0;
+        }
+
+        .art-price {
+            color: #d9534f;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .artist-name {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        h2 {
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🎨 ArtSpace - พื้นที่สำหรับศิลปิน</h1>
+    </header>
+
+    <div class="container">
+        
+        <section class="upload-section">
+            <h2>📤 ลงขายผลงานของคุณ</h2>
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label for="artistName">ชื่อศิลปิน (คุณ):</label>
+                    <input type="text" id="artistName" placeholder="เช่น Artist Jane" required>
+                </div>
+                <div class="form-group">
+                    <label for="artTitle">ชื่อผลงาน:</label>
+                    <input type="text" id="artTitle" placeholder="ตั้งชื่อภาพวาดของคุณ" required>
+                </div>
+                <div class="form-group">
+                    <label for="artPrice">ราคา (บาท):</label>
+                    <input type="number" id="artPrice" placeholder="ระบุราคา" required>
+                </div>
+                <div class="form-group">
+                    <label for="artImage">เลือกรูปภาพผลงาน:</label>
+                    <input type="file" id="artImage" accept="image/*" required>
+                </div>
+                <button type="submit">วางขายทันที</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>🖼️ ผลงานล่าสุดที่วางขาย</h2>
+            <div class="gallery-grid" id="gallery">
+                <div class="art-card">
+                    <img src="https://via.placeholder.com/400x300/ff7f7f/333?text=Art+Sample" alt="ตัวอย่าง" class="art-image">
+                    <div class="art-info">
+                        <h3 class="art-title">อาทิตย์อัสดง</h3>
+                        <div class="art-price">1,500 บาท</div>
+                        <div class="artist-name">โดย: Sample Artist</div>
+                    </div>
+                </div>
+                </div>
+        </section>
+
+    </div>
+
+    <script>
+        // ส่วนของ JavaScript: จัดการการทำงานเมื่อกดปุ่ม
+        
+        const form = document.getElementById('uploadForm');
+        const gallery = document.getElementById('gallery');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // ป้องกันไม่ให้หน้าเว็บรีเฟรช
+
+            // 1. ดึงข้อมูลจากฟอร์ม
+            const artist = document.getElementById('artistName').value;
+            const title = document.getElementById('artTitle').value;
+            const price = document.getElementById('artPrice').value;
+            const imageFile = document.getElementById('artImage').files[0];
+
+            if (imageFile) {
+                // 2. อ่านไฟล์รูปภาพเพื่อนำมาแสดงผล (ใช้ FileReader)
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const imageUrl = e.target.result; // ได้ข้อมูลรูปภาพเป็น base64
+
+                    // 3. สร้าง HTML ของการ์ดสินค้าใหม่
+                    const newArtCard = document.createElement('div');
+                    newArtCard.classList.add('art-card');
+                    newArtCard.innerHTML = `
+                        <img src="${imageUrl}" alt="${title}" class="art-image">
+                        <div class="art-info">
+                            <h3 class="art-title">${title}</h3>
+                            <div class="art-price">${Number(price).toLocaleString()} บาท</div>
+                            <div class="artist-name">โดย: ${artist}</div>
+                        </div>
+                    `;
+
+                    // 4. นำการ์ดใหม่ไปใส่ใน Gallery
+                    // prepend จะใส่ไว้ข้างหน้าสุด (งานใหม่ล่าสุดอยู่บน)
+                    gallery.prepend(newArtCard);
+
+                    // 5. เคลียร์ฟอร์มให้ว่าง
+                    form.reset();
+                    alert('ลงขายผลงานเรียบร้อยแล้ว!');
+                };
+
+                reader.readAsDataURL(imageFile); // เริ่มอ่านไฟล์
+            }
+        });
+    </script>
+
+</body>
+</html>
