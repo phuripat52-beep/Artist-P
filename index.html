@@ -9,7 +9,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Prompt:wght@600&display=swap');
 
         :root {
-            --bg-color: #faf9f6; /* สีพื้นหลังขาวนวล */
+            --bg-color: #faf9f6;
             --text-color: #2d3436;
             --accent-color: #6c5ce7;
         }
@@ -20,7 +20,7 @@
             padding: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
-            overflow: hidden; /* ล็อกแกน Scroll ไว้ก่อน */
+            overflow: hidden;
         }
 
         /* --- INTRO ANIMATION --- */
@@ -33,7 +33,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* เราจะไม่ใช้ transition opacity ที่นี่แล้ว เพราะจะใช้สีบังหน้าจอแทน */
         }
         
         #animCanvas {
@@ -47,7 +46,7 @@
             bottom: 50px;
             color: #b2bec3;
             font-family: 'Prompt', sans-serif;
-            font-size: 28px; /* ใหญ่ขึ้นตามขอ */
+            font-size: 28px;
             font-weight: 600;
             letter-spacing: 1px;
             animation: pulse 2s infinite;
@@ -63,11 +62,11 @@
 
         /* --- MAIN SITE --- */
         #main-site {
-            display: none; /* ซ่อนไว้ก่อน */
+            display: none;
             height: 100vh;
             overflow-y: auto;
             position: relative;
-            z-index: 1; /* อยู่ใต้ Canvas จนกว่า Canvas จะหายไป */
+            z-index: 1;
         }
 
         header {
@@ -214,7 +213,7 @@
     </div>
 
     <script>
-        // --- 1. ANIMATION LOGIC: Expanding Splatter ---
+        // --- 1. ANIMATION LOGIC: Bigger & More Balls ---
         const canvas = document.getElementById('animCanvas');
         const ctx = canvas.getContext('2d');
         const introOverlay = document.getElementById('intro-overlay');
@@ -232,25 +231,36 @@
         const cx = window.innerWidth / 2;
         const cy = window.innerHeight / 2;
         
-        // Config
-        const ballRadius = 60; // ขนาดลูกบอล
-        const colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7']; 
-        const timeToHit = 100;
+        // --- CONFIGURATION UPDATES ---
+        const ballRadius = 85; // ใหญ่ขึ้นตามที่ขอ (จาก 60 เป็น 85)
+        const totalBalls = 8; // เพิ่มจำนวนลูกบอล (จาก 4 เป็น 8)
+        
+        // เพิ่มชุดสีให้ครบ 8 สี
+        const colors = [
+            '#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', // 4 สีเดิม
+            '#a29bfe', '#fd79a8', '#fab1a0', '#81ecec'  // 4 สีใหม่ (ม่วง, ชมพู, ส้ม, ฟ้าอมเขียว)
+        ];
+
+        const timeToHit = 110; // เวลาวิ่งเข้าชน (Frames)
         let frameCount = 0;
-        let phase = 'rolling'; // rolling -> expanding -> finished
+        let phase = 'rolling'; 
 
         let balls = [];
         
-        // Random Rotation Offset
-        const startAngleOffset = Math.random() * Math.PI * 2; 
+        // Logic การสุ่มทิศทางแบบใหม่ (แบ่งเค้ก 8 ชิ้น)
+        const segmentAngle = (Math.PI * 2) / totalBalls; // มุมของแต่ละชิ้นเค้ก
 
-        for(let i=0; i<4; i++) {
-            const angle = startAngleOffset + (i * (Math.PI / 2));
-            const dist = Math.max(window.innerWidth, window.innerHeight) * 0.7;
+        for(let i=0; i < totalBalls; i++) {
+            // คำนวณมุม: เริ่มต้นของชิ้นที่ i + สุ่มตำแหน่งภายในชิ้นนั้น
+            const angle = (i * segmentAngle) + (Math.random() * segmentAngle * 0.8); 
+
+            // ระยะห่างเริ่มต้น (ไกลออกไปหน่อยเพราะลูกใหญ่ขึ้น)
+            const dist = Math.max(window.innerWidth, window.innerHeight) * 0.85; 
             
             const startX = cx + Math.cos(angle) * dist;
             const startY = cy + Math.sin(angle) * dist;
 
+            // คำนวณความเร็วเพื่อให้มาถึงตรงกลางพร้อมกัน
             const vx = (cx - startX) / timeToHit;
             const vy = (cy - startY) / timeToHit;
 
@@ -259,24 +269,25 @@
                 y: startY,
                 vx: vx,
                 vy: vy,
-                color: colors[i]
+                color: colors[i % colors.length] // ใช้ modulo เผื่อในอนาคตเพิ่มบอลมากกว่าสี
             });
         }
 
         let particles = [];
 
         function createExplosion() {
-            // สร้าง Particle จำนวนมาก
-            for (let i = 0; i < 200; i++) {
+            // เพิ่มจำนวน Particle เพราะบอลเยอะขึ้น
+            for (let i = 0; i < 250; i++) {
+                // สุ่มสีจากลูกบอลที่มีอยู่จริง
                 const color = balls[Math.floor(Math.random() * balls.length)].color;
                 particles.push({
                     x: cx,
                     y: cy,
-                    vx: (Math.random() - 0.5) * 50, // ความเร็วกระจายตัว
-                    vy: (Math.random() - 0.5) * 50,
-                    radius: Math.random() * 30 + 10, // ขนาดเริ่มต้น
+                    vx: (Math.random() - 0.5) * 60, // แรงระเบิด
+                    vy: (Math.random() - 0.5) * 60,
+                    radius: Math.random() * 40 + 10, // ขนาดเริ่มต้นใหญ่ขึ้น
                     color: color,
-                    growthRate: Math.random() * 3 + 2 // อัตราการขยายตัว (โตขึ้นเรื่อยๆ)
+                    growthRate: Math.random() * 4 + 3 // อัตราการขยายตัวเร็วขึ้น
                 });
             }
         }
@@ -284,15 +295,15 @@
         function animate() {
             if (phase === 'finished') return;
 
-            // ถ้ายังไม่ระเบิด ให้ล้างจอปกติ
+            // Phase Rolling: ล้างจอปกติ
             if (phase === 'rolling') {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             } 
-            // ถ้าระเบิดแล้ว ไม่ต้องล้างจอ (เพื่อให้สีมันทับกันจนเต็มจอ)
-            // หรือล้างจอก็ได้แต่ Particle ต้องใหญ่พอ
-            // เลือก: ล้างจอเพื่อให้ดูสะอาด แต่วงกลมขยายใหญ่จนบังมิด
+            // Phase Expanding: ไม่ล้างจอ เพื่อให้สีทับกันจนเต็ม
             else {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                 // Optional: ล้างแบบจางๆ ถ้าอยากให้เห็นการเคลื่อนไหว
+                 // ctx.fillStyle = 'rgba(250, 249, 246, 0.1)';
+                 // ctx.fillRect(0,0,canvas.width, canvas.height);
             }
 
             if (phase === 'rolling') {
@@ -302,8 +313,11 @@
                     ball.y += ball.vy;
 
                     ctx.save();
-                    ctx.shadowColor = "rgba(0,0,0,0.1)";
-                    ctx.shadowBlur = 20;
+                    // เพิ่มเงาให้ลูกใหญ่ดูมีมิติ
+                    ctx.shadowColor = "rgba(0,0,0,0.15)";
+                    ctx.shadowBlur = 25;
+                    ctx.shadowOffsetY = 5;
+
                     ctx.beginPath();
                     ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
                     ctx.fillStyle = ball.color;
@@ -313,42 +327,31 @@
 
                 if (frameCount >= timeToHit) {
                     phase = 'expanding';
-                    skipHint.style.display = 'none'; // ซ่อนคำแนะนำเมื่อระเบิด
+                    skipHint.style.display = 'none';
                     createExplosion();
                 }
             }
 
             if (phase === 'expanding') {
-                let filledScreen = true; // สมมติว่าเต็มจอก่อน
-                
                 particles.forEach(p => {
-                    // ขยับตำแหน่ง
                     p.x += p.vx;
                     p.y += p.vy;
-                    p.vx *= 0.95; // ชะลอความเร็วการเคลื่อนที่
-                    p.vy *= 0.95;
-                    
-                    // ขยายขนาด (หัวใจสำคัญคือตรงนี้)
-                    p.radius += p.growthRate * 2; // ขยายไวๆ
-                    p.growthRate *= 1.05; // เร่งการขยายตัว
+                    p.vx *= 0.94; 
+                    p.vy *= 0.94;
+                    p.radius += p.growthRate * 2; // ขยายใหญ่ขึ้นเรื่อยๆ
+                    p.growthRate *= 1.03; 
 
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                     ctx.fillStyle = p.color;
                     ctx.fill();
-
-                    // เช็คว่ามีวงกลมสักวงที่ยังไม่ใหญ่พอจะบังจอไหม?
-                    // จริงๆ เช็คแค่ว่าถ้าวงกลมใหญ่มากๆ แล้วค่อยจบ
-                    if (p.radius < Math.max(canvas.width, canvas.height)) {
-                        filledScreen = false;
-                    }
                 });
 
-                // ตรวจสอบว่ามีวงกลมสักวงที่ใหญ่คลุมหน้าจอหรือยัง
+                // เช็คว่ามีวงกลมที่ใหญ่คลุมจอหรือยัง
                 const maxSize = particles.reduce((max, p) => p.radius > max ? p.radius : max, 0);
-                
-                // ถ้ามีวงกลมที่ใหญ่กว่าจอมากพอ สมควรแก่เวลาเข้าเว็บ
-                if (maxSize > Math.max(canvas.width, canvas.height) * 1.5) {
+                const screenDiag = Math.sqrt(canvas.width**2 + canvas.height**2); // เส้นทแยงมุมจอ
+
+                if (maxSize > screenDiag * 0.8) {
                     enterSite();
                     return;
                 }
@@ -367,15 +370,11 @@
             phase = 'finished';
             cancelAnimationFrame(animationFrameId);
 
-            // แสดงหน้าเว็บหลัก
             mainSite.style.display = 'block';
             document.body.style.overflowY = 'auto'; 
-            
-            // ซ่อน Intro (ไม่ต้อง Fade Out เพราะสีมันบังจออยู่แล้ว)
             introOverlay.style.display = 'none';
         }
 
-        // Spacebar Skip
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space') {
                 enterSite();
