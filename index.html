@@ -126,14 +126,14 @@
         }
         .art-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-md); }
         .card-img-container { position: relative; height: 250px; overflow: hidden; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; background-color: #f1f2f6; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .art-card:hover .card-img { transform: scale(1.05); }
         
         /* Badges inside card */
         .category-badge {
             position: absolute; top: 10px; left: 10px; padding: 4px 10px;
             background: rgba(0,0,0,0.6); color: white; font-size: 10px; border-radius: 20px;
-            backdrop-filter: blur(4px); text-transform: uppercase; letter-spacing: 1px; z-index: 2;
+            backdrop-filter: blur(4px); text-transform: uppercase; letter-spacing: 1px;
         }
 
         .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column;}
@@ -399,29 +399,38 @@
             }
         }
 
-        // ================= GALLERY DATA (UPDATED LINKS) =================
+        // ================= GALLERY DATA (ART STYLE FIXED) =================
         const mockArtworks = [
-            // --- Digital Art ---
+            // --- Digital Art (ใช้ภาพแนว Cyberpunk/Digital) ---
             { title: "Neon Genesis", artist: "CyberPunk_X", price: 15000, category: "digital", img: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=600&q=80" },
             { title: "Matrix Glitch", artist: "HackerOne", price: 9900, category: "digital", img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80" },
             { title: "Virtual Reality", artist: "NeoNinja", price: 21000, category: "digital", img: "https://images.unsplash.com/photo-1535378437327-1e16ca46f63f?auto=format&fit=crop&w=600&q=80" },
             { title: "Digital Waves", artist: "DigitalWave", price: 12000, category: "digital", img: "https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=600&q=80" },
+            { title: "Pixel Heart", artist: "8BitLover", price: 5500, category: "digital", img: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=600&q=80" },
+            { title: "Cyber City", artist: "FutureMan", price: 18500, category: "digital", img: "https://images.unsplash.com/photo-1535930749574-1399327ce78f?auto=format&fit=crop&w=600&q=80" },
+            { title: "Space Odyssey", artist: "StarGazer", price: 11000, category: "digital", img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80" },
             
-            // --- Photography ---
+            // --- Photography (ใช้ภาพถ่ายวิว/คน) ---
             { title: "Mountain Mist", artist: "NatureLover", price: 4500, category: "photo", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80" },
             { title: "Tokyo Nights", artist: "StreetShooter", price: 6200, category: "photo", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&q=80" },
             { title: "Urban Decay", artist: "CityWalker", price: 3500, category: "photo", img: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=600&q=80" },
+            { title: "Golden Hour", artist: "SunChaser", price: 5000, category: "photo", img: "https://images.unsplash.com/photo-1494548162494-384bba4ab999?auto=format&fit=crop&w=600&q=80" },
+            { title: "Minimal Beach", artist: "ZenPhoto", price: 4200, category: "photo", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
+            { title: "Classic Statue", artist: "MuseumGuy", price: 3000, category: "photo", img: "https://images.unsplash.com/photo-1549497557-d54e61a6c40e?auto=format&fit=crop&w=600&q=80" },
+            { title: "Forest Path", artist: "TrailBlazer", price: 5500, category: "photo", img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=600&q=80" },
             
-            // --- Painting (บางรูปอาจเสีย ใส่ Fallback ไว้แล้ว) ---
+            // --- Painting (ใช้ภาพที่เป็นงานศิลปะจริงๆ: สีน้ำ, สีน้ำมัน, ภาพวาด) ---
             { title: "Starry Night Style", artist: "VanGogh_Fan", price: 8900, category: "painting", img: "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?auto=format&fit=crop&w=600&q=80" },
             { title: "Lady Portrait", artist: "ClassicMaster", price: 25000, category: "painting", img: "https://images.unsplash.com/photo-1583262623351-4091a13e55c7?auto=format&fit=crop&w=600&q=80" },
             { title: "Thick Impasto", artist: "PaletteKnife", price: 9200, category: "painting", img: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=600&q=80" },
-            { title: "Watercolor Dreams", artist: "SoftBrush", price: 6500, category: "painting", img: "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=600&q=80" }
+            { title: "Watercolor Dreams", artist: "SoftBrush", price: 6500, category: "painting", img: "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=600&q=80" },
+            { title: "Sunset Oil", artist: "ColorBlind", price: 13500, category: "painting", img: "https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?auto=format&fit=crop&w=600&q=80" },
+            { title: "Abstract Acrylic", artist: "Modernist", price: 16000, category: "painting", img: "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=600&q=80" }
         ];
 
         const gallery = document.getElementById('gallery');
 
-        // Function to render items (ใช้ Fallback ตัวใหม่ที่เสถียรสุดๆ)
+        // Function to render items (UPDATED WITH BETTER FALLBACK IMAGE)
         function renderGalleryItems(items) {
             gallery.innerHTML = ''; 
             items.forEach(item => {
@@ -432,8 +441,8 @@
                 let badgeText = item.category === 'digital' ? 'Digital Art' : 
                                 item.category === 'photo' ? 'Photography' : 'Painting';
 
-                // ใช้ Fallback Image จาก placehold.co (เสถียร 100%)
-                const fallbackImage = 'https://placehold.co/600x400/EEE/31343C?text=Art+Space';
+                // ใช้รูป Fallback ที่ดูเป็นงานศิลปะหน่อย (Abstract)
+                const fallbackImage = 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80';
 
                 card.innerHTML = `
                     <div class="card-img-container">
@@ -454,9 +463,10 @@
             });
         }
 
+        // Render initial items on load
         renderGalleryItems(mockArtworks);
 
-        // Upload Logic
+        // 2. Upload Logic
         const uploadForm = document.getElementById('uploadForm');
         uploadForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -485,7 +495,7 @@
             }
         });
 
-        // Filter Logic
+        // 3. Filter Logic
         function filterGallery(category) {
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
@@ -498,7 +508,7 @@
             }
         }
 
-        // Search Logic
+        // 4. Search Logic
         const searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', function(e) {
             const term = e.target.value.toLowerCase();
