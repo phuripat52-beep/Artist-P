@@ -399,38 +399,29 @@
             }
         }
 
-        // ================= GALLERY DATA (ART STYLE FIXED) =================
+        // ================= GALLERY DATA (UPDATED LINKS) =================
         const mockArtworks = [
-            // --- Digital Art (ใช้ภาพแนว Cyberpunk/Digital) ---
+            // --- Digital Art ---
             { title: "Neon Genesis", artist: "CyberPunk_X", price: 15000, category: "digital", img: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=600&q=80" },
             { title: "Matrix Glitch", artist: "HackerOne", price: 9900, category: "digital", img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80" },
             { title: "Virtual Reality", artist: "NeoNinja", price: 21000, category: "digital", img: "https://images.unsplash.com/photo-1535378437327-1e16ca46f63f?auto=format&fit=crop&w=600&q=80" },
             { title: "Digital Waves", artist: "DigitalWave", price: 12000, category: "digital", img: "https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=600&q=80" },
-            { title: "Pixel Heart", artist: "8BitLover", price: 5500, category: "digital", img: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=600&q=80" },
-            { title: "Cyber City", artist: "FutureMan", price: 18500, category: "digital", img: "https://images.unsplash.com/photo-1535930749574-1399327ce78f?auto=format&fit=crop&w=600&q=80" },
-            { title: "Space Odyssey", artist: "StarGazer", price: 11000, category: "digital", img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80" },
             
-            // --- Photography (ใช้ภาพถ่ายวิว/คน) ---
+            // --- Photography ---
             { title: "Mountain Mist", artist: "NatureLover", price: 4500, category: "photo", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80" },
             { title: "Tokyo Nights", artist: "StreetShooter", price: 6200, category: "photo", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&q=80" },
             { title: "Urban Decay", artist: "CityWalker", price: 3500, category: "photo", img: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=600&q=80" },
-            { title: "Golden Hour", artist: "SunChaser", price: 5000, category: "photo", img: "https://images.unsplash.com/photo-1494548162494-384bba4ab999?auto=format&fit=crop&w=600&q=80" },
-            { title: "Minimal Beach", artist: "ZenPhoto", price: 4200, category: "photo", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
-            { title: "Classic Statue", artist: "MuseumGuy", price: 3000, category: "photo", img: "https://images.unsplash.com/photo-1549497557-d54e61a6c40e?auto=format&fit=crop&w=600&q=80" },
-            { title: "Forest Path", artist: "TrailBlazer", price: 5500, category: "photo", img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=600&q=80" },
             
-            // --- Painting (ใช้ภาพที่เป็นงานศิลปะจริงๆ: สีน้ำ, สีน้ำมัน, ภาพวาด) ---
+            // --- Painting (บางรูปอาจเสีย ใส่ Fallback ไว้แล้ว) ---
             { title: "Starry Night Style", artist: "VanGogh_Fan", price: 8900, category: "painting", img: "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?auto=format&fit=crop&w=600&q=80" },
             { title: "Lady Portrait", artist: "ClassicMaster", price: 25000, category: "painting", img: "https://images.unsplash.com/photo-1583262623351-4091a13e55c7?auto=format&fit=crop&w=600&q=80" },
             { title: "Thick Impasto", artist: "PaletteKnife", price: 9200, category: "painting", img: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=600&q=80" },
-            { title: "Watercolor Dreams", artist: "SoftBrush", price: 6500, category: "painting", img: "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=600&q=80" },
-            { title: "Sunset Oil", artist: "ColorBlind", price: 13500, category: "painting", img: "https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?auto=format&fit=crop&w=600&q=80" },
-            { title: "Abstract Acrylic", artist: "Modernist", price: 16000, category: "painting", img: "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=600&q=80" }
+            { title: "Watercolor Dreams", artist: "SoftBrush", price: 6500, category: "painting", img: "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=600&q=80" }
         ];
 
         const gallery = document.getElementById('gallery');
 
-        // Function to render items (ใช้ placehold.co เพื่อความชัวร์ 100%)
+        // Function to render items (ใช้ Fallback ตัวใหม่ที่เสถียรสุดๆ)
         function renderGalleryItems(items) {
             gallery.innerHTML = ''; 
             items.forEach(item => {
@@ -441,7 +432,7 @@
                 let badgeText = item.category === 'digital' ? 'Digital Art' : 
                                 item.category === 'photo' ? 'Photography' : 'Painting';
 
-                // ใช้ Dummy Image ที่โหลดง่ายสุดๆ (ไม่ใช้ Unsplash แล้ว)
+                // ใช้ Fallback Image จาก placehold.co (เสถียร 100%)
                 const fallbackImage = 'https://placehold.co/600x400/EEE/31343C?text=Art+Space';
 
                 card.innerHTML = `
@@ -463,10 +454,9 @@
             });
         }
 
-        // Render initial items on load
         renderGalleryItems(mockArtworks);
 
-        // 2. Upload Logic
+        // Upload Logic
         const uploadForm = document.getElementById('uploadForm');
         uploadForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -495,7 +485,7 @@
             }
         });
 
-        // 3. Filter Logic
+        // Filter Logic
         function filterGallery(category) {
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
@@ -508,7 +498,7 @@
             }
         }
 
-        // 4. Search Logic
+        // Search Logic
         const searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', function(e) {
             const term = e.target.value.toLowerCase();
