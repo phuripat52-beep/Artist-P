@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArtSpace - Creative Market</title>
+    <title>ArtSpace - ตลาดนัดงานศิลป์</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Prompt:wght@600&display=swap');
 
         :root {
-            --bg-color: #faf9f6; /* Off-white แบบ Minimalist สบายตา */
+            --bg-color: #faf9f6; /* สีพื้นหลังขาวนวล */
             --text-color: #2d3436;
             --accent-color: #6c5ce7;
         }
@@ -20,7 +20,7 @@
             padding: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
-            overflow: hidden; /* ล็อกไว้ก่อน */
+            overflow: hidden; /* ล็อกแกน Scroll ไว้ก่อน */
         }
 
         /* --- INTRO ANIMATION --- */
@@ -28,12 +28,12 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background-color: var(--bg-color); /* ใช้สีเดียวกับเว็บหลัก */
+            background-color: var(--bg-color);
             z-index: 9999;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.8s ease-out;
+            /* เราจะไม่ใช้ transition opacity ที่นี่แล้ว เพราะจะใช้สีบังหน้าจอแทน */
         }
         
         #animCanvas {
@@ -47,27 +47,27 @@
             bottom: 50px;
             color: #b2bec3;
             font-family: 'Prompt', sans-serif;
-            font-size: 24px; /* ใหญ่ขึ้น */
+            font-size: 28px; /* ใหญ่ขึ้นตามขอ */
             font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            letter-spacing: 1px;
             animation: pulse 2s infinite;
             z-index: 10000;
             pointer-events: none;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 0.4; transform: scale(1); }
+            0%, 100% { opacity: 0.5; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.05); }
         }
 
         /* --- MAIN SITE --- */
         #main-site {
-            display: none;
-            opacity: 0;
-            transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+            display: none; /* ซ่อนไว้ก่อน */
             height: 100vh;
             overflow-y: auto;
+            position: relative;
+            z-index: 1; /* อยู่ใต้ Canvas จนกว่า Canvas จะหายไป */
         }
 
         header {
@@ -78,7 +78,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.04); /* เงาบางลง */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
         }
 
         header h1 { margin: 0; font-family: 'Prompt', sans-serif; color: var(--accent-color); }
@@ -101,9 +101,9 @@
 
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #636e72; }
-        input, button { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #dfe6e9; box-sizing: border-box; font-size: 1rem; outline: none; transition: 0.3s; }
+        input, button { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #dfe6e9; box-sizing: border-box; font-size: 1rem; outline: none; transition: 0.3s; font-family: 'Sarabun', sans-serif;}
         input:focus { border-color: var(--accent-color); }
-        button { background-color: var(--accent-color); color: white; border: none; cursor: pointer; font-weight: 600; margin-top: 10px; }
+        button { background-color: var(--accent-color); color: white; border: none; cursor: pointer; font-weight: 600; margin-top: 10px; font-family: 'Prompt', sans-serif; font-size: 1.1rem;}
         button:hover { background-color: #5849be; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3); }
 
         /* Card Style */
@@ -151,44 +151,44 @@
 
     <div id="intro-overlay">
         <canvas id="animCanvas"></canvas>
-        <div class="skip-hint">Spacebar for Skip</div>
+        <div class="skip-hint">กด Spacebar เพื่อข้าม</div>
     </div>
 
     <div id="main-site">
         <header>
             <h1>ArtSpace.</h1>
-            <p>Marketplace for Creators</p>
+            <p>พื้นที่ปล่อยของสำหรับคนมีของ</p>
         </header>
 
         <div class="container">
             
             <section class="upload-section">
-                <h2 style="font-family:'Prompt'; font-weight:600; color:#2d3436;">Create New Listing</h2>
+                <h2 style="font-family:'Prompt'; font-weight:600; color:#2d3436;">ลงขายผลงานใหม่</h2>
                 <form id="uploadForm">
                     <div class="form-group">
-                        <label>Artist Name</label>
-                        <input type="text" id="artistName" placeholder="Your name or alias" required>
+                        <label>ชื่อศิลปิน</label>
+                        <input type="text" id="artistName" placeholder="ชื่อ หรือ นามปากกาของคุณ" required>
                     </div>
                     <div class="form-group">
-                        <label>Artwork Title</label>
-                        <input type="text" id="artTitle" placeholder="Name of your masterpiece" required>
+                        <label>ชื่อผลงาน</label>
+                        <input type="text" id="artTitle" placeholder="ตั้งชื่อให้ผลงานชิ้นเอกนี้" required>
                     </div>
                     <div class="form-group">
-                        <label>Price (THB)</label>
-                        <input type="number" id="artPrice" placeholder="e.g. 5000" required>
+                        <label>ราคา (บาท)</label>
+                        <input type="number" id="artPrice" placeholder="เช่น 5000" required>
                     </div>
                     <div class="form-group">
-                        <label>Upload Image</label>
+                        <label>รูปภาพผลงาน</label>
                         <input type="file" id="artImage" accept="image/*" required>
                     </div>
-                    <button type="submit">Publish Artwork</button>
+                    <button type="submit">วางขายทันที</button>
                 </form>
             </section>
 
             <section>
                 <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px;">
-                    <h2 style="font-family:'Prompt'; margin:0;">Latest Gallery</h2>
-                    <p class="tooltip">*Click text to edit inline</p>
+                    <h2 style="font-family:'Prompt'; margin:0;">แกลเลอรีล่าสุด</h2>
+                    <p class="tooltip">*คลิกที่ข้อความเพื่อแก้ไขได้ทันที</p>
                 </div>
                 
                 <div class="art-feed" id="gallery">
@@ -198,12 +198,12 @@
                             <div class="art-header">
                                 <div>
                                     <h3 class="art-title editable" contenteditable="true">Eternal Dream</h3>
-                                    <div class="artist-badge">Artist: VanGogh_V2</div>
+                                    <div class="artist-badge">ศิลปิน: VanGogh_V2</div>
                                 </div>
                                 <button class="action-btn delete" onclick="deleteCard(this)"><i class="fas fa-trash-alt"></i></button>
                             </div>
                             <div>
-                                <div class="sales-stat"><i class="fas fa-fire"></i> Trending: 12 Sales</div>
+                                <div class="sales-stat"><i class="fas fa-fire"></i> มาแรง: ขายแล้ว 12 ภาพ</div>
                             </div>
                             <div class="art-price editable" contenteditable="true">฿2,500</div>
                         </div>
@@ -214,11 +214,12 @@
     </div>
 
     <script>
-        // --- 1. ADVANCED ANIMATION LOGIC ---
+        // --- 1. ANIMATION LOGIC: Expanding Splatter ---
         const canvas = document.getElementById('animCanvas');
         const ctx = canvas.getContext('2d');
         const introOverlay = document.getElementById('intro-overlay');
         const mainSite = document.getElementById('main-site');
+        const skipHint = document.querySelector('.skip-hint');
         let animationFrameId;
 
         function resizeCanvas() {
@@ -231,28 +232,25 @@
         const cx = window.innerWidth / 2;
         const cy = window.innerHeight / 2;
         
-        // Configuration
-        const ballRadius = 80; // ใหญ่ขึ้นสะใจ
-        const colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7']; // Palette สีพาสเทล
-        const timeToHit = 100; // จำนวน Frame ที่จะให้วิ่งชนกัน (ยิ่งเยอะยิ่งช้า)
+        // Config
+        const ballRadius = 60; // ขนาดลูกบอล
+        const colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7']; 
+        const timeToHit = 100;
         let frameCount = 0;
-        let phase = 'rolling'; // rolling -> exploding -> finished
+        let phase = 'rolling'; // rolling -> expanding -> finished
 
-        // สร้างลูกบอลแบบสุ่มทิศทาง แต่การันตีว่าชนกันตรงกลาง
         let balls = [];
         
-        // Random Rotation Offset (หมุนแกนสุ่มทุกครั้งที่โหลด)
+        // Random Rotation Offset
         const startAngleOffset = Math.random() * Math.PI * 2; 
 
         for(let i=0; i<4; i++) {
-            // คำนวณตำแหน่งเริ่มต้น (อยู่นอกจอนิดหน่อย)
-            const angle = startAngleOffset + (i * (Math.PI / 2)); // 90 องศาต่อลูก
-            const dist = Math.max(window.innerWidth, window.innerHeight) * 0.7; // ระยะห่างจากกลางจอ
+            const angle = startAngleOffset + (i * (Math.PI / 2));
+            const dist = Math.max(window.innerWidth, window.innerHeight) * 0.7;
             
             const startX = cx + Math.cos(angle) * dist;
             const startY = cy + Math.sin(angle) * dist;
 
-            // คำนวณ Velocity เพื่อให้ไปถึงจุดกึ่งกลางในเวลาที่กำหนด (timeToHit)
             const vx = (cx - startX) / timeToHit;
             const vy = (cy - startY) / timeToHit;
 
@@ -268,19 +266,17 @@
         let particles = [];
 
         function createExplosion() {
-            // เพิ่มจำนวน Particle ให้ดูอลังการขึ้น
-            for (let i = 0; i < 150; i++) {
+            // สร้าง Particle จำนวนมาก
+            for (let i = 0; i < 200; i++) {
                 const color = balls[Math.floor(Math.random() * balls.length)].color;
                 particles.push({
                     x: cx,
                     y: cy,
-                    // สุ่มทิศทางระเบิดให้ดูธรรมชาติ (Liquid Feel)
-                    vx: (Math.random() - 0.5) * 40, 
-                    vy: (Math.random() - 0.5) * 40,
-                    radius: Math.random() * 25 + 5, // สุ่มขนาด ใหญ่-เล็ก
+                    vx: (Math.random() - 0.5) * 50, // ความเร็วกระจายตัว
+                    vy: (Math.random() - 0.5) * 50,
+                    radius: Math.random() * 30 + 10, // ขนาดเริ่มต้น
                     color: color,
-                    alpha: 1,
-                    decay: Math.random() * 0.02 + 0.01 // อัตราการจางหายไม่เท่ากัน
+                    growthRate: Math.random() * 3 + 2 // อัตราการขยายตัว (โตขึ้นเรื่อยๆ)
                 });
             }
         }
@@ -288,17 +284,23 @@
         function animate() {
             if (phase === 'finished') return;
 
-            // Clear Canvas with transparency trail effect (optional smoothness)
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // ถ้ายังไม่ระเบิด ให้ล้างจอปกติ
+            if (phase === 'rolling') {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            } 
+            // ถ้าระเบิดแล้ว ไม่ต้องล้างจอ (เพื่อให้สีมันทับกันจนเต็มจอ)
+            // หรือล้างจอก็ได้แต่ Particle ต้องใหญ่พอ
+            // เลือก: ล้างจอเพื่อให้ดูสะอาด แต่วงกลมขยายใหญ่จนบังมิด
+            else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
 
             if (phase === 'rolling') {
                 frameCount++;
-                
                 balls.forEach(ball => {
                     ball.x += ball.vx;
                     ball.y += ball.vy;
 
-                    // Draw Ball with Shadow
                     ctx.save();
                     ctx.shadowColor = "rgba(0,0,0,0.1)";
                     ctx.shadowBlur = 20;
@@ -309,38 +311,44 @@
                     ctx.restore();
                 });
 
-                // เมื่อครบเวลาที่กำหนด ให้ระเบิด
                 if (frameCount >= timeToHit) {
-                    phase = 'exploding';
+                    phase = 'expanding';
+                    skipHint.style.display = 'none'; // ซ่อนคำแนะนำเมื่อระเบิด
                     createExplosion();
                 }
             }
 
-            if (phase === 'exploding') {
-                let activeParticles = 0;
-
+            if (phase === 'expanding') {
+                let filledScreen = true; // สมมติว่าเต็มจอก่อน
+                
                 particles.forEach(p => {
-                    if (p.alpha <= 0) return;
-                    activeParticles++;
-
+                    // ขยับตำแหน่ง
                     p.x += p.vx;
                     p.y += p.vy;
-                    p.vx *= 0.9; // Friction
-                    p.vy *= 0.9;
-                    p.radius *= 0.94; // Shrink
-                    p.alpha -= p.decay;
+                    p.vx *= 0.95; // ชะลอความเร็วการเคลื่อนที่
+                    p.vy *= 0.95;
+                    
+                    // ขยายขนาด (หัวใจสำคัญคือตรงนี้)
+                    p.radius += p.growthRate * 2; // ขยายไวๆ
+                    p.growthRate *= 1.05; // เร่งการขยายตัว
 
-                    if (p.radius > 0.5 && p.alpha > 0) {
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                        ctx.fillStyle = p.color;
-                        ctx.globalAlpha = p.alpha;
-                        ctx.fill();
-                        ctx.globalAlpha = 1; // Reset Alpha
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+
+                    // เช็คว่ามีวงกลมสักวงที่ยังไม่ใหญ่พอจะบังจอไหม?
+                    // จริงๆ เช็คแค่ว่าถ้าวงกลมใหญ่มากๆ แล้วค่อยจบ
+                    if (p.radius < Math.max(canvas.width, canvas.height)) {
+                        filledScreen = false;
                     }
                 });
 
-                if (activeParticles < 10 && phase !== 'finished') {
+                // ตรวจสอบว่ามีวงกลมสักวงที่ใหญ่คลุมหน้าจอหรือยัง
+                const maxSize = particles.reduce((max, p) => p.radius > max ? p.radius : max, 0);
+                
+                // ถ้ามีวงกลมที่ใหญ่กว่าจอมากพอ สมควรแก่เวลาเข้าเว็บ
+                if (maxSize > Math.max(canvas.width, canvas.height) * 1.5) {
                     enterSite();
                     return;
                 }
@@ -349,7 +357,6 @@
             animationFrameId = requestAnimationFrame(animate);
         }
 
-        // Start
         animate();
 
         // --- ENTER SITE LOGIC ---
@@ -360,17 +367,12 @@
             phase = 'finished';
             cancelAnimationFrame(animationFrameId);
 
-            introOverlay.style.opacity = '0';
-            setTimeout(() => {
-                introOverlay.style.display = 'none';
-                mainSite.style.display = 'block';
-                document.body.style.overflowY = 'auto'; 
-                
-                // Trigger Fade In
-                setTimeout(() => {
-                    mainSite.style.opacity = '1';
-                }, 50);
-            }, 800);
+            // แสดงหน้าเว็บหลัก
+            mainSite.style.display = 'block';
+            document.body.style.overflowY = 'auto'; 
+            
+            // ซ่อน Intro (ไม่ต้อง Fade Out เพราะสีมันบังจออยู่แล้ว)
+            introOverlay.style.display = 'none';
         }
 
         // Spacebar Skip
@@ -380,7 +382,7 @@
             }
         });
 
-        // --- 2. UPLOAD & GALLERY LOGIC ---
+        // --- 2. LOGIC เดิม (Upload / Gallery) ---
         const form = document.getElementById('uploadForm');
         const gallery = document.getElementById('gallery');
 
@@ -398,7 +400,6 @@
                     const imageUrl = e.target.result;
                     const newCard = document.createElement('div');
                     newCard.classList.add('art-card');
-                    // Add animation class
                     newCard.style.animation = "pulse 0.5s ease";
                     
                     newCard.innerHTML = `
@@ -407,25 +408,26 @@
                             <div class="art-header">
                                 <div>
                                     <h3 class="art-title editable" contenteditable="true">${title}</h3>
-                                    <div class="artist-badge">Artist: ${artist}</div>
+                                    <div class="artist-badge">ศิลปิน: ${artist}</div>
                                 </div>
                                 <button class="action-btn delete" onclick="deleteCard(this)"><i class="fas fa-trash-alt"></i></button>
                             </div>
                             <div>
-                                <div class="sales-stat"><i class="fas fa-bolt"></i> New Arrival</div>
+                                <div class="sales-stat"><i class="fas fa-bolt"></i> มาใหม่ล่าสุด</div>
                             </div>
                             <div class="art-price editable" contenteditable="true">฿${Number(price).toLocaleString()}</div>
                         </div>
                     `;
                     gallery.prepend(newCard);
                     form.reset();
+                    alert('ลงขายผลงานเรียบร้อย!');
                 };
                 reader.readAsDataURL(imageFile);
             }
         });
 
         function deleteCard(btn) {
-            if(confirm('Are you sure you want to remove this artwork?')) {
+            if(confirm('คุณแน่ใจหรือไม่ที่จะลบผลงานชิ้นนี้?')) {
                 const card = btn.closest('.art-card');
                 card.style.transform = "scale(0.9) translateY(20px)";
                 card.style.opacity = "0";
