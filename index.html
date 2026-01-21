@@ -27,49 +27,75 @@
             padding: 0;
             background-color: var(--bg-color);
             color: var(--text-main);
-            overflow: hidden; /* Lock scroll for intro */
+            overflow: hidden; /* Lock scroll initially */
         }
 
-        /* ================= INTRO ANIMATION (เหมือนเดิม) ================= */
+        /* ================= INTRO ANIMATION & TRANSITION ================= */
         #intro-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--bg-color); z-index: 9999;
+            background-color: var(--bg-color); 
+            z-index: 9999;
             display: flex; justify-content: center; align-items: center;
+            /* เพิ่ม Transition สำหรับการเลื่อนเปิดม่าน */
+            transition: transform 1.2s cubic-bezier(0.86, 0, 0.07, 1); 
         }
+
+        /* Class สำหรับสั่งให้เลื่อนม่านขึ้น */
+        .curtain-open {
+            transform: translateY(-100%);
+        }
+
         #animCanvas { position: absolute; top: 0; left: 0; }
+        
         .skip-hint {
             position: absolute; bottom: 50px; color: #b2bec3;
             font-family: 'Prompt', sans-serif; font-size: 28px; font-weight: 600;
             letter-spacing: 1px; animation: pulse 2s infinite; pointer-events: none;
             text-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10000;
+            transition: opacity 0.5s;
         }
         @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
 
-        /* ================= MAIN SITE LAYOUT ================= */
+        /* ================= MAIN SITE ELEMENTS (Hidden Initially) ================= */
         #main-site {
-            display: none; height: 100vh; overflow-y: auto;
-            position: relative; z-index: 1; scroll-behavior: smooth;
+            /* ไม่ใช้ display: none แล้ว แต่ใช้ visibility/position แทนเพื่อให้ animate ได้ */
+            position: relative;
+            z-index: 1; 
+            height: 100vh;
+            overflow-y: auto;
+            visibility: hidden; /* ซ่อนไว้ก่อน */
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Class สำหรับ Element ที่จะให้ลอยขึ้นมาทีละอัน */
+        .reveal-element {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* State เมื่อแสดงผล */
+        .reveal-active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* --- Navbar (Glassmorphism) --- */
         nav {
             position: sticky; top: 0; z-index: 100;
             background: var(--glass);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             padding: 15px 40px;
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
         }
         
         .logo { font-family: 'Prompt', sans-serif; font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
         .logo span { color: var(--accent); }
         .logo i { font-size: 20px; color: var(--accent); }
 
-        .search-bar {
-            position: relative; width: 400px;
-        }
+        .search-bar { position: relative; width: 400px; }
         .search-bar input {
             width: 100%; padding: 12px 20px 12px 45px;
             border-radius: 50px; border: 1px solid #dfe6e9;
@@ -96,19 +122,18 @@
         /* --- Hero Section --- */
         .hero {
             padding: 80px 20px 40px; text-align: center;
-            background: radial-gradient(circle at 50% 50%, rgba(108, 92, 231, 0.05) 0%, transparent 70%);
+            /* เพิ่ม Gradient สวยๆ */
+            background: radial-gradient(circle at 50% 50%, rgba(108, 92, 231, 0.08) 0%, transparent 70%);
         }
         .hero h1 {
-            font-family: 'Prompt', sans-serif; font-size: 48px; margin-bottom: 10px;
+            font-family: 'Prompt', sans-serif; font-size: 52px; margin-bottom: 10px;
             background: linear-gradient(135deg, #2d3436 0%, #6c5ce7 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         .hero p { color: var(--text-muted); font-size: 18px; max-width: 600px; margin: 0 auto 30px; }
 
         /* --- Filters --- */
-        .filters {
-            display: flex; justify-content: center; gap: 15px; margin-bottom: 50px;
-        }
+        .filters { display: flex; justify-content: center; gap: 15px; margin-bottom: 50px; }
         .filter-btn {
             padding: 10px 25px; border-radius: 30px; border: 1px solid #dfe6e9;
             background: white; color: var(--text-muted); font-family: 'Prompt', sans-serif;
@@ -116,7 +141,7 @@
         }
         .filter-btn:hover, .filter-btn.active {
             background: var(--text-main); color: white; border-color: var(--text-main);
-            transform: translateY(-2px);
+            transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         /* --- Main Layout --- */
@@ -124,14 +149,14 @@
         
         .content-grid {
             display: grid;
-            grid-template-columns: 300px 1fr; /* Upload Sidebar left, Gallery right */
+            grid-template-columns: 320px 1fr;
             gap: 40px;
         }
 
         /* --- Upload Card --- */
         .upload-card {
             background: white; padding: 30px; border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md); position: sticky; top: 100px; height: fit-content;
+            box-shadow: var(--shadow-md); position: sticky; top: 110px; height: fit-content;
         }
         .upload-card h3 { font-family: 'Prompt'; margin-top: 0; display: flex; align-items: center; gap: 10px; }
         
@@ -143,21 +168,16 @@
         }
         .form-control:focus { border-color: var(--accent); outline: none; }
         
-        /* File Upload Styling */
         .file-upload-wrapper {
             border: 2px dashed #dfe6e9; border-radius: 12px; padding: 20px;
             text-align: center; cursor: pointer; transition: 0.3s; position: relative;
         }
         .file-upload-wrapper:hover { border-color: var(--accent); background: #f8f7ff; }
         .file-upload-wrapper i { font-size: 24px; color: var(--accent); margin-bottom: 10px; display: block; }
-        .file-upload-wrapper input[type="file"] {
-            position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0; cursor: pointer;
-        }
+        .file-upload-wrapper input[type="file"] { position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0; cursor: pointer; }
 
         /* --- Gallery Grid --- */
-        .gallery-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px;
-        }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
 
         .art-card {
             background: white; border-radius: var(--radius-md); overflow: hidden;
@@ -189,12 +209,8 @@
         .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
         .card-title { font-family: 'Prompt'; font-weight: 600; font-size: 18px; margin: 0 0 5px 0; }
         .card-artist { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
-        .card-price {
-            margin-top: auto; padding-top: 15px; font-family: 'Prompt';
-            font-weight: 700; color: var(--accent); font-size: 20px;
-        }
+        .card-price { margin-top: auto; padding-top: 15px; font-family: 'Prompt'; font-weight: 700; color: var(--accent); font-size: 20px; }
 
-        /* Animation for Likes */
         @keyframes heartPop { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
         .liked { color: #ff7675 !important; animation: heartPop 0.3s forwards; }
 
@@ -208,7 +224,7 @@
     </div>
 
     <div id="main-site">
-        <nav>
+        <nav class="reveal-element">
             <div class="logo">
                 <i class="fas fa-palette"></i> Art<span>Space</span>
             </div>
@@ -223,10 +239,10 @@
         </nav>
 
         <div class="hero">
-            <h1>ค้นพบแรงบันดาลใจไร้ขีดจำกัด</h1>
-            <p>ตลาดซื้อขายผลงานศิลปะดิจิทัลที่รวบรวมครีเอเตอร์ระดับท็อปไว้ที่นี่</p>
+            <h1 class="reveal-element">ค้นพบแรงบันดาลใจไร้ขีดจำกัด</h1>
+            <p class="reveal-element">ตลาดซื้อขายผลงานศิลปะดิจิทัลที่รวบรวมครีเอเตอร์ระดับท็อปไว้ที่นี่</p>
             
-            <div class="filters">
+            <div class="filters reveal-element">
                 <button class="filter-btn active" onclick="filterGallery('all')">ทั้งหมด</button>
                 <button class="filter-btn" onclick="filterGallery('digital')">ดิจิทัลอาร์ต</button>
                 <button class="filter-btn" onclick="filterGallery('painting')">ภาพวาดมือ</button>
@@ -237,7 +253,7 @@
         <div class="container">
             <div class="content-grid">
                 
-                <aside>
+                <aside class="reveal-element">
                     <div class="upload-card">
                         <h3><i class="fas fa-cloud-upload-alt"></i> ลงผลงานใหม่</h3>
                         <form id="uploadForm">
@@ -266,7 +282,7 @@
                     </div>
                 </aside>
 
-                <main>
+                <main class="reveal-element">
                     <div class="gallery-grid" id="gallery">
                         <div class="art-card" data-category="digital">
                             <div class="card-img-container">
@@ -282,7 +298,6 @@
                                 <div class="card-price editable" contenteditable="true">฿12,500</div>
                             </div>
                         </div>
-
                         <div class="art-card" data-category="painting">
                             <div class="card-img-container">
                                 <img src="https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" class="card-img">
@@ -297,7 +312,6 @@
                                 <div class="card-price editable" contenteditable="true">฿8,900</div>
                             </div>
                         </div>
-
                     </div>
                 </main>
             </div>
@@ -305,7 +319,7 @@
     </div>
 
     <script>
-        // ================= INTRO ANIMATION (8 ลูกบอล + Full Screen Explode) =================
+        // ================= INTRO ANIMATION =================
         const canvas = document.getElementById('animCanvas');
         const ctx = canvas.getContext('2d');
         const introOverlay = document.getElementById('intro-overlay');
@@ -367,7 +381,7 @@
                     ctx.beginPath(); ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
                     ctx.fillStyle = ball.color; ctx.fill(); ctx.restore();
                 });
-                if (frameCount >= timeToHit) { phase = 'expanding'; skipHint.style.display = 'none'; createExplosion(); }
+                if (frameCount >= timeToHit) { phase = 'expanding'; skipHint.style.opacity = '0'; createExplosion(); }
             }
 
             if (phase === 'expanding') {
@@ -386,14 +400,35 @@
         }
         animate();
 
+        // ================= NEW TRANSITION LOGIC =================
         let isEntered = false;
         function enterSite() {
             if (isEntered) return;
             isEntered = true; phase = 'finished';
             cancelAnimationFrame(animationFrameId);
-            mainSite.style.display = 'block';
+
+            // 1. เปิดการแสดงผลหน้าเว็บ (แต่ยังล่องหนอยู่)
+            mainSite.style.visibility = 'visible';
+            mainSite.style.opacity = '1';
+
+            // 2. สั่งให้ Overlay (ม่านสี) เลื่อนขึ้นไปข้างบน
+            introOverlay.classList.add('curtain-open');
+
+            // 3. ปลดล็อก Scroll
             document.body.style.overflowY = 'auto'; 
-            introOverlay.style.display = 'none';
+
+            // 4. Staggered Animation: สั่งให้แต่ละ Element ลอยขึ้นมาทีละนิด
+            const revealElements = document.querySelectorAll('.reveal-element');
+            revealElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.classList.add('reveal-active');
+                }, 300 + (index * 150)); // เริ่มหลังจาก 300ms, ห่างกันทีละ 150ms
+            });
+
+            // 5. ลบ Overlay ทิ้งเมื่อ Animation จบเพื่อประหยัด Memory
+            setTimeout(() => {
+                introOverlay.style.display = 'none';
+            }, 1500);
         }
         document.addEventListener('keydown', (e) => { if (e.code === 'Space') enterSite(); });
 
@@ -403,7 +438,6 @@
         const gallery = document.getElementById('gallery');
         const searchInput = document.getElementById('searchInput');
 
-        // 1. Upload Logic
         function updateFileName(input) {
             const fileNameSpan = document.getElementById('fileName');
             if (input.files && input.files.length > 0) {
@@ -435,7 +469,7 @@
         function createCard(imgUrl, title, artist, price) {
             const newCard = document.createElement('div');
             newCard.classList.add('art-card');
-            newCard.setAttribute('data-category', 'digital'); // Default category for now
+            newCard.setAttribute('data-category', 'digital'); 
             newCard.innerHTML = `
                 <div class="card-img-container">
                     <img src="${imgUrl}" class="card-img">
@@ -450,11 +484,9 @@
                     <div class="card-price editable" contenteditable="true">฿${Number(price).toLocaleString()}</div>
                 </div>
             `;
-            // Insert after first card (mock) or prepend
             gallery.prepend(newCard);
         }
 
-        // 2. Action Logic (Delete / Like)
         function deleteCard(btn) {
             if(confirm('ต้องการลบผลงานนี้หรือไม่?')) {
                 const card = btn.closest('.art-card');
@@ -466,19 +498,14 @@
 
         function toggleLike(btn) {
             btn.classList.toggle('liked');
-            const icon = btn.querySelector('i');
-            // Effect added via CSS animation class 'liked'
         }
 
-        // 3. Search Logic (Real-time)
         searchInput.addEventListener('input', function(e) {
             const term = e.target.value.toLowerCase();
             const cards = document.querySelectorAll('.art-card');
-            
             cards.forEach(card => {
                 const title = card.querySelector('.card-title').innerText.toLowerCase();
                 const artist = card.querySelector('.card-artist').innerText.toLowerCase();
-                
                 if(title.includes(term) || artist.includes(term)) {
                     card.style.display = 'flex';
                 } else {
@@ -487,17 +514,13 @@
             });
         });
 
-        // 4. Filter Logic
         function filterGallery(category) {
-            // Update buttons
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-
             const cards = document.querySelectorAll('.art-card');
             cards.forEach(card => {
                 if (category === 'all' || card.getAttribute('data-category') === category) {
                     card.style.display = 'flex';
-                    // Add subtle fade in
                     card.style.opacity = '0';
                     setTimeout(() => card.style.opacity = '1', 50);
                 } else {
