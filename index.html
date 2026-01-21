@@ -430,7 +430,7 @@
 
         const gallery = document.getElementById('gallery');
 
-        // Function to render items (UPDATED WITH FALLBACK ERROR HANDLER)
+        // Function to render items (UPDATED WITH BETTER FALLBACK IMAGE)
         function renderGalleryItems(items) {
             gallery.innerHTML = ''; 
             items.forEach(item => {
@@ -441,12 +441,17 @@
                 let badgeText = item.category === 'digital' ? 'Digital Art' : 
                                 item.category === 'photo' ? 'Photography' : 'Painting';
 
-                // เพิ่ม onerror เพื่อป้องกันรูปเสีย
+                // ใช้รูป Fallback ที่ดูเป็นงานศิลปะหน่อย (Abstract)
+                const fallbackImage = 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80';
+
                 card.innerHTML = `
                     <div class="card-img-container">
                         <span class="category-badge">${badgeText}</span>
-                        <img src="${item.img}" class="card-img" loading="lazy" 
-                             onerror="this.onerror=null;this.src='https://placehold.co/600x400/EEE/31343C?text=Image+Not+Found';">
+                        <img src="${item.img}" 
+                             class="card-img" 
+                             loading="lazy" 
+                             alt="${item.title}"
+                             onerror="this.onerror=null; this.src='${fallbackImage}';">
                     </div>
                     <div class="card-body">
                         <h4 class="card-title">${item.title}</h4>
