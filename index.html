@@ -126,14 +126,14 @@
         }
         .art-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-md); }
         .card-img-container { position: relative; height: 250px; overflow: hidden; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; background-color: #f1f2f6; }
         .art-card:hover .card-img { transform: scale(1.05); }
         
         /* Badges inside card */
         .category-badge {
             position: absolute; top: 10px; left: 10px; padding: 4px 10px;
             background: rgba(0,0,0,0.6); color: white; font-size: 10px; border-radius: 20px;
-            backdrop-filter: blur(4px); text-transform: uppercase; letter-spacing: 1px;
+            backdrop-filter: blur(4px); text-transform: uppercase; letter-spacing: 1px; z-index: 2;
         }
 
         .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column;}
@@ -430,7 +430,7 @@
 
         const gallery = document.getElementById('gallery');
 
-        // Function to render items (UPDATED WITH BETTER FALLBACK IMAGE)
+        // Function to render items (ใช้ placehold.co เพื่อความชัวร์ 100%)
         function renderGalleryItems(items) {
             gallery.innerHTML = ''; 
             items.forEach(item => {
@@ -441,8 +441,8 @@
                 let badgeText = item.category === 'digital' ? 'Digital Art' : 
                                 item.category === 'photo' ? 'Photography' : 'Painting';
 
-                // ใช้รูป Fallback ที่ดูเป็นงานศิลปะหน่อย (Abstract)
-                const fallbackImage = 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80';
+                // ใช้ Dummy Image ที่โหลดง่ายสุดๆ (ไม่ใช้ Unsplash แล้ว)
+                const fallbackImage = 'https://placehold.co/600x400/EEE/31343C?text=Art+Space';
 
                 card.innerHTML = `
                     <div class="card-img-container">
