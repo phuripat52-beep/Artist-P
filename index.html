@@ -29,7 +29,6 @@
             overflow: hidden; 
         }
 
-        /* --- UTILITY --- */
         .hidden { display: none !important; }
 
         /* ================= INTRO ANIMATION ================= */
@@ -59,7 +58,6 @@
         .reveal-element { opacity: 0; transform: translateY(50px); transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); }
         .reveal-active { opacity: 1; transform: translateY(0); }
 
-        /* --- Navbar --- */
         nav {
             position: sticky; top: 0; z-index: 100;
             background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -68,6 +66,7 @@
         }
         .logo { font-family: 'Prompt', sans-serif; font-size: 24px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
         .logo span { color: var(--accent); }
+        
         .search-bar { position: relative; width: 400px; }
         .search-bar input {
             width: 100%; padding: 12px 20px 12px 45px; border-radius: 50px; border: 1px solid #dfe6e9;
@@ -76,7 +75,7 @@
         .search-bar input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1); }
         .search-bar i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #b2bec3; }
 
-        /* User Profile in Nav */
+        /* User Profile */
         .user-profile { display: flex; align-items: center; gap: 10px; cursor: pointer; }
         .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; }
         .user-info { display: flex; flex-direction: column; }
@@ -91,7 +90,7 @@
         .btn-primary { background: var(--accent); color: white !important; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); }
         .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); }
 
-        /* --- Hero --- */
+        /* Hero */
         .hero {
             padding: 80px 20px 40px; text-align: center;
             background: radial-gradient(circle at 50% 50%, rgba(108, 92, 231, 0.08) 0%, transparent 70%);
@@ -107,13 +106,12 @@
         }
         .filter-btn:hover, .filter-btn.active { background: var(--text-main); color: white; border-color: var(--text-main); }
 
-        /* --- Content --- */
+        /* Content Grid */
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px; }
         .content-grid { display: grid; grid-template-columns: 320px 1fr; gap: 40px; transition: 0.3s; }
-        /* ถ้าไม่มี sidebar ให้ขยายเต็ม */
-        .content-grid.full-width { grid-template-columns: 1fr; } 
+        .content-grid.full-width { grid-template-columns: 1fr; } /* กรณี Guest */
 
-        /* Sidebar */
+        /* Upload Sidebar */
         .upload-card {
             background: white; padding: 30px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
             position: sticky; top: 110px; height: fit-content;
@@ -162,19 +160,10 @@
             content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background: var(--accent);
         }
 
-        .role-selector { display: flex; gap: 15px; margin-bottom: 20px; }
-        .role-option {
-            flex: 1; border: 2px solid #f1f2f6; border-radius: 12px; padding: 15px;
-            text-align: center; cursor: pointer; transition: 0.2s;
-        }
-        .role-option i { font-size: 24px; display: block; margin-bottom: 5px; color: #b2bec3; }
-        .role-option.selected { border-color: var(--accent); background: #f8f7ff; }
-        .role-option.selected i, .role-option.selected span { color: var(--accent); font-weight: bold; }
-
         .auth-btn {
             width: 100%; background: var(--accent); color: white; padding: 14px;
             border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer;
-            margin-top: 10px; transition: 0.3s;
+            margin-top: 20px; transition: 0.3s;
         }
         .auth-btn:hover { background: var(--accent-hover); box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3); }
 
@@ -203,15 +192,8 @@
             </form>
 
             <form id="registerForm" class="hidden">
-                <div class="role-selector">
-                    <div class="role-option selected" onclick="selectRole(this, 'collector')">
-                        <i class="fas fa-shopping-bag"></i>
-                        <span>นักสะสม</span>
-                    </div>
-                    <div class="role-option" onclick="selectRole(this, 'creator')">
-                        <i class="fas fa-paint-brush"></i>
-                        <span>ศิลปิน</span>
-                    </div>
+                <div style="text-align:center; color:#636e72; margin-bottom:15px; font-size:14px;">
+                    บัญชีเดียว ซื้อก็ได้ ขายก็ดี
                 </div>
                 <input type="text" id="regName" class="form-control" placeholder="ชื่อที่ใช้แสดง (Display Name)" required>
                 <input type="email" id="regEmail" class="form-control" placeholder="อีเมล" required>
@@ -239,16 +221,16 @@
                     <div class="user-avatar" id="displayAvatar">U</div>
                     <div class="user-info">
                         <span class="user-name" id="displayName">Username</span>
-                        <span class="user-role" id="displayRole">Collector</span>
+                        <span class="user-role">Member</span>
                     </div>
                 </div>
-                <button class="btn-nav" onclick="logout()" style="color:#e74c3c;"><i class="fas fa-sign-out-alt"></i></button>
+                <button class="btn-nav" onclick="logout()" style="color:#e74c3c;" title="ออกจากระบบ"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </nav>
 
         <div class="hero">
             <h1 class="reveal-element">ค้นพบแรงบันดาลใจไร้ขีดจำกัด</h1>
-            <p class="reveal-element">พื้นที่เสรีสำหรับคนรักศิลปะ ซื้อขายผลงานดิจิทัลและงานคราฟต์</p>
+            <p class="reveal-element">พื้นที่เสรีสำหรับคนรักศิลปะ ซื้อขายผลงานดิจิทัลและงานคราฟต์ง่ายๆ ในที่เดียว</p>
             <div class="filters reveal-element">
                 <button class="filter-btn active" onclick="filterGallery('all')">ทั้งหมด</button>
                 <button class="filter-btn" onclick="filterGallery('digital')">ดิจิทัลอาร์ต</button>
@@ -266,7 +248,7 @@
                             <input type="text" id="artTitle" class="form-control" placeholder="ชื่อผลงาน" required>
                             <input type="number" id="artPrice" class="form-control" placeholder="ราคา (บาท)" required>
                             <input type="file" id="artImage" class="form-control" accept="image/*" required>
-                            <button type="submit" class="btn-nav btn-primary" style="width: 100%;">เผยแพร่</button>
+                            <button type="submit" class="btn-nav btn-primary" style="width: 100%;">เผยแพร่ทันที</button>
                         </form>
                     </div>
                 </aside>
@@ -300,7 +282,7 @@
     </div>
 
     <script>
-        // ================= INTRO ANIMATION CODE (Same as before) =================
+        // ================= INTRO ANIMATION (Same as before) =================
         const canvas = document.getElementById('animCanvas');
         const ctx = canvas.getContext('2d');
         const introOverlay = document.getElementById('intro-overlay');
@@ -377,13 +359,11 @@
         }
         document.addEventListener('keydown', (e) => { if (e.code === 'Space') enterSite(); });
 
-        // ================= AUTH SYSTEM LOGIC =================
+        // ================= UNIFIED AUTH SYSTEM LOGIC =================
         const authModal = document.getElementById('auth-modal');
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
-        let selectedRole = 'collector'; // Default role for registration
 
-        // 1. Modal Control
         function openAuthModal(mode = 'login') {
             authModal.classList.add('open');
             switchTab(mode);
@@ -391,16 +371,13 @@
         function closeAuthModal() {
             authModal.classList.remove('open');
         }
-        // Click outside to close
         authModal.addEventListener('click', (e) => {
             if (e.target === authModal) closeAuthModal();
         });
 
-        // 2. Tab Switching
         function switchTab(tab) {
             const tabs = document.querySelectorAll('.auth-tab');
             tabs.forEach(t => t.classList.remove('active'));
-            
             if (tab === 'login') {
                 tabs[0].classList.add('active');
                 loginForm.classList.remove('hidden');
@@ -412,52 +389,35 @@
             }
         }
 
-        // 3. Role Selection (Register)
-        function selectRole(element, role) {
-            document.querySelectorAll('.role-option').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedRole = role;
-        }
-
-        // 4. Handle Login/Register Simulation
+        // --- Login Simulation ---
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            // Simulate Login Success as a "Creator" (for demo)
-            loginUser("Somchai Arts", "creator");
+            loginUser("Somchai Arts");
         });
 
         registerForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const name = document.getElementById('regName').value;
-            // Simulate Register Success with selected role
-            loginUser(name, selectedRole);
+            loginUser(name);
         });
 
-        function loginUser(name, role) {
-            // Update UI State
+        function loginUser(name) {
             closeAuthModal();
             document.getElementById('guestNav').classList.add('hidden');
             document.getElementById('userNav').classList.remove('hidden');
             
             document.getElementById('displayName').textContent = name;
-            document.getElementById('displayRole').textContent = role === 'creator' ? 'ศิลปิน (Creator)' : 'นักสะสม (Collector)';
             document.getElementById('displayAvatar').textContent = name.charAt(0).toUpperCase();
 
-            // Check Role to Show/Hide Sidebar
+            // Unlock Sidebar for Everyone
             const sidebar = document.getElementById('creatorSidebar');
             const contentLayout = document.getElementById('contentLayout');
+            
+            sidebar.classList.remove('hidden');
+            contentLayout.classList.remove('full-width');
+            setTimeout(() => sidebar.classList.add('reveal-active'), 100);
 
-            if (role === 'creator') {
-                sidebar.classList.remove('hidden');
-                contentLayout.classList.remove('full-width');
-                // Trigger animation for sidebar
-                setTimeout(() => sidebar.classList.add('reveal-active'), 100);
-                alert(`ยินดีต้อนรับศิลปิน ${name}! คุณสามารถลงผลงานได้แล้ว`);
-            } else {
-                sidebar.classList.add('hidden');
-                contentLayout.classList.add('full-width');
-                alert(`ยินดีต้อนรับคุณ ${name}! ขอให้มีความสุขกับการเลือกชมผลงาน`);
-            }
+            alert(`ยินดีต้อนรับคุณ ${name}! คุณสามารถเลือกซื้อ หรือลงขายผลงานได้ทันที`);
         }
 
         function logout() {
@@ -465,13 +425,13 @@
                 document.getElementById('guestNav').classList.remove('hidden');
                 document.getElementById('userNav').classList.add('hidden');
                 
-                // Hide Creator Tools
+                // Hide Sidebar (Return to Guest View)
                 document.getElementById('creatorSidebar').classList.add('hidden');
                 document.getElementById('contentLayout').classList.add('full-width');
             }
         }
 
-        // 5. Upload Logic (Existing)
+        // --- Upload Logic ---
         const uploadForm = document.getElementById('uploadForm');
         const gallery = document.getElementById('gallery');
         uploadForm.addEventListener('submit', function(e) {
@@ -501,7 +461,6 @@
                 reader.readAsDataURL(file);
             }
         });
-
     </script>
 </body>
 </html>
