@@ -399,34 +399,33 @@
             }
         }
 
-        // ================= GALLERY DATA (UPDATED WITH PICSUM) =================
-        // ข้อมูล 20 ชิ้น พร้อมหมวดหมู่ และลิงก์รูปที่เสถียร
+        // ================= GALLERY DATA (ART STYLE FIXED) =================
         const mockArtworks = [
-            // --- Digital Art ---
-            { title: "Neon Genesis", artist: "CyberPunk_X", price: 15000, category: "digital", img: "https://picsum.photos/id/119/600/400" },
-            { title: "Matrix Glitch", artist: "HackerOne", price: 9900, category: "digital", img: "https://picsum.photos/id/180/600/400" },
-            { title: "Virtual Reality", artist: "NeoNinja", price: 21000, category: "digital", img: "https://picsum.photos/id/160/600/400" },
-            { title: "Digital Waves", artist: "DigitalWave", price: 12000, category: "digital", img: "https://picsum.photos/id/134/600/400" },
-            { title: "Pixel Heart", artist: "8BitLover", price: 5500, category: "digital", img: "https://picsum.photos/id/96/600/400" },
-            { title: "Cyber City", artist: "FutureMan", price: 18500, category: "digital", img: "https://picsum.photos/id/201/600/400" },
-            { title: "AI Dreams", artist: "RobotSoul", price: 11000, category: "digital", img: "https://picsum.photos/id/236/600/400" },
+            // --- Digital Art (ใช้ภาพแนว Cyberpunk/Digital) ---
+            { title: "Neon Genesis", artist: "CyberPunk_X", price: 15000, category: "digital", img: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=600&q=80" },
+            { title: "Matrix Glitch", artist: "HackerOne", price: 9900, category: "digital", img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80" },
+            { title: "Virtual Reality", artist: "NeoNinja", price: 21000, category: "digital", img: "https://images.unsplash.com/photo-1535378437327-1e16ca46f63f?auto=format&fit=crop&w=600&q=80" },
+            { title: "Digital Waves", artist: "DigitalWave", price: 12000, category: "digital", img: "https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=600&q=80" },
+            { title: "Pixel Heart", artist: "8BitLover", price: 5500, category: "digital", img: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=600&q=80" },
+            { title: "Cyber City", artist: "FutureMan", price: 18500, category: "digital", img: "https://images.unsplash.com/photo-1535930749574-1399327ce78f?auto=format&fit=crop&w=600&q=80" },
+            { title: "Space Odyssey", artist: "StarGazer", price: 11000, category: "digital", img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80" },
             
-            // --- Photography ---
-            { title: "Mountain Mist", artist: "NatureLover", price: 4500, category: "photo", img: "https://picsum.photos/id/10/600/400" },
-            { title: "Tokyo Nights", artist: "StreetShooter", price: 6200, category: "photo", img: "https://picsum.photos/id/48/600/400" },
-            { title: "Urban Decay", artist: "CityWalker", price: 3500, category: "photo", img: "https://picsum.photos/id/58/600/400" },
-            { title: "Golden Hour", artist: "SunChaser", price: 5000, category: "photo", img: "https://picsum.photos/id/66/600/400" },
-            { title: "Minimal Beach", artist: "ZenPhoto", price: 4200, category: "photo", img: "https://picsum.photos/id/103/600/400" },
-            { title: "Classic Statue", artist: "MuseumGuy", price: 3000, category: "photo", img: "https://picsum.photos/id/42/600/400" },
-            { title: "Forest Path", artist: "TrailBlazer", price: 5500, category: "photo", img: "https://picsum.photos/id/28/600/400" },
+            // --- Photography (ใช้ภาพถ่ายวิว/คน) ---
+            { title: "Mountain Mist", artist: "NatureLover", price: 4500, category: "photo", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80" },
+            { title: "Tokyo Nights", artist: "StreetShooter", price: 6200, category: "photo", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&q=80" },
+            { title: "Urban Decay", artist: "CityWalker", price: 3500, category: "photo", img: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=600&q=80" },
+            { title: "Golden Hour", artist: "SunChaser", price: 5000, category: "photo", img: "https://images.unsplash.com/photo-1494548162494-384bba4ab999?auto=format&fit=crop&w=600&q=80" },
+            { title: "Minimal Beach", artist: "ZenPhoto", price: 4200, category: "photo", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
+            { title: "Classic Statue", artist: "MuseumGuy", price: 3000, category: "photo", img: "https://images.unsplash.com/photo-1549497557-d54e61a6c40e?auto=format&fit=crop&w=600&q=80" },
+            { title: "Forest Path", artist: "TrailBlazer", price: 5500, category: "photo", img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=600&q=80" },
             
-            // --- Painting ---
-            { title: "Abstract Soul", artist: "ArtyFarty", price: 8900, category: "painting", img: "https://picsum.photos/id/1084/600/400" },
-            { title: "Portrait of Anna", artist: "DaVinci_Code", price: 25000, category: "painting", img: "https://picsum.photos/id/106/600/400" },
-            { title: "Oil Texture", artist: "PaletteKnife", price: 9200, category: "painting", img: "https://picsum.photos/id/1062/600/400" },
-            { title: "Watercolor Flow", artist: "SoftBrush", price: 6500, category: "painting", img: "https://picsum.photos/id/1070/600/400" },
-            { title: "Sunset Canvas", artist: "ColorBlind", price: 13500, category: "painting", img: "https://picsum.photos/id/1043/600/400" },
-            { title: "Red Wall", artist: "Modernist", price: 16000, category: "painting", img: "https://picsum.photos/id/1029/600/400" }
+            // --- Painting (ใช้ภาพที่เป็นงานศิลปะจริงๆ: สีน้ำ, สีน้ำมัน, ภาพวาด) ---
+            { title: "Starry Night Style", artist: "VanGogh_Fan", price: 8900, category: "painting", img: "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?auto=format&fit=crop&w=600&q=80" },
+            { title: "Lady Portrait", artist: "ClassicMaster", price: 25000, category: "painting", img: "https://images.unsplash.com/photo-1583262623351-4091a13e55c7?auto=format&fit=crop&w=600&q=80" },
+            { title: "Thick Impasto", artist: "PaletteKnife", price: 9200, category: "painting", img: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=600&q=80" },
+            { title: "Watercolor Dreams", artist: "SoftBrush", price: 6500, category: "painting", img: "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=600&q=80" },
+            { title: "Sunset Oil", artist: "ColorBlind", price: 13500, category: "painting", img: "https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?auto=format&fit=crop&w=600&q=80" },
+            { title: "Abstract Acrylic", artist: "Modernist", price: 16000, category: "painting", img: "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=600&q=80" }
         ];
 
         const gallery = document.getElementById('gallery');
