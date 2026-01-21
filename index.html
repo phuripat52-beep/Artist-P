@@ -14,9 +14,10 @@
             padding: 0;
             background-color: #f4f4f9;
             overflow-x: hidden;
+            overflow-y: hidden; /* ล็อกแกน Y ไว้ก่อนจนกว่าจะเข้าเว็บ */
         }
 
-        /* --- ส่วนที่ 1: Intro Canvas (ลูกบอล) --- */
+        /* --- ส่วนที่ 1: Intro Animation (ลูกบอลสี) --- */
         #intro-overlay {
             position: fixed;
             top: 0;
@@ -25,27 +26,41 @@
             height: 100%;
             background-color: #fff;
             z-index: 9999;
-            transition: opacity 0.8s ease-out;
             display: flex;
             justify-content: center;
             align-items: center;
+            transition: opacity 1s ease-out;
         }
         
-        #introCanvas {
+        #animCanvas {
             display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .skip-hint {
+            position: absolute;
+            bottom: 30px;
+            color: #ccc;
+            font-size: 16px;
+            font-weight: 300;
+            animation: blink 2s infinite;
+            z-index: 10000;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
         /* --- ส่วนที่ 2: Main Website (หน้าหลัก) --- */
         #main-site {
             display: none;
             opacity: 0;
-            transition: opacity 1.5s cubic-bezier(0.22, 1, 0.36, 1); /* Easing แบบสมูท */
-            transform: translateY(20px);
-        }
-
-        #main-site.active {
-            opacity: 1;
-            transform: translateY(0);
+            transition: opacity 1.5s ease-in;
+            height: 100vh;
+            overflow-y: auto; /* ให้ scroll ได้เมื่อเข้าเว็บแล้ว */
         }
 
         header {
@@ -94,32 +109,18 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease;
-        }
-        
-        .art-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            position: relative;
         }
 
         @media (min-width: 768px) {
-            .art-card {
-                flex-direction: row;
-                height: 300px;
-            }
+            .art-card { flex-direction: row; height: 300px; }
+            .art-image { width: 50%; height: 100%; }
         }
 
         .art-image {
             width: 100%;
             height: 250px;
             object-fit: cover;
-        }
-        
-        @media (min-width: 768px) {
-            .art-image {
-                width: 50%;
-                height: 100%;
-            }
         }
 
         .art-info {
@@ -197,7 +198,8 @@
 <body>
 
     <div id="intro-overlay">
-        <canvas id="introCanvas"></canvas>
+        <canvas id="animCanvas"></canvas>
+        <div class="skip-hint">[Spacebar] เพื่อข้าม Intro</div>
     </div>
 
     <div id="main-site">
@@ -253,7 +255,7 @@
                         </div>
                     </div>
 
-                    <div class="art-card">
+                     <div class="art-card">
                         <img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Art" class="art-image">
                         <div class="art-info">
                             <div class="art-header">
@@ -276,141 +278,151 @@
     </div>
 
     <script>
-        // --- 1. Animation Logic: Colored Balls Meeting ---
-        const canvas = document.getElementById('introCanvas');
+        // --- 1. Animation Logic (ลูกบอลชนกัน) ---
+        const canvas = document.getElementById('animCanvas');
         const ctx = canvas.getContext('2d');
         const introOverlay = document.getElementById('intro-overlay');
         const mainSite = document.getElementById('main-site');
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-
-        let balls = [];
         let animationFrameId;
-        let isTransitioning = false;
 
-        class Ball {
-            constructor(x, y, radius, color, speed) {
-                this.x = x;
-                this.y = y;
-                this.radius = radius;
-                this.color = color;
-                
-                // คำนวณมุมเพื่อวิ่งเข้าหาจุดกึ่งกลาง
-                const angle = Math.atan2(centerY - y, centerX - x);
-                this.dx = Math.cos(angle) * speed;
-                this.dy = Math.sin(angle) * speed;
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-                ctx.fillStyle = this.color;
-                ctx.fill();
-                ctx.closePath();
-            }
-
-            update() {
-                this.x += this.dx;
-                this.y += this.dy;
-                this.draw();
-            }
+        // Resize Canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        function initBalls() {
-            const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF9F43', '#5f27cd'];
-            const numberOfBalls = 8;
-            
-            for (let i = 0; i < numberOfBalls; i++) {
-                const radius = 30;
-                let x, y;
-                // สุ่มตำแหน่งเริ่มต้นให้อยู่นอกจอ
-                if (Math.random() < 0.5) {
-                    x = Math.random() < 0.5 ? -radius : canvas.width + radius;
-                    y = Math.random() * canvas.height;
-                } else {
-                    x = Math.random() * canvas.width;
-                    y = Math.random() < 0.5 ? -radius : canvas.height + radius;
-                }
-                
-                // สุ่มความเร็ว
-                const speed = 4 + Math.random() * 3; 
-                const color = colors[i % colors.length];
-                
-                balls.push(new Ball(x, y, radius, color, speed));
+        // Config
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        const ballRadius = 40;
+        const speed = 8;
+        let phase = 'rolling'; // rolling -> exploding -> finished
+
+        // สร้างลูกบอล 4 ทิศ
+        const balls = [
+            { x: -100, y: cy, vx: speed, vy: 0, color: '#ff7675' }, // ซ้าย (แดง)
+            { x: window.innerWidth + 100, y: cy, vx: -speed, vy: 0, color: '#74b9ff' }, // ขวา (ฟ้า)
+            { x: cx, y: -100, vx: 0, vy: speed, color: '#55efc4' }, // บน (เขียว)
+            { x: cx, y: window.innerHeight + 100, vx: 0, vy: -speed, color: '#ffeaa7' } // ล่าง (เหลือง)
+        ];
+
+        // อนุภาคระเบิด (Paint Splatter)
+        let particles = [];
+
+        function createExplosion() {
+            for (let i = 0; i < 80; i++) {
+                particles.push({
+                    x: cx,
+                    y: cy,
+                    vx: (Math.random() - 0.5) * 30, // กระจายแรงๆ
+                    vy: (Math.random() - 0.5) * 30,
+                    radius: Math.random() * 20 + 5,
+                    color: balls[Math.floor(Math.random() * 4)].color, // สุ่มสีจากลูกบอล
+                    alpha: 1
+                });
             }
         }
 
         function animate() {
-            if (isTransitioning) return;
+            if (phase === 'finished') return;
 
-            requestAnimationFrame(animate);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            let allMet = true;
+            // Phase 1: ลูกบอลกลิ้งเข้าหากัน
+            if (phase === 'rolling') {
+                let hitCenter = false;
 
-            balls.forEach(ball => {
-                ball.update();
-                
-                // เช็คระยะห่างจากตรงกลาง
-                const dist = Math.hypot(centerX - ball.x, centerY - ball.y);
-                
-                // ถ้าบอลยังไม่ถึงตรงกลาง (เหลือระยะ 10px) ถือว่ายังไม่จบ
-                if (dist > 10) {
-                    allMet = false;
+                balls.forEach(ball => {
+                    ball.x += ball.vx;
+                    ball.y += ball.vy;
+
+                    // วาดลูกบอล
+                    ctx.beginPath();
+                    ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = ball.color;
+                    ctx.fill();
+                    ctx.closePath();
+
+                    // เช็คว่าถึงตรงกลางหรือยัง (เช็คแค่ลูกแรกก็พอ เพราะความเร็วเท่ากัน)
+                    const dist = Math.hypot(ball.x - cx, ball.y - cy);
+                    if (dist < speed + 5) {
+                        hitCenter = true;
+                    }
+                });
+
+                if (hitCenter) {
+                    phase = 'exploding';
+                    createExplosion();
                 }
-            });
-
-            // ถ้าทุกบอลมาถึงตรงกลางแล้ว
-            if (allMet) {
-                triggerTransition();
             }
-        }
 
-        function triggerTransition() {
-            isTransitioning = true;
-            
-            // Effect: วาดวงกลมขยายใหญ่เพื่อบังจอ (Transition)
-            let radius = 0;
-            function expandEffect() {
-                radius += 40;
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
-                ctx.fillStyle = '#f4f4f9'; // สีเดียวกับ Background เว็บ
-                ctx.fill();
+            // Phase 2: ระเบิดกระจาย (Explosion)
+            if (phase === 'exploding') {
+                let allFaded = true;
 
-                if (radius < Math.max(canvas.width, canvas.height)) {
-                    requestAnimationFrame(expandEffect);
-                } else {
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vx *= 0.92; // แรงเสียดทาน (ช้าลงเรื่อยๆ)
+                    p.vy *= 0.92;
+                    p.radius *= 0.96; // เล็กลงเรื่อยๆ
+
+                    if (p.radius > 0.5) {
+                        allFaded = false;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = p.color;
+                        ctx.globalAlpha = p.alpha;
+                        ctx.fill();
+                        ctx.globalAlpha = 1;
+                        ctx.closePath();
+                    }
+                });
+
+                // เมื่อกระจายตัวไประดับนึง ให้เข้าเว็บ
+                if (particles[0].radius < 5 && phase !== 'finished') {
                     enterSite();
+                    return; 
                 }
             }
-            expandEffect();
+
+            animationFrameId = requestAnimationFrame(animate);
         }
 
+        // เริ่ม Animation
+        animate();
+
+        // ฟังก์ชันเข้าเว็บ
+        let isEntered = false;
         function enterSite() {
+            if (isEntered) return;
+            isEntered = true;
+            phase = 'finished';
+            cancelAnimationFrame(animationFrameId);
+
             introOverlay.style.opacity = '0';
             setTimeout(() => {
                 introOverlay.style.display = 'none';
                 mainSite.style.display = 'block';
+                document.body.style.overflowY = 'auto'; // คืนค่า Scroll
                 
-                // Trigger reflow for CSS transition
-                setTimeout(() => {
-                    mainSite.classList.add('active');
-                }, 50);
-                
+                // Trigger reflow & Fade in
+                void mainSite.offsetWidth;
+                mainSite.style.opacity = '1';
             }, 800);
         }
 
-        // เริ่มต้น Animation
-        initBalls();
-        animate();
+        // กด Spacebar เพื่อข้าม
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                enterSite();
+            }
+        });
 
 
-        // --- 2. Logic เดิม: ฟอร์มลงขายและ Gallery ---
+        // --- 2. Logic เดิมของเว็บ (Upload/Delete) ---
         const form = document.getElementById('uploadForm');
         const gallery = document.getElementById('gallery');
 
@@ -426,7 +438,6 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const imageUrl = e.target.result;
-
                     const newCard = document.createElement('div');
                     newCard.classList.add('art-card');
                     newCard.innerHTML = `
@@ -445,7 +456,6 @@
                             <div class="art-price editable" contenteditable="true">${Number(price).toLocaleString()} บาท</div>
                         </div>
                     `;
-
                     gallery.prepend(newCard);
                     form.reset();
                     alert('ลงขายสำเร็จ!');
@@ -456,10 +466,7 @@
 
         function deleteCard(btn) {
             if(confirm('ต้องการลบผลงานชิ้นนี้ใช่ไหม?')) {
-                const card = btn.closest('.art-card');
-                card.style.transform = "scale(0.8)";
-                card.style.opacity = "0";
-                setTimeout(() => card.remove(), 300);
+                btn.closest('.art-card').remove();
             }
         }
     </script>
