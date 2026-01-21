@@ -99,7 +99,7 @@
             font-family: 'Prompt', sans-serif; font-size: 52px; margin-bottom: 10px;
             background: linear-gradient(135deg, #2d3436 0%, #6c5ce7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .filters { display: flex; justify-content: center; gap: 15px; margin-bottom: 50px; }
+        .filters { display: flex; justify-content: center; gap: 15px; margin-bottom: 50px; flex-wrap: wrap;}
         .filter-btn {
             padding: 10px 25px; border-radius: 30px; border: 1px solid #dfe6e9; background: white;
             color: var(--text-muted); font-family: 'Prompt', sans-serif; cursor: pointer; transition: 0.3s;
@@ -109,7 +109,7 @@
         /* Content Grid */
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px; }
         .content-grid { display: grid; grid-template-columns: 320px 1fr; gap: 40px; transition: 0.3s; }
-        .content-grid.full-width { grid-template-columns: 1fr; } /* กรณี Guest */
+        .content-grid.full-width { grid-template-columns: 1fr; }
 
         /* Upload Sidebar */
         .upload-card {
@@ -119,18 +119,26 @@
         .form-control { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 12px; font-family: 'Sarabun'; margin-bottom: 15px; box-sizing: border-box; }
         
         /* Gallery */
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
         .art-card {
             background: white; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);
-            transition: all 0.3s ease; position: relative; display: flex; flex-direction: column;
+            transition: all 0.3s ease; position: relative; display: flex; flex-direction: column; height: 100%;
         }
         .art-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-md); }
-        .card-img-container { position: relative; height: 220px; overflow: hidden; }
+        .card-img-container { position: relative; height: 250px; overflow: hidden; }
         .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .art-card:hover .card-img { transform: scale(1.05); }
-        .card-body { padding: 20px; }
-        .card-title { font-family: 'Prompt'; font-weight: 600; font-size: 18px; margin: 0 0 5px 0; }
-        .card-price { margin-top: auto; padding-top: 10px; font-family: 'Prompt'; font-weight: 700; color: var(--accent); }
+        
+        /* Badges inside card */
+        .category-badge {
+            position: absolute; top: 10px; left: 10px; padding: 4px 10px;
+            background: rgba(0,0,0,0.6); color: white; font-size: 10px; border-radius: 20px;
+            backdrop-filter: blur(4px); text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column;}
+        .card-title { font-family: 'Prompt'; font-weight: 600; font-size: 16px; margin: 0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .card-price { margin-top: auto; padding-top: 10px; font-family: 'Prompt'; font-weight: 700; color: var(--accent); font-size: 18px; }
 
         /* ================= AUTH MODAL ================= */
         #auth-modal {
@@ -235,6 +243,7 @@
                 <button class="filter-btn active" onclick="filterGallery('all')">ทั้งหมด</button>
                 <button class="filter-btn" onclick="filterGallery('digital')">ดิจิทัลอาร์ต</button>
                 <button class="filter-btn" onclick="filterGallery('painting')">ภาพวาดมือ</button>
+                <button class="filter-btn" onclick="filterGallery('photo')">ภาพถ่าย</button>
             </div>
         </div>
 
@@ -255,34 +264,14 @@
 
                 <main class="reveal-element">
                     <div class="gallery-grid" id="gallery">
-                        <div class="art-card" data-category="digital">
-                            <div class="card-img-container">
-                                <img src="https://images.unsplash.com/photo-1633511090164-b43840ea1607?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" class="card-img">
-                            </div>
-                            <div class="card-body">
-                                <h4 class="card-title">Cyber Punk 2077</h4>
-                                <div style="font-size:13px; color:#636e72;">โดย: NeoArtist</div>
-                                <div class="card-price">฿12,500</div>
-                            </div>
                         </div>
-                        <div class="art-card" data-category="painting">
-                            <div class="card-img-container">
-                                <img src="https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" class="card-img">
-                            </div>
-                            <div class="card-body">
-                                <h4 class="card-title">Van Gogh V2</h4>
-                                <div style="font-size:13px; color:#636e72;">โดย: ClassicMan</div>
-                                <div class="card-price">฿8,900</div>
-                            </div>
-                        </div>
-                    </div>
                 </main>
             </div>
         </div>
     </div>
 
     <script>
-        // ================= INTRO ANIMATION (Same as before) =================
+        // ================= INTRO ANIMATION =================
         const canvas = document.getElementById('animCanvas');
         const ctx = canvas.getContext('2d');
         const introOverlay = document.getElementById('intro-overlay');
@@ -359,7 +348,7 @@
         }
         document.addEventListener('keydown', (e) => { if (e.code === 'Space') enterSite(); });
 
-        // ================= UNIFIED AUTH SYSTEM LOGIC =================
+        // ================= AUTH SYSTEM =================
         const authModal = document.getElementById('auth-modal');
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
@@ -371,69 +360,105 @@
         function closeAuthModal() {
             authModal.classList.remove('open');
         }
-        authModal.addEventListener('click', (e) => {
-            if (e.target === authModal) closeAuthModal();
-        });
+        authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
 
         function switchTab(tab) {
             const tabs = document.querySelectorAll('.auth-tab');
             tabs.forEach(t => t.classList.remove('active'));
             if (tab === 'login') {
-                tabs[0].classList.add('active');
-                loginForm.classList.remove('hidden');
-                registerForm.classList.add('hidden');
+                tabs[0].classList.add('active'); loginForm.classList.remove('hidden'); registerForm.classList.add('hidden');
             } else {
-                tabs[1].classList.add('active');
-                loginForm.classList.add('hidden');
-                registerForm.classList.remove('hidden');
+                tabs[1].classList.add('active'); loginForm.classList.add('hidden'); registerForm.classList.remove('hidden');
             }
         }
 
-        // --- Login Simulation ---
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            loginUser("Somchai Arts");
-        });
-
-        registerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('regName').value;
-            loginUser(name);
-        });
+        loginForm.addEventListener('submit', (e) => { e.preventDefault(); loginUser("Somchai Arts"); });
+        registerForm.addEventListener('submit', (e) => { e.preventDefault(); const name = document.getElementById('regName').value; loginUser(name); });
 
         function loginUser(name) {
             closeAuthModal();
             document.getElementById('guestNav').classList.add('hidden');
             document.getElementById('userNav').classList.remove('hidden');
-            
             document.getElementById('displayName').textContent = name;
             document.getElementById('displayAvatar').textContent = name.charAt(0).toUpperCase();
-
-            // Unlock Sidebar for Everyone
+            
             const sidebar = document.getElementById('creatorSidebar');
             const contentLayout = document.getElementById('contentLayout');
-            
             sidebar.classList.remove('hidden');
             contentLayout.classList.remove('full-width');
             setTimeout(() => sidebar.classList.add('reveal-active'), 100);
-
-            alert(`ยินดีต้อนรับคุณ ${name}! คุณสามารถเลือกซื้อ หรือลงขายผลงานได้ทันที`);
+            alert(`ยินดีต้อนรับคุณ ${name}!`);
         }
 
         function logout() {
             if(confirm('ต้องการออกจากระบบหรือไม่?')) {
                 document.getElementById('guestNav').classList.remove('hidden');
                 document.getElementById('userNav').classList.add('hidden');
-                
-                // Hide Sidebar (Return to Guest View)
                 document.getElementById('creatorSidebar').classList.add('hidden');
                 document.getElementById('contentLayout').classList.add('full-width');
             }
         }
 
-        // --- Upload Logic ---
-        const uploadForm = document.getElementById('uploadForm');
+        // ================= GALLERY DATA & UPLOAD =================
+        
+        // 1. Initial 20 Mock Items
+        const mockArtworks = [
+            { title: "Neon Future City", artist: "CyberPunk_X", price: 15000, category: "digital", img: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Mountain Mist", artist: "NatureLover", price: 4500, category: "photo", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Abstract Soul", artist: "ArtyFarty", price: 8900, category: "painting", img: "https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Tokyo Nights", artist: "StreetShooter", price: 6200, category: "photo", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Fluid Dreams", artist: "DigitalWave", price: 12000, category: "digital", img: "https://images.unsplash.com/photo-1563089145-599997674d42?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Portrait of Anna", artist: "DaVinci_Code", price: 25000, category: "painting", img: "https://images.unsplash.com/photo-1531913764164-f85c52e6e654?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Space Odyssey", artist: "StarGazer", price: 18500, category: "digital", img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Urban Decay", artist: "CityWalker", price: 3500, category: "photo", img: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Golden Hour", artist: "SunChaser", price: 5000, category: "photo", img: "https://images.unsplash.com/photo-1494548162494-384bba4ab999?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Geometric Mind", artist: "ShapeMaster", price: 7800, category: "digital", img: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Oil Texture", artist: "PaletteKnife", price: 9200, category: "painting", img: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Minimal Beach", artist: "ZenPhoto", price: 4200, category: "photo", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Retro Glitch", artist: "VaporBoi", price: 11000, category: "digital", img: "https://images.unsplash.com/photo-1535930749574-1399327ce78f?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Watercolor Flower", artist: "SoftBrush", price: 6500, category: "painting", img: "https://images.unsplash.com/photo-1576495119069-c0952cb70242?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Cyber Samurai", artist: "NeoNinja", price: 21000, category: "digital", img: "https://images.unsplash.com/photo-1535378437327-1e16ca46f63f?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Classic Statue", artist: "MuseumGuy", price: 3000, category: "photo", img: "https://images.unsplash.com/photo-1549497557-d54e61a6c40e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Deep Sea", artist: "AquaMan", price: 16000, category: "digital", img: "https://images.unsplash.com/photo-1518837695005-2083093ee35b?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Sunset Canvas", artist: "ColorBlind", price: 13500, category: "painting", img: "https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Code Matrix", artist: "HackerOne", price: 9900, category: "digital", img: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" },
+            { title: "Forest Path", artist: "TrailBlazer", price: 5500, category: "photo", img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" }
+        ];
+
         const gallery = document.getElementById('gallery');
+
+        // Function to render items
+        function renderGalleryItems(items) {
+            gallery.innerHTML = ''; // Clear current
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'art-card';
+                card.setAttribute('data-category', item.category);
+                
+                // Set Badge Text
+                let badgeText = item.category === 'digital' ? 'Digital Art' : 
+                                item.category === 'photo' ? 'Photography' : 'Painting';
+
+                card.innerHTML = `
+                    <div class="card-img-container">
+                        <span class="category-badge">${badgeText}</span>
+                        <img src="${item.img}" class="card-img" loading="lazy">
+                    </div>
+                    <div class="card-body">
+                        <h4 class="card-title">${item.title}</h4>
+                        <div style="font-size:13px; color:#636e72;"><i class="fas fa-user-circle"></i> ${item.artist}</div>
+                        <div class="card-price">฿${item.price.toLocaleString()}</div>
+                    </div>
+                `;
+                gallery.appendChild(card);
+            });
+        }
+
+        // Render initial items on load
+        renderGalleryItems(mockArtworks);
+
+        // 2. Upload Logic
+        const uploadForm = document.getElementById('uploadForm');
         uploadForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const title = document.getElementById('artTitle').value;
@@ -444,23 +469,51 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(evt) {
-                    const newCard = document.createElement('div');
-                    newCard.className = 'art-card';
-                    newCard.innerHTML = `
-                        <div class="card-img-container"><img src="${evt.target.result}" class="card-img"></div>
-                        <div class="card-body">
-                            <h4 class="card-title">${title}</h4>
-                            <div style="font-size:13px; color:#636e72;">โดย: ${artist}</div>
-                            <div class="card-price">฿${Number(price).toLocaleString()}</div>
-                        </div>
-                    `;
-                    gallery.prepend(newCard);
+                    const newItem = {
+                        title: title,
+                        artist: artist,
+                        price: Number(price),
+                        category: 'digital', // Default for upload
+                        img: evt.target.result
+                    };
+                    
+                    // Add to array (in memory)
+                    mockArtworks.unshift(newItem); 
+                    // Re-render
+                    renderGalleryItems(mockArtworks);
+                    
                     uploadForm.reset();
                     alert('ลงขายสำเร็จ!');
                 }
                 reader.readAsDataURL(file);
             }
         });
+
+        // 3. Filter Logic (Update)
+        function filterGallery(category) {
+            // Button Active State
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if(category === 'all') {
+                renderGalleryItems(mockArtworks);
+            } else {
+                const filtered = mockArtworks.filter(item => item.category === category);
+                renderGalleryItems(filtered);
+            }
+        }
+
+        // 4. Search Logic
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const filtered = mockArtworks.filter(item => 
+                item.title.toLowerCase().includes(term) || 
+                item.artist.toLowerCase().includes(term)
+            );
+            renderGalleryItems(filtered);
+        });
+
     </script>
 </body>
 </html>
