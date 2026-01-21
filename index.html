@@ -3,334 +3,393 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArtSpace - Creative Marketplace</title>
+    <title>ArtSpace - วาดฝันสู่รายได้</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
 
-        :root {
-            --primary: #2d3436;
-            --accent: #6c5ce7;
-            --bg: #ffffff;
-            --surface: #f9f9f9;
-            --text-main: #2d3436;
-            --text-light: #636e72;
-            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+        body {
+            font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            overflow-x: hidden; /* ซ่อนแกนแนวนอน */
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Prompt', sans-serif; }
-        
-        body { overflow: hidden; background: var(--bg); color: var(--text-main); }
-
-        /* --- INTRO SECTION (CANVAS) --- */
-        #intro-layer {
+        /* --- ส่วนที่ 1: Intro Canvas (หน้าวาดรูป) --- */
+        #intro-overlay {
             position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: #fff;
-            z-index: 9999;
-            cursor: none; /* ซ่อนเมาส์ปกติ */
-            transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
-        }
-        
-        canvas { display: block; }
-
-        /* Custom Brush Cursor */
-        #cursor-brush {
-            position: fixed;
-            width: 40px; height: 40px;
-            border: 2px solid var(--accent);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 10000;
-            transform: translate(-50%, -50%);
-            background: rgba(108, 92, 231, 0.2);
-            transition: width 0.2s, height 0.2s;
-        }
-
-        .enter-btn-container {
-            position: absolute;
-            bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            pointer-events: none; /* ให้คลิกทะลุไปวาดได้ จนกว่าจะแสดงปุ่ม */
-            opacity: 0;
-            transition: opacity 1s;
-        }
-
-        .enter-btn {
-            pointer-events: auto;
-            background: var(--text-main);
-            color: #fff;
-            padding: 15px 40px;
-            border-radius: 50px;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s;
-        }
-        .enter-btn:hover { transform: scale(1.05); }
-
-        /* --- MAIN WEBSITE --- */
-        #main-site {
-            position: absolute;
-            top: 0; left: 0;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 100vh;
-            overflow-y: auto;
-            background: var(--bg);
-            transform: translateY(100vh); /* ซ่อนไว้ข้างล่างก่อน */
-            transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
-            padding: 40px 8%;
+            height: 100%;
+            background-color: #fff;
+            z-index: 9999; /* อยู่บนสุดเสมอ */
+            cursor: url('https://cdn-icons-png.flaticon.com/32/587/587372.png') 0 32, auto; /* เมาส์รูปพู่กัน */
+            transition: opacity 1s ease-out;
         }
-
-        /* Active State Classes */
-        body.site-active #intro-layer { transform: translateY(-100vh); }
-        body.site-active #main-site { transform: translateY(0); }
-
-        /* --- UI COMPONENTS --- */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 60px;
-        }
-
-        .logo { font-size: 1.8rem; font-weight: 600; letter-spacing: -1px; }
-        .logo span { color: var(--accent); }
-
-        .auth-buttons button {
-            padding: 10px 25px;
-            border-radius: 30px;
-            border: none;
-            font-weight: 500;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        .btn-login { background: transparent; border: 1px solid var(--text-main); }
-        .btn-admin { background: var(--text-main); color: #fff; }
-
-        h2 { font-size: 2rem; margin-bottom: 30px; position: relative; display: inline-block; }
-        h2::after {
-            content: ''; position: absolute; bottom: 5px; right: -10px;
-            width: 30px; height: 30px; background: rgba(108, 92, 231, 0.2);
-            z-index: -1; border-radius: 50%;
-        }
-
-        /* --- GRID SYSTEM --- */
-        .section { margin-bottom: 80px; }
         
-        .artwork-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        #drawingCanvas {
+            display: block;
+        }
+
+        .hint-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ddd;
+            font-size: 24px;
+            pointer-events: none; /* คลิกทะลุได้ */
+            user-select: none;
+        }
+
+        /* --- ส่วนที่ 2: Main Website (หน้าหลัก) --- */
+        #main-site {
+            display: none; /* ซ่อนไว้ก่อน */
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* ฟอร์มลงขาย */
+        .upload-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            margin-bottom: 50px;
+        }
+
+        /* สไตล์ฟอร์มเดิม (ย่อ) */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, button { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background-color: #3498db; color: white; border: none; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
+        button:hover { background-color: #2980b9; }
+
+        /* การ์ดสินค้าแนวตั้ง (Feed) */
+        .art-feed {
+            display: flex;
+            flex-direction: column;
             gap: 40px;
         }
 
         .art-card {
-            background: #fff;
-            border-radius: 20px;
+            background: white;
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
-        }
-        .art-card:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--shadow);
-        }
-        .art-img {
-            width: 100%;
-            height: 250px;
-            background-color: #eee;
-            object-fit: cover;
-        }
-        .art-info { padding: 20px; }
-        .art-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 5px; }
-        .art-artist { font-size: 0.9rem; color: var(--text-light); }
-        .art-price { float: right; color: var(--accent); font-weight: 600; }
-
-        /* Top Artists */
-        .artist-list {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
             display: flex;
-            gap: 30px;
-            overflow-x: auto;
-            padding-bottom: 20px;
-        }
-        .artist-card {
-            min-width: 150px;
-            text-align: center;
-        }
-        .artist-avatar {
-            width: 100px; height: 100px;
-            border-radius: 50%;
-            background: #ddd;
-            margin: 0 auto 15px;
-            border: 3px solid transparent;
-            background-clip: padding-box;
+            flex-direction: column; /* มือถือเป็นแนวตั้ง */
             position: relative;
         }
-        .rank-1 .artist-avatar { border-color: gold; }
-        .rank-2 .artist-avatar { border-color: silver; }
-        .rank-3 .artist-avatar { border-color: #cd7f32; }
+
+        @media (min-width: 768px) {
+            .art-card {
+                flex-direction: row; /* จอใหญ่เป็นแนวนอน */
+                height: 300px;
+            }
+        }
+
+        .art-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        
+        @media (min-width: 768px) {
+            .art-image {
+                width: 50%;
+                height: 100%;
+            }
+        }
+
+        .art-info {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .art-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .art-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+            color: #333;
+        }
+
+        .editable:hover {
+            background-color: #fef9e7;
+            border: 1px dashed #ccc;
+            cursor: text;
+        }
+
+        .artist-badge {
+            background-color: #eee;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #555;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .sales-stat {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .art-price {
+            font-size: 28px;
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: auto; /* ดันลงล่างสุด */
+            padding-top: 15px;
+        }
+
+        /* ปุ่มจัดการ (Edit/Delete) */
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #999;
+            transition: 0.2s;
+            padding: 5px;
+        }
+        .action-btn.delete:hover { color: #e74c3c; }
+        
+        /* Tooltip สอนใช้งาน */
+        .tooltip {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
 
     </style>
 </head>
 <body>
 
-    <div id="cursor-brush"></div>
-
-    <div id="intro-layer">
-        <canvas id="drawCanvas"></canvas>
-        <div class="enter-btn-container" id="enterContainer">
-            <p style="margin-bottom: 10px; color: #aaa;">วาดเพื่อปลดล็อกจินตนาการ</p>
-            <button class="enter-btn" onclick="enterSite()">เข้าสู่ ArtSpace</button>
-        </div>
+    <div id="intro-overlay">
+        <div class="hint-text">วาดเส้นเพื่อเริ่ม...</div>
+        <canvas id="drawingCanvas"></canvas>
     </div>
 
     <div id="main-site">
-        <nav>
-            <div class="logo">Art<span>Space</span>.</div>
-            <div class="auth-buttons">
-                <button class="btn-login">เข้าสู่ระบบ</button>
-                <button class="btn-admin">Admin</button>
-            </div>
-        </nav>
+        <header>
+            <h1>🎨 ArtSpace Market</h1>
+            <p>พื้นที่ซื้อขายงานศิลปะที่ให้คุณเป็นเจ้าของ</p>
+        </header>
 
-        <div class="section">
-            <h2>ศิลปินยอดนิยม 🔥</h2>
-            <div class="artist-list">
-                <div class="artist-card rank-1">
-                    <img src="https://i.pravatar.cc/150?img=1" class="artist-avatar" alt="Artist">
-                    <h4>K.Somsri</h4>
-                    <p style="color:var(--text-light)">2.5M ยอดขาย</p>
-                </div>
-                <div class="artist-card rank-2">
-                    <img src="https://i.pravatar.cc/150?img=5" class="artist-avatar" alt="Artist">
-                    <h4>John Doe</h4>
-                    <p style="color:var(--text-light)">1.8M ยอดขาย</p>
-                </div>
-                <div class="artist-card rank-3">
-                    <img src="https://i.pravatar.cc/150?img=9" class="artist-avatar" alt="Artist">
-                    <h4>PixelM</h4>
-                    <p style="color:var(--text-light)">900K ยอดขาย</p>
-                </div>
-                <div class="artist-card">
-                    <img src="https://i.pravatar.cc/150?img=12" class="artist-avatar" alt="Artist">
-                    <h4>ArtVader</h4>
-                    <p style="color:var(--text-light)">500K ยอดขาย</p>
-                </div>
-            </div>
-        </div>
+        <div class="container">
+            
+            <section class="upload-section">
+                <h2>📤 ลงขายผลงาน (สำหรับศิลปิน)</h2>
+                <form id="uploadForm">
+                    <div class="form-group">
+                        <label>ชื่อศิลปิน:</label>
+                        <input type="text" id="artistName" placeholder="ชื่อของคุณ" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ชื่อผลงาน:</label>
+                        <input type="text" id="artTitle" placeholder="ชื่อภาพ" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ราคา (บาท):</label>
+                        <input type="number" id="artPrice" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>รูปภาพ:</label>
+                        <input type="file" id="artImage" accept="image/*" required>
+                    </div>
+                    <button type="submit">วางขายทันที</button>
+                </form>
+            </section>
 
-        <div class="section">
-            <h2>ผลงานมาใหม่ 🎨</h2>
-            <div class="artwork-grid">
-                <div class="art-card">
-                    <img src="https://picsum.photos/400/300?random=1" class="art-img" alt="Art">
-                    <div class="art-info">
-                        <div class="art-title">The Silence <span class="art-price">฿5,000</span></div>
-                        <div class="art-artist">by K.Somsri</div>
+            <section>
+                <h2>🔥 แกลเลอรีผลงาน (เลื่อนเพื่อดู)</h2>
+                <p class="tooltip">*คลิกที่ชื่อหรือราคาเพื่อแก้ไขข้อมูลได้ทันที</p>
+                <div class="art-feed" id="gallery">
+                    
+                    <div class="art-card">
+                        <img src="https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Art" class="art-image">
+                        <div class="art-info">
+                            <div class="art-header">
+                                <div>
+                                    <h3 class="art-title editable" contenteditable="true">Abstract Dreams</h3>
+                                    <div class="artist-badge">👤 โดย: Van Gogh Remake</div>
+                                </div>
+                                <button class="action-btn delete" onclick="deleteCard(this)" title="ลบผลงาน"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <div class="sales-stat">
+                                <i class="fas fa-chart-line"></i> ยอดขายสะสม: 12,500 บาท (ขายแล้ว 5 ภาพ)
+                            </div>
+                            <div class="art-price editable" contenteditable="true">2,500 บาท</div>
+                        </div>
                     </div>
-                </div>
-                <div class="art-card">
-                    <img src="https://picsum.photos/400/300?random=2" class="art-img" alt="Art">
-                    <div class="art-info">
-                        <div class="art-title">Neon Future <span class="art-price">฿3,200</span></div>
-                        <div class="art-artist">by PixelM</div>
+
+                     <div class="art-card">
+                        <img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Art" class="art-image">
+                        <div class="art-info">
+                            <div class="art-header">
+                                <div>
+                                    <h3 class="art-title editable" contenteditable="true">Colorful Mind</h3>
+                                    <div class="artist-badge">👤 โดย: Artist Jane</div>
+                                </div>
+                                <button class="action-btn delete" onclick="deleteCard(this)" title="ลบผลงาน"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <div class="sales-stat">
+                                <i class="fas fa-chart-line"></i> ยอดขายสะสม: 45,000 บาท (ขายแล้ว 10 ภาพ)
+                            </div>
+                            <div class="art-price editable" contenteditable="true">4,500 บาท</div>
+                        </div>
                     </div>
+
                 </div>
-                <div class="art-card">
-                    <img src="https://picsum.photos/400/300?random=3" class="art-img" alt="Art">
-                    <div class="art-info">
-                        <div class="art-title">Abstract #99 <span class="art-price">฿8,500</span></div>
-                        <div class="art-artist">by John Doe</div>
-                    </div>
-                </div>
-                <div class="art-card">
-                    <img src="https://picsum.photos/400/300?random=4" class="art-img" alt="Art">
-                    <div class="art-info">
-                        <div class="art-title">Golden Hour <span class="art-price">฿4,100</span></div>
-                        <div class="art-artist">by ArtVader</div>
-                    </div>
-                </div>
-            </div>
+            </section>
         </div>
     </div>
 
     <script>
-        // --- CANVAS SETUP ---
-        const canvas = document.getElementById('drawCanvas');
+        // --- 1. จัดการ Canvas Intro ---
+        const canvas = document.getElementById('drawingCanvas');
         const ctx = canvas.getContext('2d');
-        const cursor = document.getElementById('cursor-brush');
-        const enterContainer = document.getElementById('enterContainer');
-        
-        // Resize canvas to full screen
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        const introOverlay = document.getElementById('intro-overlay');
+        const mainSite = document.getElementById('main-site');
+
+        // ตั้งค่าขนาด Canvas ให้เต็มจอ
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let painting = false;
+        let hasDrawn = false; // เช็คว่ามีการวาดหรือยัง
+
+        function startPosition(e) {
+            painting = true;
+            draw(e);
         }
-        window.addEventListener('resize', resize);
-        resize();
 
-        // Drawing Logic
-        let isDrawing = false;
-        let lastX = 0;
-        let lastY = 0;
-        let hue = 0;
-        let drawCount = 0; // นับจำนวนครั้งที่วาด เพื่อโชว์ปุ่มเข้าเว็บ
-
-        function draw(e) {
-            if (!isDrawing) return;
-            
-            ctx.strokeStyle = `hsl(${hue}, 70%, 50%)`;
+        function finishedPosition() {
+            painting = false;
             ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(e.clientX, e.clientY);
-            ctx.stroke();
             
-            [lastX, lastY] = [e.clientX, e.clientY];
-            hue++;
-            
-            // Effect: Brush gets bigger/smaller based on speed (optional logic here)
-            ctx.lineWidth = 20;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-
-            drawCount++;
-            if(drawCount > 50) { // วาดไปสักพัก ปุ่มจะขึ้น
-                enterContainer.style.opacity = '1';
-                enterContainer.style.pointerEvents = 'auto';
+            // ถ้ามีการวาดเส้นแล้ว ให้พาเข้าเว็บ
+            if (hasDrawn) {
+                setTimeout(enterSite, 800); // รอ 0.8 วิ แล้วค่อยเข้าเว็บ
             }
         }
 
-        canvas.addEventListener('mousedown', (e) => {
-            isDrawing = true;
-            [lastX, lastY] = [e.clientX, e.clientY];
-            cursor.style.transform = `translate(-50%, -50%) scale(0.8)`; // กดแล้วเคอร์เซอร์เล็กลง
-        });
+        function draw(e) {
+            if (!painting) return;
+            hasDrawn = true; // มาร์คว่าวาดแล้ว
 
-        canvas.addEventListener('mousemove', (e) => {
-            // Update custom cursor position
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            draw(e);
-        });
+            ctx.lineWidth = 15; // ขนาดเส้น
+            ctx.lineCap = 'round';
+            // สุ่มสีรุ้ง
+            ctx.strokeStyle = `hsl(${Math.random() * 360}, 100%, 50%)`;
 
-        window.addEventListener('mouseup', () => {
-            isDrawing = false;
-            cursor.style.transform = `translate(-50%, -50%) scale(1)`; // ปล่อยแล้วคืนขนาด
-        });
+            ctx.lineTo(e.clientX, e.clientY);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX, e.clientY);
+        }
 
-        // --- TRANSITION LOGIC ---
+        // ฟังก์ชันเข้าเว็บ
         function enterSite() {
-            // Add class to body to trigger CSS transitions
-            document.body.classList.add('site-active');
-            
-            // คืนค่าเมาส์ปกติ
+            introOverlay.style.opacity = '0';
             setTimeout(() => {
-                cursor.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }, 1000);
+                introOverlay.style.display = 'none';
+                mainSite.style.display = 'block';
+                // Trigger reflow
+                void mainSite.offsetWidth;
+                mainSite.style.opacity = '1';
+            }, 1000); // รอให้ Fade out จบก่อน
+        }
+
+        // Event Listeners ของ Canvas
+        canvas.addEventListener('mousedown', startPosition);
+        canvas.addEventListener('mouseup', finishedPosition);
+        canvas.addEventListener('mousemove', draw);
+
+
+        // --- 2. จัดการฟอร์มลงขายและ Gallery ---
+        const form = document.getElementById('uploadForm');
+        const gallery = document.getElementById('gallery');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const artist = document.getElementById('artistName').value;
+            const title = document.getElementById('artTitle').value;
+            const price = document.getElementById('artPrice').value;
+            const imageFile = document.getElementById('artImage').files[0];
+
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageUrl = e.target.result;
+
+                    // สร้างการ์ดสินค้าใหม่
+                    const newCard = document.createElement('div');
+                    newCard.classList.add('art-card');
+                    newCard.innerHTML = `
+                        <img src="${imageUrl}" alt="${title}" class="art-image">
+                        <div class="art-info">
+                            <div class="art-header">
+                                <div>
+                                    <h3 class="art-title editable" contenteditable="true">${title}</h3>
+                                    <div class="artist-badge">👤 โดย: ${artist}</div>
+                                </div>
+                                <button class="action-btn delete" onclick="deleteCard(this)"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <div class="sales-stat">
+                                <i class="fas fa-chart-line"></i> ยอดขายสะสม: 0 บาท (เพิ่งลงขาย)
+                            </div>
+                            <div class="art-price editable" contenteditable="true">${Number(price).toLocaleString()} บาท</div>
+                        </div>
+                    `;
+
+                    gallery.prepend(newCard); // เพิ่มไว้บนสุด
+                    form.reset();
+                    alert('ลงขายสำเร็จ!');
+                };
+                reader.readAsDataURL(imageFile);
+            }
+        });
+
+        // --- 3. ฟังก์ชันลบการ์ด (Delete) ---
+        function deleteCard(btn) {
+            if(confirm('ต้องการลบผลงานชิ้นนี้ใช่ไหม?')) {
+                const card = btn.closest('.art-card');
+                card.remove();
+            }
         }
     </script>
 </body>
