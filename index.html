@@ -3,15 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArtSpace - ตลาดนัดงานศิลป์</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>ArtSpace - อาณาจักรงานศิลป์</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&family=Prompt:wght@600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&family=Prompt:wght@400;600;700&display=swap');
 
         :root {
             --bg-color: #faf9f6;
-            --text-color: #2d3436;
-            --accent-color: #6c5ce7;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --accent: #6c5ce7;
+            --accent-hover: #5849be;
+            --glass: rgba(255, 255, 255, 0.85);
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.02);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.06);
+            --radius-lg: 24px;
+            --radius-md: 16px;
         }
 
         body {
@@ -19,130 +26,177 @@
             margin: 0;
             padding: 0;
             background-color: var(--bg-color);
-            color: var(--text-color);
-            overflow: hidden;
+            color: var(--text-main);
+            overflow: hidden; /* Lock scroll for intro */
         }
 
-        /* --- INTRO ANIMATION --- */
+        /* ================= INTRO ANIMATION (เหมือนเดิม) ================= */
         #intro-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: var(--bg-color);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        #animCanvas { position: absolute; top: 0; left: 0; }
+        .skip-hint {
+            position: absolute; bottom: 50px; color: #b2bec3;
+            font-family: 'Prompt', sans-serif; font-size: 28px; font-weight: 600;
+            letter-spacing: 1px; animation: pulse 2s infinite; pointer-events: none;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10000;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
+
+        /* ================= MAIN SITE LAYOUT ================= */
+        #main-site {
+            display: none; height: 100vh; overflow-y: auto;
+            position: relative; z-index: 1; scroll-behavior: smooth;
+        }
+
+        /* --- Navbar (Glassmorphism) --- */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 15px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
         }
         
-        #animCanvas {
-            display: block;
-            position: absolute;
-            top: 0; left: 0;
+        .logo { font-family: 'Prompt', sans-serif; font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--accent); }
+        .logo i { font-size: 20px; color: var(--accent); }
+
+        .search-bar {
+            position: relative; width: 400px;
+        }
+        .search-bar input {
+            width: 100%; padding: 12px 20px 12px 45px;
+            border-radius: 50px; border: 1px solid #dfe6e9;
+            background: #fff; font-family: 'Sarabun', sans-serif;
+            transition: 0.3s; outline: none;
+        }
+        .search-bar input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1); }
+        .search-bar i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #b2bec3; }
+
+        .nav-actions { display: flex; gap: 15px; }
+        .btn-nav {
+            background: transparent; border: 1px solid transparent;
+            padding: 8px 16px; border-radius: 12px; font-weight: 600;
+            color: var(--text-muted); cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; gap: 8px; font-family: 'Prompt', sans-serif;
+        }
+        .btn-nav:hover { background: rgba(0,0,0,0.03); color: var(--text-main); }
+        .btn-primary {
+            background: var(--accent); color: white !important;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); }
+
+        /* --- Hero Section --- */
+        .hero {
+            padding: 80px 20px 40px; text-align: center;
+            background: radial-gradient(circle at 50% 50%, rgba(108, 92, 231, 0.05) 0%, transparent 70%);
+        }
+        .hero h1 {
+            font-family: 'Prompt', sans-serif; font-size: 48px; margin-bottom: 10px;
+            background: linear-gradient(135deg, #2d3436 0%, #6c5ce7 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero p { color: var(--text-muted); font-size: 18px; max-width: 600px; margin: 0 auto 30px; }
+
+        /* --- Filters --- */
+        .filters {
+            display: flex; justify-content: center; gap: 15px; margin-bottom: 50px;
+        }
+        .filter-btn {
+            padding: 10px 25px; border-radius: 30px; border: 1px solid #dfe6e9;
+            background: white; color: var(--text-muted); font-family: 'Prompt', sans-serif;
+            cursor: pointer; transition: 0.3s; font-size: 14px;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--text-main); color: white; border-color: var(--text-main);
+            transform: translateY(-2px);
         }
 
-        .skip-hint {
-            position: absolute;
-            bottom: 50px;
-            color: #b2bec3;
-            font-family: 'Prompt', sans-serif;
-            font-size: 28px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            animation: pulse 2s infinite;
-            z-index: 10000;
-            pointer-events: none;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        /* --- Main Layout --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px; }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr; /* Upload Sidebar left, Gallery right */
+            gap: 40px;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
+        /* --- Upload Card --- */
+        .upload-card {
+            background: white; padding: 30px; border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md); position: sticky; top: 100px; height: fit-content;
         }
-
-        /* --- MAIN SITE --- */
-        #main-site {
-            display: none;
-            height: 100vh;
-            overflow-y: auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        header {
-            background-color: #ffffff;
-            color: var(--text-color);
-            padding: 20px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-        }
-
-        header h1 { margin: 0; font-family: 'Prompt', sans-serif; color: var(--accent-color); }
-
-        .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        /* Form Style */
-        .upload-section {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-            margin-bottom: 50px;
-            border: 1px solid rgba(0,0,0,0.02);
-        }
-
+        .upload-card h3 { font-family: 'Prompt'; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #636e72; }
-        input, button { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #dfe6e9; box-sizing: border-box; font-size: 1rem; outline: none; transition: 0.3s; font-family: 'Sarabun', sans-serif;}
-        input:focus { border-color: var(--accent-color); }
-        button { background-color: var(--accent-color); color: white; border: none; cursor: pointer; font-weight: 600; margin-top: 10px; font-family: 'Prompt', sans-serif; font-size: 1.1rem;}
-        button:hover { background-color: #5849be; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3); }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+        .form-control {
+            width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 12px;
+            font-family: 'Sarabun'; transition: 0.3s; box-sizing: border-box;
+        }
+        .form-control:focus { border-color: var(--accent); outline: none; }
+        
+        /* File Upload Styling */
+        .file-upload-wrapper {
+            border: 2px dashed #dfe6e9; border-radius: 12px; padding: 20px;
+            text-align: center; cursor: pointer; transition: 0.3s; position: relative;
+        }
+        .file-upload-wrapper:hover { border-color: var(--accent); background: #f8f7ff; }
+        .file-upload-wrapper i { font-size: 24px; color: var(--accent); margin-bottom: 10px; display: block; }
+        .file-upload-wrapper input[type="file"] {
+            position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0; cursor: pointer;
+        }
 
-        /* Card Style */
-        .art-feed { display: flex; flex-direction: column; gap: 40px; padding-bottom: 50px; }
+        /* --- Gallery Grid --- */
+        .gallery-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px;
+        }
 
         .art-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
+            background: white; border-radius: var(--radius-md); overflow: hidden;
+            box-shadow: var(--shadow-sm); transition: all 0.3s ease;
+            position: relative; display: flex; flex-direction: column;
         }
-        .art-card:hover { transform: translateY(-5px); }
+        .art-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-md); }
 
-        @media (min-width: 768px) {
-            .art-card { flex-direction: row; height: 320px; }
-            .art-image { width: 55%; height: 100%; }
+        .card-img-container { position: relative; height: 220px; overflow: hidden; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .art-card:hover .card-img { transform: scale(1.05); }
+
+        .card-actions {
+            position: absolute; top: 15px; right: 15px; display: flex; gap: 8px;
+            opacity: 0; transform: translateY(-10px); transition: 0.3s;
+        }
+        .art-card:hover .card-actions { opacity: 1; transform: translateY(0); }
+        
+        .icon-btn {
+            width: 36px; height: 36px; border-radius: 50%; background: white;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s;
+            color: var(--text-main); font-size: 14px;
+        }
+        .icon-btn:hover { transform: scale(1.1); }
+        .icon-btn.like-btn:hover { color: #ff7675; }
+        .icon-btn.delete-btn:hover { color: #d63031; background: #ffebeb; }
+
+        .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+        .card-title { font-family: 'Prompt'; font-weight: 600; font-size: 18px; margin: 0 0 5px 0; }
+        .card-artist { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+        .card-price {
+            margin-top: auto; padding-top: 15px; font-family: 'Prompt';
+            font-weight: 700; color: var(--accent); font-size: 20px;
         }
 
-        .art-image { width: 100%; height: 280px; object-fit: cover; }
-        
-        .art-info { padding: 30px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        
-        .art-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .art-title { font-size: 26px; font-family: 'Prompt', sans-serif; font-weight: 600; margin: 0; color: #2d3436; }
-        
-        .artist-badge { background-color: #f1f2f6; padding: 6px 12px; border-radius: 30px; font-size: 13px; color: #636e72; display: inline-block; margin-top: 8px; }
-
-        .sales-stat { margin-top: 20px; font-size: 14px; color: #00b894; font-weight: 600; background: rgba(0, 184, 148, 0.1); padding: 8px 12px; border-radius: 8px; display: inline-block; }
-
-        .art-price { font-size: 32px; color: var(--accent-color); font-weight: 700; margin-top: auto; font-family: 'Prompt', sans-serif; }
-
-        .action-btn { background: transparent; border: none; cursor: pointer; font-size: 20px; color: #b2bec3; padding: 0; transition: 0.2s; }
-        .action-btn:hover { color: #ff7675; }
-
-        .editable:hover { background-color: #fffce3; outline: 1px dashed #ffeaa7; cursor: text; border-radius: 4px; padding: 0 5px; margin: 0 -5px; }
-        
-        .tooltip { font-size: 13px; color: #b2bec3; margin-bottom: 15px; font-style: normal; text-align: right; }
+        /* Animation for Likes */
+        @keyframes heartPop { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
+        .liked { color: #ff7675 !important; animation: heartPop 0.3s forwards; }
 
     </style>
 </head>
@@ -154,66 +208,104 @@
     </div>
 
     <div id="main-site">
-        <header>
-            <h1>ArtSpace.</h1>
-            <p>พื้นที่ปล่อยของสำหรับคนมีของ</p>
-        </header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-palette"></i> Art<span>Space</span>
+            </div>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="ค้นหาศิลปิน, ชื่อภาพ...">
+            </div>
+            <div class="nav-actions">
+                <button class="btn-nav">เข้าสู่ระบบ</button>
+                <button class="btn-nav btn-primary"><i class="fas fa-plus"></i> ลงขายงาน</button>
+            </div>
+        </nav>
+
+        <div class="hero">
+            <h1>ค้นพบแรงบันดาลใจไร้ขีดจำกัด</h1>
+            <p>ตลาดซื้อขายผลงานศิลปะดิจิทัลที่รวบรวมครีเอเตอร์ระดับท็อปไว้ที่นี่</p>
+            
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterGallery('all')">ทั้งหมด</button>
+                <button class="filter-btn" onclick="filterGallery('digital')">ดิจิทัลอาร์ต</button>
+                <button class="filter-btn" onclick="filterGallery('painting')">ภาพวาดมือ</button>
+                <button class="filter-btn" onclick="filterGallery('photo')">ภาพถ่าย</button>
+            </div>
+        </div>
 
         <div class="container">
-            
-            <section class="upload-section">
-                <h2 style="font-family:'Prompt'; font-weight:600; color:#2d3436;">ลงขายผลงานใหม่</h2>
-                <form id="uploadForm">
-                    <div class="form-group">
-                        <label>ชื่อศิลปิน</label>
-                        <input type="text" id="artistName" placeholder="ชื่อ หรือ นามปากกาของคุณ" required>
-                    </div>
-                    <div class="form-group">
-                        <label>ชื่อผลงาน</label>
-                        <input type="text" id="artTitle" placeholder="ตั้งชื่อให้ผลงานชิ้นเอกนี้" required>
-                    </div>
-                    <div class="form-group">
-                        <label>ราคา (บาท)</label>
-                        <input type="number" id="artPrice" placeholder="เช่น 5000" required>
-                    </div>
-                    <div class="form-group">
-                        <label>รูปภาพผลงาน</label>
-                        <input type="file" id="artImage" accept="image/*" required>
-                    </div>
-                    <button type="submit">วางขายทันที</button>
-                </form>
-            </section>
-
-            <section>
-                <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px;">
-                    <h2 style="font-family:'Prompt'; margin:0;">แกลเลอรีล่าสุด</h2>
-                    <p class="tooltip">*คลิกที่ข้อความเพื่อแก้ไขได้ทันที</p>
-                </div>
+            <div class="content-grid">
                 
-                <div class="art-feed" id="gallery">
-                    <div class="art-card">
-                        <img src="https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Art" class="art-image">
-                        <div class="art-info">
-                            <div class="art-header">
-                                <div>
-                                    <h3 class="art-title editable" contenteditable="true">Eternal Dream</h3>
-                                    <div class="artist-badge">ศิลปิน: VanGogh_V2</div>
+                <aside>
+                    <div class="upload-card">
+                        <h3><i class="fas fa-cloud-upload-alt"></i> ลงผลงานใหม่</h3>
+                        <form id="uploadForm">
+                            <div class="form-group">
+                                <label>ชื่อศิลปิน</label>
+                                <input type="text" id="artistName" class="form-control" placeholder="ชื่อศิลปิน" required>
+                            </div>
+                            <div class="form-group">
+                                <label>ชื่อผลงาน</label>
+                                <input type="text" id="artTitle" class="form-control" placeholder="ชื่อผลงาน" required>
+                            </div>
+                            <div class="form-group">
+                                <label>ราคา (บาท)</label>
+                                <input type="number" id="artPrice" class="form-control" placeholder="0.00" required>
+                            </div>
+                            <div class="form-group">
+                                <label>รูปภาพ</label>
+                                <div class="file-upload-wrapper" onclick="document.getElementById('artImage').click()">
+                                    <i class="fas fa-image"></i>
+                                    <span id="fileName">คลิกเพื่ออัปโหลด</span>
+                                    <input type="file" id="artImage" accept="image/*" onchange="updateFileName(this)" required>
                                 </div>
-                                <button class="action-btn delete" onclick="deleteCard(this)"><i class="fas fa-trash-alt"></i></button>
                             </div>
-                            <div>
-                                <div class="sales-stat"><i class="fas fa-fire"></i> มาแรง: ขายแล้ว 12 ภาพ</div>
-                            </div>
-                            <div class="art-price editable" contenteditable="true">฿2,500</div>
-                        </div>
+                            <button type="submit" class="btn-nav btn-primary" style="width: 100%; justify-content: center; padding: 12px;">เผยแพร่ทันที</button>
+                        </form>
                     </div>
-                </div>
-            </section>
+                </aside>
+
+                <main>
+                    <div class="gallery-grid" id="gallery">
+                        <div class="art-card" data-category="digital">
+                            <div class="card-img-container">
+                                <img src="https://images.unsplash.com/photo-1633511090164-b43840ea1607?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" class="card-img">
+                                <div class="card-actions">
+                                    <div class="icon-btn like-btn" onclick="toggleLike(this)"><i class="fas fa-heart"></i></div>
+                                    <div class="icon-btn delete-btn" onclick="deleteCard(this)"><i class="fas fa-trash"></i></div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h4 class="card-title editable" contenteditable="true">Cyber Punk 2077</h4>
+                                <div class="card-artist"><i class="fas fa-user-circle"></i> โดย: NeoArtist</div>
+                                <div class="card-price editable" contenteditable="true">฿12,500</div>
+                            </div>
+                        </div>
+
+                        <div class="art-card" data-category="painting">
+                            <div class="card-img-container">
+                                <img src="https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" class="card-img">
+                                <div class="card-actions">
+                                    <div class="icon-btn like-btn" onclick="toggleLike(this)"><i class="fas fa-heart"></i></div>
+                                    <div class="icon-btn delete-btn" onclick="deleteCard(this)"><i class="fas fa-trash"></i></div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h4 class="card-title editable" contenteditable="true">Van Gogh Reimagined</h4>
+                                <div class="card-artist"><i class="fas fa-user-circle"></i> โดย: ClassicMan</div>
+                                <div class="card-price editable" contenteditable="true">฿8,900</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </main>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- 1. ANIMATION LOGIC: Bigger & More Balls ---
+        // ================= INTRO ANIMATION (8 ลูกบอล + Full Screen Explode) =================
         const canvas = document.getElementById('animCanvas');
         const ctx = canvas.getContext('2d');
         const introOverlay = document.getElementById('intro-overlay');
@@ -221,173 +313,108 @@
         const skipHint = document.querySelector('.skip-hint');
         let animationFrameId;
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
         const cx = window.innerWidth / 2;
         const cy = window.innerHeight / 2;
-        
-        // --- CONFIGURATION UPDATES ---
-        const ballRadius = 85; // ใหญ่ขึ้นตามที่ขอ (จาก 60 เป็น 85)
-        const totalBalls = 8; // เพิ่มจำนวนลูกบอล (จาก 4 เป็น 8)
-        
-        // เพิ่มชุดสีให้ครบ 8 สี
-        const colors = [
-            '#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', // 4 สีเดิม
-            '#a29bfe', '#fd79a8', '#fab1a0', '#81ecec'  // 4 สีใหม่ (ม่วง, ชมพู, ส้ม, ฟ้าอมเขียว)
-        ];
-
-        const timeToHit = 110; // เวลาวิ่งเข้าชน (Frames)
+        const ballRadius = 85; 
+        const totalBalls = 8;
+        const colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe', '#fd79a8', '#fab1a0', '#81ecec'];
+        const timeToHit = 110;
         let frameCount = 0;
         let phase = 'rolling'; 
-
         let balls = [];
         
-        // Logic การสุ่มทิศทางแบบใหม่ (แบ่งเค้ก 8 ชิ้น)
-        const segmentAngle = (Math.PI * 2) / totalBalls; // มุมของแต่ละชิ้นเค้ก
-
+        const segmentAngle = (Math.PI * 2) / totalBalls; 
         for(let i=0; i < totalBalls; i++) {
-            // คำนวณมุม: เริ่มต้นของชิ้นที่ i + สุ่มตำแหน่งภายในชิ้นนั้น
             const angle = (i * segmentAngle) + (Math.random() * segmentAngle * 0.8); 
-
-            // ระยะห่างเริ่มต้น (ไกลออกไปหน่อยเพราะลูกใหญ่ขึ้น)
             const dist = Math.max(window.innerWidth, window.innerHeight) * 0.85; 
-            
             const startX = cx + Math.cos(angle) * dist;
             const startY = cy + Math.sin(angle) * dist;
-
-            // คำนวณความเร็วเพื่อให้มาถึงตรงกลางพร้อมกัน
-            const vx = (cx - startX) / timeToHit;
-            const vy = (cy - startY) / timeToHit;
-
             balls.push({
-                x: startX,
-                y: startY,
-                vx: vx,
-                vy: vy,
-                color: colors[i % colors.length] // ใช้ modulo เผื่อในอนาคตเพิ่มบอลมากกว่าสี
+                x: startX, y: startY,
+                vx: (cx - startX) / timeToHit,
+                vy: (cy - startY) / timeToHit,
+                color: colors[i % colors.length]
             });
         }
 
         let particles = [];
-
         function createExplosion() {
-            // เพิ่มจำนวน Particle เพราะบอลเยอะขึ้น
             for (let i = 0; i < 250; i++) {
-                // สุ่มสีจากลูกบอลที่มีอยู่จริง
                 const color = balls[Math.floor(Math.random() * balls.length)].color;
                 particles.push({
-                    x: cx,
-                    y: cy,
-                    vx: (Math.random() - 0.5) * 60, // แรงระเบิด
-                    vy: (Math.random() - 0.5) * 60,
-                    radius: Math.random() * 40 + 10, // ขนาดเริ่มต้นใหญ่ขึ้น
-                    color: color,
-                    growthRate: Math.random() * 4 + 3 // อัตราการขยายตัวเร็วขึ้น
+                    x: cx, y: cy,
+                    vx: (Math.random() - 0.5) * 60, vy: (Math.random() - 0.5) * 60,
+                    radius: Math.random() * 40 + 10, color: color,
+                    growthRate: Math.random() * 4 + 3
                 });
             }
         }
 
         function animate() {
             if (phase === 'finished') return;
-
-            // Phase Rolling: ล้างจอปกติ
-            if (phase === 'rolling') {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            } 
-            // Phase Expanding: ไม่ล้างจอ เพื่อให้สีทับกันจนเต็ม
-            else {
-                 // Optional: ล้างแบบจางๆ ถ้าอยากให้เห็นการเคลื่อนไหว
-                 // ctx.fillStyle = 'rgba(250, 249, 246, 0.1)';
-                 // ctx.fillRect(0,0,canvas.width, canvas.height);
-            }
+            if (phase === 'rolling') ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             if (phase === 'rolling') {
                 frameCount++;
                 balls.forEach(ball => {
-                    ball.x += ball.vx;
-                    ball.y += ball.vy;
-
+                    ball.x += ball.vx; ball.y += ball.vy;
                     ctx.save();
-                    // เพิ่มเงาให้ลูกใหญ่ดูมีมิติ
-                    ctx.shadowColor = "rgba(0,0,0,0.15)";
-                    ctx.shadowBlur = 25;
-                    ctx.shadowOffsetY = 5;
-
-                    ctx.beginPath();
-                    ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
-                    ctx.fillStyle = ball.color;
-                    ctx.fill();
-                    ctx.restore();
+                    ctx.shadowColor = "rgba(0,0,0,0.15)"; ctx.shadowBlur = 25; ctx.shadowOffsetY = 5;
+                    ctx.beginPath(); ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = ball.color; ctx.fill(); ctx.restore();
                 });
-
-                if (frameCount >= timeToHit) {
-                    phase = 'expanding';
-                    skipHint.style.display = 'none';
-                    createExplosion();
-                }
+                if (frameCount >= timeToHit) { phase = 'expanding'; skipHint.style.display = 'none'; createExplosion(); }
             }
 
             if (phase === 'expanding') {
                 particles.forEach(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.vx *= 0.94; 
-                    p.vy *= 0.94;
-                    p.radius += p.growthRate * 2; // ขยายใหญ่ขึ้นเรื่อยๆ
-                    p.growthRate *= 1.03; 
-
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color;
-                    ctx.fill();
+                    p.x += p.vx; p.y += p.vy;
+                    p.vx *= 0.94; p.vy *= 0.94;
+                    p.radius += p.growthRate * 2; p.growthRate *= 1.03; 
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color; ctx.fill();
                 });
-
-                // เช็คว่ามีวงกลมที่ใหญ่คลุมจอหรือยัง
                 const maxSize = particles.reduce((max, p) => p.radius > max ? p.radius : max, 0);
-                const screenDiag = Math.sqrt(canvas.width**2 + canvas.height**2); // เส้นทแยงมุมจอ
-
-                if (maxSize > screenDiag * 0.8) {
-                    enterSite();
-                    return;
-                }
+                const screenDiag = Math.sqrt(canvas.width**2 + canvas.height**2);
+                if (maxSize > screenDiag * 0.8) { enterSite(); return; }
             }
-
             animationFrameId = requestAnimationFrame(animate);
         }
-
         animate();
 
-        // --- ENTER SITE LOGIC ---
         let isEntered = false;
         function enterSite() {
             if (isEntered) return;
-            isEntered = true;
-            phase = 'finished';
+            isEntered = true; phase = 'finished';
             cancelAnimationFrame(animationFrameId);
-
             mainSite.style.display = 'block';
             document.body.style.overflowY = 'auto'; 
             introOverlay.style.display = 'none';
         }
+        document.addEventListener('keydown', (e) => { if (e.code === 'Space') enterSite(); });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                enterSite();
-            }
-        });
 
-        // --- 2. LOGIC เดิม (Upload / Gallery) ---
+        // ================= INTERNAL WEBSITE LOGIC =================
         const form = document.getElementById('uploadForm');
         const gallery = document.getElementById('gallery');
+        const searchInput = document.getElementById('searchInput');
+
+        // 1. Upload Logic
+        function updateFileName(input) {
+            const fileNameSpan = document.getElementById('fileName');
+            if (input.files && input.files.length > 0) {
+                fileNameSpan.textContent = input.files[0].name;
+                fileNameSpan.style.color = '#2d3436';
+                fileNameSpan.style.fontWeight = 'bold';
+            }
+        }
 
         form.addEventListener('submit', function(event) {
             event.preventDefault();
-            
             const artist = document.getElementById('artistName').value;
             const title = document.getElementById('artTitle').value;
             const price = document.getElementById('artPrice').value;
@@ -396,42 +423,87 @@
             if (imageFile) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const imageUrl = e.target.result;
-                    const newCard = document.createElement('div');
-                    newCard.classList.add('art-card');
-                    newCard.style.animation = "pulse 0.5s ease";
-                    
-                    newCard.innerHTML = `
-                        <img src="${imageUrl}" alt="${title}" class="art-image">
-                        <div class="art-info">
-                            <div class="art-header">
-                                <div>
-                                    <h3 class="art-title editable" contenteditable="true">${title}</h3>
-                                    <div class="artist-badge">ศิลปิน: ${artist}</div>
-                                </div>
-                                <button class="action-btn delete" onclick="deleteCard(this)"><i class="fas fa-trash-alt"></i></button>
-                            </div>
-                            <div>
-                                <div class="sales-stat"><i class="fas fa-bolt"></i> มาใหม่ล่าสุด</div>
-                            </div>
-                            <div class="art-price editable" contenteditable="true">฿${Number(price).toLocaleString()}</div>
-                        </div>
-                    `;
-                    gallery.prepend(newCard);
+                    createCard(e.target.result, title, artist, price);
                     form.reset();
-                    alert('ลงขายผลงานเรียบร้อย!');
+                    document.getElementById('fileName').textContent = "คลิกเพื่ออัปโหลด";
+                    alert('ลงผลงานเรียบร้อยแล้ว!');
                 };
                 reader.readAsDataURL(imageFile);
             }
         });
 
+        function createCard(imgUrl, title, artist, price) {
+            const newCard = document.createElement('div');
+            newCard.classList.add('art-card');
+            newCard.setAttribute('data-category', 'digital'); // Default category for now
+            newCard.innerHTML = `
+                <div class="card-img-container">
+                    <img src="${imgUrl}" class="card-img">
+                    <div class="card-actions">
+                        <div class="icon-btn like-btn" onclick="toggleLike(this)"><i class="fas fa-heart"></i></div>
+                        <div class="icon-btn delete-btn" onclick="deleteCard(this)"><i class="fas fa-trash"></i></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title editable" contenteditable="true">${title}</h4>
+                    <div class="card-artist"><i class="fas fa-user-circle"></i> โดย: ${artist}</div>
+                    <div class="card-price editable" contenteditable="true">฿${Number(price).toLocaleString()}</div>
+                </div>
+            `;
+            // Insert after first card (mock) or prepend
+            gallery.prepend(newCard);
+        }
+
+        // 2. Action Logic (Delete / Like)
         function deleteCard(btn) {
-            if(confirm('คุณแน่ใจหรือไม่ที่จะลบผลงานชิ้นนี้?')) {
+            if(confirm('ต้องการลบผลงานนี้หรือไม่?')) {
                 const card = btn.closest('.art-card');
-                card.style.transform = "scale(0.9) translateY(20px)";
-                card.style.opacity = "0";
+                card.style.transform = 'scale(0.8)';
+                card.style.opacity = '0';
                 setTimeout(() => card.remove(), 300);
             }
+        }
+
+        function toggleLike(btn) {
+            btn.classList.toggle('liked');
+            const icon = btn.querySelector('i');
+            // Effect added via CSS animation class 'liked'
+        }
+
+        // 3. Search Logic (Real-time)
+        searchInput.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.art-card');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('.card-title').innerText.toLowerCase();
+                const artist = card.querySelector('.card-artist').innerText.toLowerCase();
+                
+                if(title.includes(term) || artist.includes(term)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // 4. Filter Logic
+        function filterGallery(category) {
+            // Update buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const cards = document.querySelectorAll('.art-card');
+            cards.forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                    card.style.display = 'flex';
+                    // Add subtle fade in
+                    card.style.opacity = '0';
+                    setTimeout(() => card.style.opacity = '1', 50);
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
     </script>
 </body>
