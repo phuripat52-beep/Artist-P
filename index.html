@@ -23,30 +23,24 @@
 
         body {
             font-family: 'Sarabun', sans-serif;
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             background-color: var(--bg-color);
             color: var(--text-main);
-            overflow: hidden; /* Lock scroll initially */
+            overflow: hidden; 
         }
 
-        /* ================= INTRO ANIMATION & TRANSITION ================= */
+        /* --- UTILITY --- */
+        .hidden { display: none !important; }
+
+        /* ================= INTRO ANIMATION ================= */
         #intro-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--bg-color); 
-            z-index: 9999;
+            background-color: var(--bg-color); z-index: 9999;
             display: flex; justify-content: center; align-items: center;
-            /* เพิ่ม Transition สำหรับการเลื่อนเปิดม่าน */
             transition: transform 1.2s cubic-bezier(0.86, 0, 0.07, 1); 
         }
-
-        /* Class สำหรับสั่งให้เลื่อนม่านขึ้น */
-        .curtain-open {
-            transform: translateY(-100%);
-        }
-
+        .curtain-open { transform: translateY(-100%); }
         #animCanvas { position: absolute; top: 0; left: 0; }
-        
         .skip-hint {
             position: absolute; bottom: 50px; color: #b2bec3;
             font-family: 'Prompt', sans-serif; font-size: 28px; font-weight: 600;
@@ -56,163 +50,133 @@
         }
         @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
 
-        /* ================= MAIN SITE ELEMENTS (Hidden Initially) ================= */
+        /* ================= MAIN SITE ================= */
         #main-site {
-            /* ไม่ใช้ display: none แล้ว แต่ใช้ visibility/position แทนเพื่อให้ animate ได้ */
-            position: relative;
-            z-index: 1; 
-            height: 100vh;
-            overflow-y: auto;
-            visibility: hidden; /* ซ่อนไว้ก่อน */
-            opacity: 0;
-            transition: opacity 0.5s ease;
+            position: relative; z-index: 1; height: 100vh; overflow-y: auto;
+            visibility: hidden; opacity: 0; transition: opacity 0.5s ease;
         }
 
-        /* Class สำหรับ Element ที่จะให้ลอยขึ้นมาทีละอัน */
-        .reveal-element {
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
-        }
+        .reveal-element { opacity: 0; transform: translateY(50px); transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); }
+        .reveal-active { opacity: 1; transform: translateY(0); }
 
-        /* State เมื่อแสดงผล */
-        .reveal-active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* --- Navbar (Glassmorphism) --- */
+        /* --- Navbar --- */
         nav {
             position: sticky; top: 0; z-index: 100;
-            background: var(--glass);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            padding: 15px 40px;
-            display: flex; justify-content: space-between; align-items: center;
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid rgba(0,0,0,0.05);
         }
-        
-        .logo { font-family: 'Prompt', sans-serif; font-size: 24px; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
+        .logo { font-family: 'Prompt', sans-serif; font-size: 24px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
         .logo span { color: var(--accent); }
-        .logo i { font-size: 20px; color: var(--accent); }
-
         .search-bar { position: relative; width: 400px; }
         .search-bar input {
-            width: 100%; padding: 12px 20px 12px 45px;
-            border-radius: 50px; border: 1px solid #dfe6e9;
-            background: #fff; font-family: 'Sarabun', sans-serif;
-            transition: 0.3s; outline: none;
+            width: 100%; padding: 12px 20px 12px 45px; border-radius: 50px; border: 1px solid #dfe6e9;
+            background: #fff; font-family: 'Sarabun', sans-serif; transition: 0.3s; outline: none;
         }
         .search-bar input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1); }
         .search-bar i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #b2bec3; }
 
-        .nav-actions { display: flex; gap: 15px; }
+        /* User Profile in Nav */
+        .user-profile { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; }
+        .user-info { display: flex; flex-direction: column; }
+        .user-name { font-weight: 600; font-size: 14px; }
+        .user-role { font-size: 12px; color: var(--text-muted); }
+
         .btn-nav {
-            background: transparent; border: 1px solid transparent;
-            padding: 8px 16px; border-radius: 12px; font-weight: 600;
-            color: var(--text-muted); cursor: pointer; transition: 0.2s;
-            display: flex; align-items: center; gap: 8px; font-family: 'Prompt', sans-serif;
+            background: transparent; border: 1px solid transparent; padding: 8px 16px; border-radius: 12px;
+            font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-family: 'Prompt', sans-serif;
         }
         .btn-nav:hover { background: rgba(0,0,0,0.03); color: var(--text-main); }
-        .btn-primary {
-            background: var(--accent); color: white !important;
-            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
-        }
+        .btn-primary { background: var(--accent); color: white !important; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); }
         .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); }
 
-        /* --- Hero Section --- */
+        /* --- Hero --- */
         .hero {
             padding: 80px 20px 40px; text-align: center;
-            /* เพิ่ม Gradient สวยๆ */
             background: radial-gradient(circle at 50% 50%, rgba(108, 92, 231, 0.08) 0%, transparent 70%);
         }
         .hero h1 {
             font-family: 'Prompt', sans-serif; font-size: 52px; margin-bottom: 10px;
-            background: linear-gradient(135deg, #2d3436 0%, #6c5ce7 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background: linear-gradient(135deg, #2d3436 0%, #6c5ce7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .hero p { color: var(--text-muted); font-size: 18px; max-width: 600px; margin: 0 auto 30px; }
-
-        /* --- Filters --- */
         .filters { display: flex; justify-content: center; gap: 15px; margin-bottom: 50px; }
         .filter-btn {
-            padding: 10px 25px; border-radius: 30px; border: 1px solid #dfe6e9;
-            background: white; color: var(--text-muted); font-family: 'Prompt', sans-serif;
-            cursor: pointer; transition: 0.3s; font-size: 14px;
+            padding: 10px 25px; border-radius: 30px; border: 1px solid #dfe6e9; background: white;
+            color: var(--text-muted); font-family: 'Prompt', sans-serif; cursor: pointer; transition: 0.3s;
         }
-        .filter-btn:hover, .filter-btn.active {
-            background: var(--text-main); color: white; border-color: var(--text-main);
-            transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
+        .filter-btn:hover, .filter-btn.active { background: var(--text-main); color: white; border-color: var(--text-main); }
 
-        /* --- Main Layout --- */
+        /* --- Content --- */
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px; }
-        
-        .content-grid {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 40px;
-        }
+        .content-grid { display: grid; grid-template-columns: 320px 1fr; gap: 40px; transition: 0.3s; }
+        /* ถ้าไม่มี sidebar ให้ขยายเต็ม */
+        .content-grid.full-width { grid-template-columns: 1fr; } 
 
-        /* --- Upload Card --- */
+        /* Sidebar */
         .upload-card {
-            background: white; padding: 30px; border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md); position: sticky; top: 110px; height: fit-content;
+            background: white; padding: 30px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+            position: sticky; top: 110px; height: fit-content;
         }
-        .upload-card h3 { font-family: 'Prompt'; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 12px; font-family: 'Sarabun'; margin-bottom: 15px; box-sizing: border-box; }
         
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
-        .form-control {
-            width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 12px;
-            font-family: 'Sarabun'; transition: 0.3s; box-sizing: border-box;
-        }
-        .form-control:focus { border-color: var(--accent); outline: none; }
-        
-        .file-upload-wrapper {
-            border: 2px dashed #dfe6e9; border-radius: 12px; padding: 20px;
-            text-align: center; cursor: pointer; transition: 0.3s; position: relative;
-        }
-        .file-upload-wrapper:hover { border-color: var(--accent); background: #f8f7ff; }
-        .file-upload-wrapper i { font-size: 24px; color: var(--accent); margin-bottom: 10px; display: block; }
-        .file-upload-wrapper input[type="file"] { position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0; cursor: pointer; }
-
-        /* --- Gallery Grid --- */
+        /* Gallery */
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
-
         .art-card {
-            background: white; border-radius: var(--radius-md); overflow: hidden;
-            box-shadow: var(--shadow-sm); transition: all 0.3s ease;
-            position: relative; display: flex; flex-direction: column;
+            background: white; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease; position: relative; display: flex; flex-direction: column;
         }
         .art-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-md); }
-
         .card-img-container { position: relative; height: 220px; overflow: hidden; }
         .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .art-card:hover .card-img { transform: scale(1.05); }
-
-        .card-actions {
-            position: absolute; top: 15px; right: 15px; display: flex; gap: 8px;
-            opacity: 0; transform: translateY(-10px); transition: 0.3s;
-        }
-        .art-card:hover .card-actions { opacity: 1; transform: translateY(0); }
-        
-        .icon-btn {
-            width: 36px; height: 36px; border-radius: 50%; background: white;
-            display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s;
-            color: var(--text-main); font-size: 14px;
-        }
-        .icon-btn:hover { transform: scale(1.1); }
-        .icon-btn.like-btn:hover { color: #ff7675; }
-        .icon-btn.delete-btn:hover { color: #d63031; background: #ffebeb; }
-
-        .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+        .card-body { padding: 20px; }
         .card-title { font-family: 'Prompt'; font-weight: 600; font-size: 18px; margin: 0 0 5px 0; }
-        .card-artist { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
-        .card-price { margin-top: auto; padding-top: 15px; font-family: 'Prompt'; font-weight: 700; color: var(--accent); font-size: 20px; }
+        .card-price { margin-top: auto; padding-top: 10px; font-family: 'Prompt'; font-weight: 700; color: var(--accent); }
 
-        @keyframes heartPop { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
-        .liked { color: #ff7675 !important; animation: heartPop 0.3s forwards; }
+        /* ================= AUTH MODAL ================= */
+        #auth-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(45, 52, 54, 0.4); backdrop-filter: blur(8px);
+            z-index: 1000; display: none; opacity: 0; transition: opacity 0.3s;
+            justify-content: center; align-items: center;
+        }
+        #auth-modal.open { display: flex; opacity: 1; }
+
+        .auth-box {
+            background: white; width: 400px; padding: 40px; border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1); position: relative;
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #auth-modal.open .auth-box { transform: scale(1); }
+
+        .close-modal { position: absolute; top: 20px; right: 20px; font-size: 20px; cursor: pointer; color: #b2bec3; }
+        
+        .auth-tabs { display: flex; margin-bottom: 30px; border-bottom: 2px solid #f1f2f6; }
+        .auth-tab {
+            flex: 1; text-align: center; padding: 15px; cursor: pointer;
+            font-family: 'Prompt'; font-weight: 600; color: #b2bec3; position: relative;
+        }
+        .auth-tab.active { color: var(--accent); }
+        .auth-tab.active::after {
+            content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background: var(--accent);
+        }
+
+        .role-selector { display: flex; gap: 15px; margin-bottom: 20px; }
+        .role-option {
+            flex: 1; border: 2px solid #f1f2f6; border-radius: 12px; padding: 15px;
+            text-align: center; cursor: pointer; transition: 0.2s;
+        }
+        .role-option i { font-size: 24px; display: block; margin-bottom: 5px; color: #b2bec3; }
+        .role-option.selected { border-color: var(--accent); background: #f8f7ff; }
+        .role-option.selected i, .role-option.selected span { color: var(--accent); font-weight: bold; }
+
+        .auth-btn {
+            width: 100%; background: var(--accent); color: white; padding: 14px;
+            border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer;
+            margin-top: 10px; transition: 0.3s;
+        }
+        .auth-btn:hover { background: var(--accent-hover); box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3); }
 
     </style>
 </head>
@@ -223,61 +187,86 @@
         <div class="skip-hint">กด Spacebar เพื่อข้าม</div>
     </div>
 
+    <div id="auth-modal">
+        <div class="auth-box">
+            <div class="close-modal" onclick="closeAuthModal()"><i class="fas fa-times"></i></div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchTab('login')">เข้าสู่ระบบ</div>
+                <div class="auth-tab" onclick="switchTab('register')">สมัครสมาชิก</div>
+            </div>
+
+            <form id="loginForm">
+                <input type="email" class="form-control" placeholder="อีเมลของคุณ" value="user@artspace.com" required>
+                <input type="password" class="form-control" placeholder="รหัสผ่าน" value="123456" required>
+                <button type="submit" class="auth-btn">เข้าสู่ระบบ</button>
+            </form>
+
+            <form id="registerForm" class="hidden">
+                <div class="role-selector">
+                    <div class="role-option selected" onclick="selectRole(this, 'collector')">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>นักสะสม</span>
+                    </div>
+                    <div class="role-option" onclick="selectRole(this, 'creator')">
+                        <i class="fas fa-paint-brush"></i>
+                        <span>ศิลปิน</span>
+                    </div>
+                </div>
+                <input type="text" id="regName" class="form-control" placeholder="ชื่อที่ใช้แสดง (Display Name)" required>
+                <input type="email" id="regEmail" class="form-control" placeholder="อีเมล" required>
+                <input type="password" class="form-control" placeholder="รหัสผ่าน" required>
+                <button type="submit" class="auth-btn">สร้างบัญชีผู้ใช้</button>
+            </form>
+        </div>
+    </div>
+
     <div id="main-site">
         <nav class="reveal-element">
-            <div class="logo">
-                <i class="fas fa-palette"></i> Art<span>Space</span>
-            </div>
+            <div class="logo"><i class="fas fa-palette"></i> Art<span>Space</span></div>
             <div class="search-bar">
                 <i class="fas fa-search"></i>
                 <input type="text" id="searchInput" placeholder="ค้นหาศิลปิน, ชื่อภาพ...">
             </div>
-            <div class="nav-actions">
-                <button class="btn-nav">เข้าสู่ระบบ</button>
-                <button class="btn-nav btn-primary"><i class="fas fa-plus"></i> ลงขายงาน</button>
+            
+            <div class="nav-actions" id="guestNav">
+                <button class="btn-nav" onclick="openAuthModal('login')">เข้าสู่ระบบ</button>
+                <button class="btn-nav btn-primary" onclick="openAuthModal('register')">สมัครสมาชิก</button>
+            </div>
+
+            <div class="nav-actions hidden" id="userNav">
+                <div class="user-profile">
+                    <div class="user-avatar" id="displayAvatar">U</div>
+                    <div class="user-info">
+                        <span class="user-name" id="displayName">Username</span>
+                        <span class="user-role" id="displayRole">Collector</span>
+                    </div>
+                </div>
+                <button class="btn-nav" onclick="logout()" style="color:#e74c3c;"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </nav>
 
         <div class="hero">
             <h1 class="reveal-element">ค้นพบแรงบันดาลใจไร้ขีดจำกัด</h1>
-            <p class="reveal-element">ตลาดซื้อขายผลงานศิลปะดิจิทัลที่รวบรวมครีเอเตอร์ระดับท็อปไว้ที่นี่</p>
-            
+            <p class="reveal-element">พื้นที่เสรีสำหรับคนรักศิลปะ ซื้อขายผลงานดิจิทัลและงานคราฟต์</p>
             <div class="filters reveal-element">
                 <button class="filter-btn active" onclick="filterGallery('all')">ทั้งหมด</button>
                 <button class="filter-btn" onclick="filterGallery('digital')">ดิจิทัลอาร์ต</button>
                 <button class="filter-btn" onclick="filterGallery('painting')">ภาพวาดมือ</button>
-                <button class="filter-btn" onclick="filterGallery('photo')">ภาพถ่าย</button>
             </div>
         </div>
 
         <div class="container">
-            <div class="content-grid">
+            <div class="content-grid full-width" id="contentLayout">
                 
-                <aside class="reveal-element">
+                <aside class="reveal-element hidden" id="creatorSidebar">
                     <div class="upload-card">
                         <h3><i class="fas fa-cloud-upload-alt"></i> ลงผลงานใหม่</h3>
                         <form id="uploadForm">
-                            <div class="form-group">
-                                <label>ชื่อศิลปิน</label>
-                                <input type="text" id="artistName" class="form-control" placeholder="ชื่อศิลปิน" required>
-                            </div>
-                            <div class="form-group">
-                                <label>ชื่อผลงาน</label>
-                                <input type="text" id="artTitle" class="form-control" placeholder="ชื่อผลงาน" required>
-                            </div>
-                            <div class="form-group">
-                                <label>ราคา (บาท)</label>
-                                <input type="number" id="artPrice" class="form-control" placeholder="0.00" required>
-                            </div>
-                            <div class="form-group">
-                                <label>รูปภาพ</label>
-                                <div class="file-upload-wrapper" onclick="document.getElementById('artImage').click()">
-                                    <i class="fas fa-image"></i>
-                                    <span id="fileName">คลิกเพื่ออัปโหลด</span>
-                                    <input type="file" id="artImage" accept="image/*" onchange="updateFileName(this)" required>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn-nav btn-primary" style="width: 100%; justify-content: center; padding: 12px;">เผยแพร่ทันที</button>
+                            <input type="text" id="artTitle" class="form-control" placeholder="ชื่อผลงาน" required>
+                            <input type="number" id="artPrice" class="form-control" placeholder="ราคา (บาท)" required>
+                            <input type="file" id="artImage" class="form-control" accept="image/*" required>
+                            <button type="submit" class="btn-nav btn-primary" style="width: 100%;">เผยแพร่</button>
                         </form>
                     </div>
                 </aside>
@@ -287,29 +276,21 @@
                         <div class="art-card" data-category="digital">
                             <div class="card-img-container">
                                 <img src="https://images.unsplash.com/photo-1633511090164-b43840ea1607?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" class="card-img">
-                                <div class="card-actions">
-                                    <div class="icon-btn like-btn" onclick="toggleLike(this)"><i class="fas fa-heart"></i></div>
-                                    <div class="icon-btn delete-btn" onclick="deleteCard(this)"><i class="fas fa-trash"></i></div>
-                                </div>
                             </div>
                             <div class="card-body">
-                                <h4 class="card-title editable" contenteditable="true">Cyber Punk 2077</h4>
-                                <div class="card-artist"><i class="fas fa-user-circle"></i> โดย: NeoArtist</div>
-                                <div class="card-price editable" contenteditable="true">฿12,500</div>
+                                <h4 class="card-title">Cyber Punk 2077</h4>
+                                <div style="font-size:13px; color:#636e72;">โดย: NeoArtist</div>
+                                <div class="card-price">฿12,500</div>
                             </div>
                         </div>
                         <div class="art-card" data-category="painting">
                             <div class="card-img-container">
                                 <img src="https://images.unsplash.com/photo-1579783902614-a3fb39279c0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" class="card-img">
-                                <div class="card-actions">
-                                    <div class="icon-btn like-btn" onclick="toggleLike(this)"><i class="fas fa-heart"></i></div>
-                                    <div class="icon-btn delete-btn" onclick="deleteCard(this)"><i class="fas fa-trash"></i></div>
-                                </div>
                             </div>
                             <div class="card-body">
-                                <h4 class="card-title editable" contenteditable="true">Van Gogh Reimagined</h4>
-                                <div class="card-artist"><i class="fas fa-user-circle"></i> โดย: ClassicMan</div>
-                                <div class="card-price editable" contenteditable="true">฿8,900</div>
+                                <h4 class="card-title">Van Gogh V2</h4>
+                                <div style="font-size:13px; color:#636e72;">โดย: ClassicMan</div>
+                                <div class="card-price">฿8,900</div>
                             </div>
                         </div>
                     </div>
@@ -319,7 +300,7 @@
     </div>
 
     <script>
-        // ================= INTRO ANIMATION =================
+        // ================= INTRO ANIMATION CODE (Same as before) =================
         const canvas = document.getElementById('animCanvas');
         const ctx = canvas.getContext('2d');
         const introOverlay = document.getElementById('intro-overlay');
@@ -328,29 +309,21 @@
         let animationFrameId;
 
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
-        const cx = window.innerWidth / 2;
-        const cy = window.innerHeight / 2;
-        const ballRadius = 85; 
-        const totalBalls = 8;
+        const cx = window.innerWidth / 2; const cy = window.innerHeight / 2;
+        const ballRadius = 85; const totalBalls = 8;
         const colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe', '#fd79a8', '#fab1a0', '#81ecec'];
-        const timeToHit = 110;
-        let frameCount = 0;
-        let phase = 'rolling'; 
-        let balls = [];
+        const timeToHit = 110; let frameCount = 0; let phase = 'rolling'; let balls = [];
         
         const segmentAngle = (Math.PI * 2) / totalBalls; 
         for(let i=0; i < totalBalls; i++) {
             const angle = (i * segmentAngle) + (Math.random() * segmentAngle * 0.8); 
             const dist = Math.max(window.innerWidth, window.innerHeight) * 0.85; 
-            const startX = cx + Math.cos(angle) * dist;
-            const startY = cy + Math.sin(angle) * dist;
             balls.push({
-                x: startX, y: startY,
-                vx: (cx - startX) / timeToHit,
-                vy: (cy - startY) / timeToHit,
+                x: cx + Math.cos(angle) * dist, y: cy + Math.sin(angle) * dist,
+                vx: (cx - (cx + Math.cos(angle) * dist)) / timeToHit,
+                vy: (cy - (cy + Math.sin(angle) * dist)) / timeToHit,
                 color: colors[i % colors.length]
             });
         }
@@ -360,10 +333,8 @@
             for (let i = 0; i < 250; i++) {
                 const color = balls[Math.floor(Math.random() * balls.length)].color;
                 particles.push({
-                    x: cx, y: cy,
-                    vx: (Math.random() - 0.5) * 60, vy: (Math.random() - 0.5) * 60,
-                    radius: Math.random() * 40 + 10, color: color,
-                    growthRate: Math.random() * 4 + 3
+                    x: cx, y: cy, vx: (Math.random() - 0.5) * 60, vy: (Math.random() - 0.5) * 60,
+                    radius: Math.random() * 40 + 10, color: color, growthRate: Math.random() * 4 + 3
                 });
             }
         }
@@ -371,163 +342,166 @@
         function animate() {
             if (phase === 'finished') return;
             if (phase === 'rolling') ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             if (phase === 'rolling') {
                 frameCount++;
                 balls.forEach(ball => {
                     ball.x += ball.vx; ball.y += ball.vy;
-                    ctx.save();
-                    ctx.shadowColor = "rgba(0,0,0,0.15)"; ctx.shadowBlur = 25; ctx.shadowOffsetY = 5;
-                    ctx.beginPath(); ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
-                    ctx.fillStyle = ball.color; ctx.fill(); ctx.restore();
+                    ctx.save(); ctx.shadowColor = "rgba(0,0,0,0.15)"; ctx.shadowBlur = 25; ctx.shadowOffsetY = 5;
+                    ctx.beginPath(); ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2); ctx.fillStyle = ball.color; ctx.fill(); ctx.restore();
                 });
                 if (frameCount >= timeToHit) { phase = 'expanding'; skipHint.style.opacity = '0'; createExplosion(); }
             }
-
             if (phase === 'expanding') {
                 particles.forEach(p => {
-                    p.x += p.vx; p.y += p.vy;
-                    p.vx *= 0.94; p.vy *= 0.94;
+                    p.x += p.vx; p.y += p.vy; p.vx *= 0.94; p.vy *= 0.94;
                     p.radius += p.growthRate * 2; p.growthRate *= 1.03; 
-                    ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color; ctx.fill();
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill();
                 });
                 const maxSize = particles.reduce((max, p) => p.radius > max ? p.radius : max, 0);
-                const screenDiag = Math.sqrt(canvas.width**2 + canvas.height**2);
-                if (maxSize > screenDiag * 0.8) { enterSite(); return; }
+                if (maxSize > Math.sqrt(canvas.width**2 + canvas.height**2) * 0.8) { enterSite(); return; }
             }
             animationFrameId = requestAnimationFrame(animate);
         }
         animate();
 
-        // ================= NEW TRANSITION LOGIC =================
         let isEntered = false;
         function enterSite() {
             if (isEntered) return;
-            isEntered = true; phase = 'finished';
-            cancelAnimationFrame(animationFrameId);
-
-            // 1. เปิดการแสดงผลหน้าเว็บ (แต่ยังล่องหนอยู่)
-            mainSite.style.visibility = 'visible';
-            mainSite.style.opacity = '1';
-
-            // 2. สั่งให้ Overlay (ม่านสี) เลื่อนขึ้นไปข้างบน
-            introOverlay.classList.add('curtain-open');
-
-            // 3. ปลดล็อก Scroll
-            document.body.style.overflowY = 'auto'; 
-
-            // 4. Staggered Animation: สั่งให้แต่ละ Element ลอยขึ้นมาทีละนิด
-            const revealElements = document.querySelectorAll('.reveal-element');
-            revealElements.forEach((el, index) => {
-                setTimeout(() => {
-                    el.classList.add('reveal-active');
-                }, 300 + (index * 150)); // เริ่มหลังจาก 300ms, ห่างกันทีละ 150ms
+            isEntered = true; phase = 'finished'; cancelAnimationFrame(animationFrameId);
+            mainSite.style.visibility = 'visible'; mainSite.style.opacity = '1';
+            introOverlay.classList.add('curtain-open'); document.body.style.overflowY = 'auto'; 
+            document.querySelectorAll('.reveal-element').forEach((el, index) => {
+                setTimeout(() => { el.classList.add('reveal-active'); }, 300 + (index * 150));
             });
-
-            // 5. ลบ Overlay ทิ้งเมื่อ Animation จบเพื่อประหยัด Memory
-            setTimeout(() => {
-                introOverlay.style.display = 'none';
-            }, 1500);
+            setTimeout(() => { introOverlay.style.display = 'none'; }, 1500);
         }
         document.addEventListener('keydown', (e) => { if (e.code === 'Space') enterSite(); });
 
+        // ================= AUTH SYSTEM LOGIC =================
+        const authModal = document.getElementById('auth-modal');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        let selectedRole = 'collector'; // Default role for registration
 
-        // ================= INTERNAL WEBSITE LOGIC =================
-        const form = document.getElementById('uploadForm');
-        const gallery = document.getElementById('gallery');
-        const searchInput = document.getElementById('searchInput');
+        // 1. Modal Control
+        function openAuthModal(mode = 'login') {
+            authModal.classList.add('open');
+            switchTab(mode);
+        }
+        function closeAuthModal() {
+            authModal.classList.remove('open');
+        }
+        // Click outside to close
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) closeAuthModal();
+        });
 
-        function updateFileName(input) {
-            const fileNameSpan = document.getElementById('fileName');
-            if (input.files && input.files.length > 0) {
-                fileNameSpan.textContent = input.files[0].name;
-                fileNameSpan.style.color = '#2d3436';
-                fileNameSpan.style.fontWeight = 'bold';
+        // 2. Tab Switching
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.auth-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'login') {
+                tabs[0].classList.add('active');
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+            } else {
+                tabs[1].classList.add('active');
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
             }
         }
 
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const artist = document.getElementById('artistName').value;
+        // 3. Role Selection (Register)
+        function selectRole(element, role) {
+            document.querySelectorAll('.role-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedRole = role;
+        }
+
+        // 4. Handle Login/Register Simulation
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Simulate Login Success as a "Creator" (for demo)
+            loginUser("Somchai Arts", "creator");
+        });
+
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            // Simulate Register Success with selected role
+            loginUser(name, selectedRole);
+        });
+
+        function loginUser(name, role) {
+            // Update UI State
+            closeAuthModal();
+            document.getElementById('guestNav').classList.add('hidden');
+            document.getElementById('userNav').classList.remove('hidden');
+            
+            document.getElementById('displayName').textContent = name;
+            document.getElementById('displayRole').textContent = role === 'creator' ? 'ศิลปิน (Creator)' : 'นักสะสม (Collector)';
+            document.getElementById('displayAvatar').textContent = name.charAt(0).toUpperCase();
+
+            // Check Role to Show/Hide Sidebar
+            const sidebar = document.getElementById('creatorSidebar');
+            const contentLayout = document.getElementById('contentLayout');
+
+            if (role === 'creator') {
+                sidebar.classList.remove('hidden');
+                contentLayout.classList.remove('full-width');
+                // Trigger animation for sidebar
+                setTimeout(() => sidebar.classList.add('reveal-active'), 100);
+                alert(`ยินดีต้อนรับศิลปิน ${name}! คุณสามารถลงผลงานได้แล้ว`);
+            } else {
+                sidebar.classList.add('hidden');
+                contentLayout.classList.add('full-width');
+                alert(`ยินดีต้อนรับคุณ ${name}! ขอให้มีความสุขกับการเลือกชมผลงาน`);
+            }
+        }
+
+        function logout() {
+            if(confirm('ต้องการออกจากระบบหรือไม่?')) {
+                document.getElementById('guestNav').classList.remove('hidden');
+                document.getElementById('userNav').classList.add('hidden');
+                
+                // Hide Creator Tools
+                document.getElementById('creatorSidebar').classList.add('hidden');
+                document.getElementById('contentLayout').classList.add('full-width');
+            }
+        }
+
+        // 5. Upload Logic (Existing)
+        const uploadForm = document.getElementById('uploadForm');
+        const gallery = document.getElementById('gallery');
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
             const title = document.getElementById('artTitle').value;
             const price = document.getElementById('artPrice').value;
-            const imageFile = document.getElementById('artImage').files[0];
+            const file = document.getElementById('artImage').files[0];
+            const artist = document.getElementById('displayName').textContent;
 
-            if (imageFile) {
+            if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    createCard(e.target.result, title, artist, price);
-                    form.reset();
-                    document.getElementById('fileName').textContent = "คลิกเพื่ออัปโหลด";
-                    alert('ลงผลงานเรียบร้อยแล้ว!');
-                };
-                reader.readAsDataURL(imageFile);
+                reader.onload = function(evt) {
+                    const newCard = document.createElement('div');
+                    newCard.className = 'art-card';
+                    newCard.innerHTML = `
+                        <div class="card-img-container"><img src="${evt.target.result}" class="card-img"></div>
+                        <div class="card-body">
+                            <h4 class="card-title">${title}</h4>
+                            <div style="font-size:13px; color:#636e72;">โดย: ${artist}</div>
+                            <div class="card-price">฿${Number(price).toLocaleString()}</div>
+                        </div>
+                    `;
+                    gallery.prepend(newCard);
+                    uploadForm.reset();
+                    alert('ลงขายสำเร็จ!');
+                }
+                reader.readAsDataURL(file);
             }
         });
 
-        function createCard(imgUrl, title, artist, price) {
-            const newCard = document.createElement('div');
-            newCard.classList.add('art-card');
-            newCard.setAttribute('data-category', 'digital'); 
-            newCard.innerHTML = `
-                <div class="card-img-container">
-                    <img src="${imgUrl}" class="card-img">
-                    <div class="card-actions">
-                        <div class="icon-btn like-btn" onclick="toggleLike(this)"><i class="fas fa-heart"></i></div>
-                        <div class="icon-btn delete-btn" onclick="deleteCard(this)"><i class="fas fa-trash"></i></div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h4 class="card-title editable" contenteditable="true">${title}</h4>
-                    <div class="card-artist"><i class="fas fa-user-circle"></i> โดย: ${artist}</div>
-                    <div class="card-price editable" contenteditable="true">฿${Number(price).toLocaleString()}</div>
-                </div>
-            `;
-            gallery.prepend(newCard);
-        }
-
-        function deleteCard(btn) {
-            if(confirm('ต้องการลบผลงานนี้หรือไม่?')) {
-                const card = btn.closest('.art-card');
-                card.style.transform = 'scale(0.8)';
-                card.style.opacity = '0';
-                setTimeout(() => card.remove(), 300);
-            }
-        }
-
-        function toggleLike(btn) {
-            btn.classList.toggle('liked');
-        }
-
-        searchInput.addEventListener('input', function(e) {
-            const term = e.target.value.toLowerCase();
-            const cards = document.querySelectorAll('.art-card');
-            cards.forEach(card => {
-                const title = card.querySelector('.card-title').innerText.toLowerCase();
-                const artist = card.querySelector('.card-artist').innerText.toLowerCase();
-                if(title.includes(term) || artist.includes(term)) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-
-        function filterGallery(category) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            const cards = document.querySelectorAll('.art-card');
-            cards.forEach(card => {
-                if (category === 'all' || card.getAttribute('data-category') === category) {
-                    card.style.display = 'flex';
-                    card.style.opacity = '0';
-                    setTimeout(() => card.style.opacity = '1', 50);
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
     </script>
 </body>
 </html>
