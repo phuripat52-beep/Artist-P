@@ -126,14 +126,14 @@
         }
         .art-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-md); }
         .card-img-container { position: relative; height: 250px; overflow: hidden; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; background-color: #f1f2f6; }
         .art-card:hover .card-img { transform: scale(1.05); }
         
         /* Badges inside card */
         .category-badge {
             position: absolute; top: 10px; left: 10px; padding: 4px 10px;
             background: rgba(0,0,0,0.6); color: white; font-size: 10px; border-radius: 20px;
-            backdrop-filter: blur(4px); text-transform: uppercase; letter-spacing: 1px;
+            backdrop-filter: blur(4px); text-transform: uppercase; letter-spacing: 1px; z-index: 2;
         }
 
         .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column;}
@@ -399,29 +399,33 @@
             }
         }
 
-        // ================= GALLERY DATA (UPDATED WITH YOUR IMAGES) =================
+        // ================= GALLERY DATA (LOCAL FOLDER: img) =================
         const mockArtworks = [
-            // --- Digital Art (Updated with provided images) ---
-            { title: "Starry Night Style", artist: "VanGogh_Fan", price: 8900, category: "digital", img: "https://i.imgur.com/1Q5Q5Q5.png" }, // image_2.png
-            { title: "Lady Portrait", artist: "ClassicMaster", price: 25000, category: "digital", img: "https://i.imgur.com/6R6R6R6.png" }, // image_7.png
-            { title: "Neon Genesis", artist: "CyberPunk_X", price: 15000, category: "digital", img: "https://i.imgur.com/3S3S3S3.png" }, // image_4.png
-            { title: "Matrix Glitch", artist: "HackerOne", price: 9900, category: "digital", img: "https://i.imgur.com/4T4T4T4.png" }, // image_5.png
-            { title: "Virtual Reality", artist: "NeoNinja", price: 21000, category: "digital", img: "https://i.imgur.com/2R2R2R2.png" }, // image_3.png
-            { title: "Digital Waves", artist: "DigitalWave", price: 12000, category: "digital", img: "https://i.imgur.com/5U5U5U5.png" }, // image_6.png
+            // --- Digital Art (1-5) ---
+            { title: "Digital Concept", artist: "CyberPunk_X", price: 15000, category: "digital", img: "img/1.jpg" },
+            { title: "Neon City", artist: "HackerOne", price: 9900, category: "digital", img: "img/2.jpg" },
+            { title: "Future World", artist: "NeoNinja", price: 21000, category: "digital", img: "img/3.jpg" },
+            { title: "Cyber Glitch", artist: "DigitalWave", price: 12000, category: "digital", img: "img/4.jpg" },
+            { title: "Pixel Dream", artist: "8BitLover", price: 5500, category: "digital", img: "img/5.jpg" },
             
-            // --- Photography ---
-            { title: "Mountain Mist", artist: "NatureLover", price: 4500, category: "photo", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80" },
-            { title: "Tokyo Nights", artist: "StreetShooter", price: 6200, category: "photo", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&q=80" },
-            { title: "Urban Decay", artist: "CityWalker", price: 3500, category: "photo", img: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=600&q=80" },
+            // --- Painting (6-10) ---
+            { title: "Watercolor Flower", artist: "SoftBrush", price: 4500, category: "painting", img: "img/6.jpg" },
+            { title: "Oil Abstract", artist: "PaletteKnife", price: 6200, category: "painting", img: "img/7.jpg" },
+            { title: "Classic Portrait", artist: "ClassicMaster", price: 3500, category: "painting", img: "img/8.jpg" },
+            { title: "Sunset Vibe", artist: "ColorBlind", price: 5000, category: "painting", img: "img/9.jpg" },
+            { title: "Modern Art", artist: "Modernist", price: 4200, category: "painting", img: "img/10.jpg" },
             
-            // --- Painting ---
-            { title: "Thick Impasto", artist: "PaletteKnife", price: 9200, category: "painting", img: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=600&q=80" },
-            { title: "Watercolor Dreams", artist: "SoftBrush", price: 6500, category: "painting", img: "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=600&q=80" }
+            // --- Photography (11-15) ---
+            { title: "Mountain View", artist: "NatureLover", price: 8900, category: "photo", img: "img/11.jpg" },
+            { title: "City Night", artist: "StreetShooter", price: 25000, category: "photo", img: "img/12.jpg" },
+            { title: "Street Life", artist: "CityWalker", price: 9200, category: "photo", img: "img/13.jpg" },
+            { title: "Golden Hour", artist: "SunChaser", price: 6500, category: "photo", img: "img/14.jpg" },
+            { title: "Minimalist", artist: "ZenPhoto", price: 13500, category: "photo", img: "img/15.jpg" }
         ];
 
         const gallery = document.getElementById('gallery');
 
-        // Function to render items (kept robust fallback)
+        // Function to render items (ใช้ Fallback ตัวใหม่ที่เสถียรสุดๆ)
         function renderGalleryItems(items) {
             gallery.innerHTML = ''; 
             items.forEach(item => {
@@ -432,8 +436,8 @@
                 let badgeText = item.category === 'digital' ? 'Digital Art' : 
                                 item.category === 'photo' ? 'Photography' : 'Painting';
 
-                // Robust fallback image
-                const fallbackImage = 'https://placehold.co/600x400/EEE/31343C?text=Art+Space';
+                // Fallback Image ยังคงไว้เผื่อกรณีหาไฟล์ในโฟลเดอร์ไม่เจอ
+                const fallbackImage = 'https://placehold.co/600x400/EEE/31343C?text=Image+Not+Found';
 
                 card.innerHTML = `
                     <div class="card-img-container">
@@ -454,10 +458,9 @@
             });
         }
 
-        // Render initial items on load
         renderGalleryItems(mockArtworks);
 
-        // 2. Upload Logic
+        // Upload Logic
         const uploadForm = document.getElementById('uploadForm');
         uploadForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -486,7 +489,7 @@
             }
         });
 
-        // 3. Filter Logic
+        // Filter Logic
         function filterGallery(category) {
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
@@ -499,7 +502,7 @@
             }
         }
 
-        // 4. Search Logic
+        // Search Logic
         const searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', function(e) {
             const term = e.target.value.toLowerCase();
