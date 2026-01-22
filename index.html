@@ -430,7 +430,7 @@
 
         const gallery = document.getElementById('gallery');
 
-        // Function to render items (UPDATED WITH BETTER FALLBACK IMAGE)
+        // Function to render items (UPDATED: ใช้ placehold.co เพื่อให้รูปสำรองทำงานได้ชัวร์ 100%)
         function renderGalleryItems(items) {
             gallery.innerHTML = ''; 
             items.forEach(item => {
@@ -441,8 +441,8 @@
                 let badgeText = item.category === 'digital' ? 'Digital Art' : 
                                 item.category === 'photo' ? 'Photography' : 'Painting';
 
-                // ใช้รูป Fallback ที่ดูเป็นงานศิลปะหน่อย (Abstract)
-                const fallbackImage = 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80';
+                // ใช้รูป Fallback จาก placehold.co เพื่อความเสถียรสูงสุด
+                const fallbackImage = 'https://placehold.co/600x400/EEE/31343C?text=Art+Space';
 
                 card.innerHTML = `
                     <div class="card-img-container">
