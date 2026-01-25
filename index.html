@@ -149,6 +149,7 @@
         .preview-box {
             background: white; border-radius: 20px; overflow: hidden; max-width: 900px; width: 100%;
             display: flex; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideUp 0.4s ease;
+            position: relative; /* สำคัญ: เพื่อให้ปุ่มปิดอ้างอิงตำแหน่งจากกล่องนี้ */
         }
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
@@ -168,12 +169,40 @@
         }
         .buy-btn:hover { background: var(--accent-hover); transform: scale(1.02); }
         
-        .close-preview { position: absolute; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; }
+        /* แก้ไขปุ่มปิดให้มาอยู่ในกล่อง */
+        .close-preview { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            color: #2d3436; /* สีเข้มเพื่อให้เห็นชัดบนพื้นขาว */
+            font-size: 24px; 
+            cursor: pointer; 
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.8); /* พื้นหลังจางๆ เผื่อกรณีรูปทับ */
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            transition: 0.2s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .close-preview:hover {
+            background: #f1f2f6;
+            transform: scale(1.1);
+        }
 
         /* ================= AUTH FORM ================= */
         .auth-container {
-            background: white; width: 400px; padding: 40px; border-radius: 24px; text-align: center;
+            background: white; width: 400px; padding: 40px; border-radius: 24px; text-align: center; position: relative;
         }
+        /* ปุ่มปิดของ Modal Login ก็ปรับด้วย */
+        .close-auth {
+            position: absolute; top: 15px; right: 15px; font-size: 20px; cursor: pointer; color: #b2bec3; transition: 0.2s;
+        }
+        .close-auth:hover { color: var(--text-main); }
+
         .form-control { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; }
 
         /* Responsive */
@@ -188,7 +217,7 @@
 
     <div id="auth-modal" class="modal">
         <div class="auth-container">
-            <div style="text-align: right; cursor: pointer;" onclick="closeModal('auth-modal')"><i class="fas fa-times"></i></div>
+            <div class="close-auth" onclick="closeModal('auth-modal')"><i class="fas fa-times"></i></div>
             <h2 style="margin-bottom: 20px; font-family: 'Prompt';">ยินดีต้อนรับ</h2>
             
             <div id="login-section">
@@ -213,8 +242,9 @@
     </div>
 
     <div id="preview-modal" class="modal">
-        <div class="close-preview" onclick="closeModal('preview-modal')"><i class="fas fa-times"></i></div>
         <div class="preview-box">
+            <div class="close-preview" onclick="closeModal('preview-modal')"><i class="fas fa-times"></i></div>
+            
             <div class="preview-img">
                 <img id="modal-img" src="" alt="">
             </div>
