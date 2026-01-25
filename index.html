@@ -215,7 +215,9 @@
         
         .buy-btn { width: 100%; padding: 14px; background: var(--gradient-btn); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; font-family: 'Prompt'; font-size: 16px; margin-top: 15px;}
         .buy-btn:hover { opacity: 0.9; transform: translateY(-2px); }
-        .btn-download { background: var(--download); color: white; text-decoration: none; display: flex; justify-content: center; align-items: center; margin-top: 10px; padding: 14px; border-radius: 12px; font-weight: bold; font-family: 'Prompt'; transition: 0.2s; }
+        
+        /* ปุ่มดาวน์โหลด */
+        .btn-download { background: var(--download); color: white; text-decoration: none; display: flex; justify-content: center; align-items: center; margin-top: 10px; padding: 14px; border-radius: 12px; font-weight: bold; font-family: 'Prompt'; transition: 0.2s; cursor: pointer; }
         .btn-download:hover { opacity: 0.9; transform: translateY(-2px); }
         
         .form-control { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; background: #1a1a1f; color: white; font-family: 'Sarabun';}
@@ -395,8 +397,8 @@
 
         <div class="container">
             <div id="admin-panel" class="hidden" style="background:var(--card-bg); padding:20px; border-radius:15px; margin-bottom:30px; border:1px solid #333;">
-                <h3>🛡️ จัดการผู้ใช้งาน (Admin Only)</h3>
-                <div id="user-list-container" style="margin-top:15px;"></div>
+                <h3 style="color:white; border-bottom:1px solid #444; padding-bottom:10px; margin-bottom:15px;">🛡️ จัดการผู้ใช้งาน (Admin Only)</h3>
+                <div id="user-list-container"></div>
             </div>
 
             <div id="studio-panel" class="hidden" style="background:var(--card-bg); padding:20px; border-radius:15px; margin-bottom:30px; border:1px solid #333;">
@@ -547,6 +549,7 @@
             if(localStorage.getItem('as_users')) {
                 users = JSON.parse(localStorage.getItem('as_users'));
                 artworks = JSON.parse(localStorage.getItem('as_artworks'));
+                // Ensure legacy data has captions
                 artworks.forEach(a => { if(!a.caption) a.caption = "ศิลปินไม่ได้ระบุรายละเอียด"; });
             } else {
                 users = [...defaultUsers];
@@ -601,8 +604,7 @@
                 if(foundUser.email === 'admin@artspace.com') foundUser.role = 'admin';
                 sessionStorage.setItem('as_session', JSON.stringify(currentUser));
                 updateUI();
-                closeModal('auth-modal'); // Close immediately
-                // alert(`ยินดีต้อนรับ ${currentUser.name}`); // REMOVED ALERT FOR SMOOTHNESS
+                closeModal('auth-modal'); // Close Immediately, NO ALERT
             } else {
                 alert('ข้อมูลไม่ถูกต้อง');
             }
@@ -616,6 +618,7 @@
                 document.getElementById('display-name').innerText = currentUser.name;
                 document.getElementById('display-role').innerText = currentUser.role === 'admin' ? 'Administrator' : 'Member';
                 
+                // Show Admin Panel & Reset Button for Admin
                 if(currentUser.role === 'admin') {
                     document.getElementById('admin-reset-btn').classList.remove('hidden');
                     document.getElementById('admin-panel').classList.remove('hidden');
@@ -642,8 +645,10 @@
 
         function deleteAccount() {
             if(confirm('⚠️ ยืนยันลบบัญชีของคุณถาวร?')) {
+                // Filter out current user from users array
                 users = users.filter(u => u.email !== currentUser.email);
                 saveSystem();
+                // Logout logic
                 currentUser = null;
                 sessionStorage.clear();
                 location.reload();
@@ -849,8 +854,7 @@
                     btn.innerHTML = '<i class="fas fa-check"></i> คุณเป็นเจ้าของแล้ว';
                     btn.disabled = true;
                     btn.style.background = 'var(--success)';
-                    
-                    // Show Download Button
+                    // Enable Download
                     dlBtn.href = item.img;
                     dlBtn.download = `ArtSpace_${item.title}.jpg`;
                     dlBtn.classList.remove('hidden');
@@ -861,7 +865,7 @@
                     dlBtn.classList.add('hidden');
                 }
             } else {
-                // If I am the artist (creator), I can download too
+                // If I created it, I can download too
                 if (currentUser && item.artist === currentUser.name) {
                     dlBtn.href = item.img;
                     dlBtn.classList.remove('hidden');
