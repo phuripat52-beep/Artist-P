@@ -169,9 +169,7 @@
         .category-badge { position: absolute; top: 10px; left: 10px; padding: 4px 12px; background: rgba(0,0,0,0.6); color: white; font-size: 10px; border-radius: 20px; backdrop-filter: blur(4px); letter-spacing: 1px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
         .sold-overlay-badge { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); border: 4px solid var(--danger); color: var(--danger); font-size: 32px; font-weight: 800; padding: 10px 20px; text-transform: uppercase; font-family: 'Prompt', sans-serif; letter-spacing: 2px; background: rgba(0,0,0, 0.8); backdrop-filter: blur(2px); z-index: 5; pointer-events: none; opacity: 0.9; }
         
-        /* Grayscale for sold items ONLY when not in 'My Collection' */
         .art-card.sold .card-img { filter: grayscale(100%); opacity: 0.5; }
-        /* Reset for My Collection (Dynamic class will handle this) */
         .art-card.owned .card-img { filter: none !important; opacity: 1 !important; }
 
         .delete-btn { position: absolute; top: 10px; right: 10px; background: var(--danger); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 10; opacity: 0; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
@@ -212,7 +210,7 @@
         .close-modal:hover { color: white; }
 
         /* Misc */
-        .reset-btn-float { position: fixed; bottom: 20px; right: 20px; background: var(--danger); color: white; border: none; padding: 12px 20px; border-radius: 50px; box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4); cursor: pointer; z-index: 5000; font-family: 'Prompt'; font-weight: bold; transition: 0.3s; }
+        .reset-btn-float { position: fixed; bottom: 20px; right: 20px; background: var(--danger); color: white; border: none; padding: 12px 20px; border-radius: 50px; box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4); cursor: pointer; z-index: 7000; font-family: 'Prompt'; font-weight: bold; transition: 0.3s; }
         .reset-btn-float:hover { transform: scale(1.05); }
         .bank-card { background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: left; }
         .studio-tabs { display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
@@ -220,6 +218,7 @@
         .studio-tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
         .link-text { color: var(--accent); cursor: pointer; text-decoration: none; font-weight: bold; }
         .link-text:hover { text-decoration: underline; }
+        .admin-user-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; color: #ccc;}
 
         /* Animations */
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -355,8 +354,8 @@
 
         <div class="container">
             <div id="admin-panel" class="hidden" style="background:var(--card-bg); padding:20px; border-radius:15px; margin-bottom:30px; border:1px solid #333;">
-                <h3>🛡️ จัดการผู้ใช้งาน (Admin Only)</h3>
-                <div id="user-list-container" style="margin-top:15px;"></div>
+                <h3 style="color:white; border-bottom:1px solid #444; padding-bottom:10px; margin-bottom:15px;">🛡️ จัดการผู้ใช้งาน (Admin Only)</h3>
+                <div id="user-list-container"></div>
             </div>
 
             <div id="studio-panel" class="hidden" style="background:var(--card-bg); padding:20px; border-radius:15px; margin-bottom:30px; border:1px solid #333;">
@@ -512,6 +511,11 @@
                 artworks = [...defaultArtworks];
                 saveSystem();
             }
+            const session = sessionStorage.getItem('as_session');
+            if(session) {
+                currentUser = JSON.parse(session);
+                updateUI();
+            }
             renderTopArtists();
             renderGallery(artworks);
         }
@@ -524,6 +528,7 @@
         function systemReset() {
             if(confirm('🔴 ยืนยันรีเซ็ตระบบทั้งหมด? ข้อมูลผู้ใช้และรูปใหม่จะหายไป')) {
                 localStorage.clear();
+                sessionStorage.clear();
                 location.reload();
             }
         }
@@ -547,49 +552,68 @@
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
-            const user = users.find(u => u.email === email && u.pass === pass);
-            if(user) loginUser(user);
-            else alert('ข้อมูลไม่ถูกต้อง');
+            
+            const foundUser = users.find(u => u.email === email && u.pass === pass);
+            if(foundUser) {
+                currentUser = foundUser;
+                if(foundUser.email === 'admin@artspace.com') foundUser.role = 'admin';
+                sessionStorage.setItem('as_session', JSON.stringify(currentUser));
+                updateUI();
+                closeModal('auth-modal');
+                alert(`ยินดีต้อนรับ ${currentUser.name}`);
+            } else {
+                alert('ข้อมูลไม่ถูกต้อง');
+            }
+        }
+
+        function updateUI() {
+            if(currentUser) {
+                document.getElementById('guest-nav').classList.add('hidden');
+                document.getElementById('user-nav').classList.remove('hidden');
+                document.getElementById('user-nav').style.display = 'flex';
+                document.getElementById('display-name').innerText = currentUser.name;
+                document.getElementById('display-role').innerText = currentUser.role === 'admin' ? 'Administrator' : 'Member';
+                
+                // Show Admin Panel & Reset Button for Admin
+                if(currentUser.role === 'admin') {
+                    document.getElementById('admin-reset-btn').classList.remove('hidden');
+                    document.getElementById('admin-panel').classList.remove('hidden');
+                    renderAdminUserList();
+                }
+            }
         }
 
         function loginUser(user) {
             currentUser = user;
             isAdmin = (user.role === 'admin');
             closeModal('auth-modal');
-            
-            document.getElementById('guest-nav').classList.add('hidden');
-            document.getElementById('user-nav').classList.remove('hidden');
-            document.getElementById('user-nav').style.display = 'flex';
-            document.getElementById('display-name').textContent = user.name;
-            document.getElementById('avatar-circle').textContent = user.name.charAt(0).toUpperCase();
-            
-            if(isAdmin) {
-                document.getElementById('admin-panel').classList.remove('hidden');
-                document.getElementById('admin-reset-btn').classList.remove('hidden');
-                renderAdminUserList();
-            }
-
-            alert(`ยินดีต้อนรับคุณ ${user.name}`);
+            updateUI(); // Combine logic
             renderGallery(artworks);
         }
 
         function logout() {
-            if(confirm('ออกจากระบบ?')) location.reload();
+            if(confirm('ออกจากระบบ?')) {
+                currentUser = null;
+                sessionStorage.removeItem('as_session');
+                location.reload();
+            }
         }
 
         function deleteAccount() {
             if(confirm('ยืนยันลบบัญชีของคุณถาวร?')) {
                 users = users.filter(u => u.email !== currentUser.email);
                 saveSystem();
+                currentUser = null;
+                sessionStorage.clear();
                 location.reload();
             }
         }
 
-        // ================= ADMIN =================
+        // ================= ADMIN (FIXED RENDER) =================
         function renderAdminUserList() {
-            const list = document.getElementById('admin-user-list');
+            const list = document.getElementById('user-list-container');
             list.innerHTML = users.map((u, i) => `
-                <div class="user-item">
+                <div class="admin-user-row">
                     <span>👤 ${u.name} (${u.email}) - ${u.role}</span>
                     ${u.role !== 'admin' ? `<button onclick="adminDeleteUser(${i})" style="color:var(--danger); border:none; background:none; cursor:pointer;">ลบ</button>` : ''}
                 </div>
@@ -613,10 +637,8 @@
                 const canDelete = (currentUser && currentUser.role === 'admin') || (currentUser && item.artist === currentUser.name);
                 const deleteBtn = canDelete ? `<button class="delete-btn" onclick="deleteArt(${item.id}, event)"><i class="fas fa-trash"></i></button>` : '';
                 
-                // --- LOGIC: Hide SOLD stamp if in My Collection mode ---
                 let soldClass = (item.isSold && !isCollection) ? 'sold' : (isCollection ? 'owned' : '');
                 let soldOverlay = (item.isSold && !isCollection) ? `<div class="sold-overlay-badge">SOLD</div>` : '';
-                
                 let badgeText = item.category === 'digital' ? 'Digital' : item.category === 'photo' ? 'Photo' : 'Paint';
 
                 return `
@@ -639,19 +661,12 @@
 
         function openMyStudio() {
             if(!currentUser) return;
-            
-            // 1. Hide Top Artists Section
             document.getElementById('top-artists-section').classList.add('hidden');
-            
-            // 2. Change Header Text
             document.getElementById('hero-title').innerHTML = `พื้นที่สร้างสรรค์<br><span>และคลังสะสมของคุณ</span>`;
             document.getElementById('hero-subtitle').textContent = "จัดการผลงานศิลปะของคุณได้ง่ายๆ ที่นี่";
-
-            // 3. Show Studio Panel
             document.getElementById('studio-panel').classList.remove('hidden');
             switchStudioTab('upload');
             
-            // 4. Highlight Button
             document.getElementById('my-studio-btn').style.borderColor = 'var(--accent)';
             document.getElementById('my-studio-btn').style.color = 'var(--accent)';
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -668,15 +683,13 @@
                 document.getElementById('tab-collection').classList.add('active');
                 document.getElementById('upload-form').classList.add('hidden');
                 document.getElementById('collection-msg').classList.remove('hidden');
-                // Show items bought by user -> Pass true for 'isCollection' to hide SOLD stamps
                 renderGallery(artworks.filter(a => a.owner === currentUser.name && a.isSold), true);
             }
         }
 
         function filterGallery(cat, btn) {
-            // Reset View logic if navigating away from studio
             document.getElementById('studio-panel').classList.add('hidden'); 
-            document.getElementById('top-artists-section').classList.remove('hidden'); // Show Top Artists again
+            document.getElementById('top-artists-section').classList.remove('hidden'); 
             document.getElementById('hero-title').innerHTML = `ค้นพบความงาม<br><span>ที่ไร้ขีดจำกัด</span>`;
             document.getElementById('hero-subtitle').textContent = "พื้นที่เสรีสำหรับคนรักศิลปะ ซื้อขายผลงานดิจิทัลและงานคราฟต์ง่ายๆ ในที่เดียว";
 
@@ -705,13 +718,12 @@
 
         function searchGallery() {
             const term = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = artworks.filter(a => a.title.toLowerCase().includes(term) || a.artist.toLowerCase().includes(term));
-            renderGallery(filtered);
+            renderGallery(artworks.filter(a => a.title.toLowerCase().includes(term) || a.artist.toLowerCase().includes(term)));
         }
 
         function resetView() { location.reload(); }
 
-        // ================= 3. AUTH & USER MANAGEMENT (FIXED TOGGLE) =================
+        // ================= MODALS & PREVIEW =================
         function openAuthModal(mode='login') {
             document.getElementById('auth-modal').classList.add('open');
             toggleAuth(mode);
@@ -742,8 +754,6 @@
             document.getElementById('modal-price').textContent = `฿${item.price.toLocaleString()}`;
             
             const btn = document.getElementById('modal-buy-btn');
-            // If viewing in collection mode (owned), show "You own this" or disable button
-            // If normal mode and sold, show Sold
             const isOwned = (currentUser && item.owner === currentUser.name);
 
             if(item.isSold) {
@@ -777,7 +787,6 @@
             e.preventDefault();
             closeModal('payment-modal');
             
-            // Mark Sold & Transfer Ownership
             selectedItemForPay.isSold = true;
             selectedItemForPay.owner = currentUser.name; 
             selectedItemForPay.sales++;
@@ -785,11 +794,12 @@
             saveSystem();
             renderTopArtists();
             
-            // If in studio, reload studio collection. Else reload general gallery
             if(!document.getElementById('studio-panel').classList.contains('hidden')) {
                 switchStudioTab('collection');
             } else {
-                filterGallery('all', document.querySelector('.filter-btn'));
+                const activeBtn = document.querySelector('.filter-btn.active');
+                if(activeBtn.innerText.includes('ขายแล้ว')) filterGallery('sold', activeBtn);
+                else filterGallery('all', document.querySelector('.filter-btn'));
             }
 
             document.getElementById('success-modal').classList.add('open');
@@ -813,7 +823,7 @@
                 };
                 artworks.unshift(newArt);
                 saveSystem();
-                renderGallery(artworks.filter(a => a.artist === currentUser.name));
+                renderGallery(artworks.filter(a => a.artist === currentUser.name), false);
                 e.target.reset();
                 alert('ลงผลงานสำเร็จ!');
             }
@@ -825,9 +835,7 @@
             if(confirm('ลบผลงานนี้?')) {
                 artworks = artworks.filter(a => a.id !== id);
                 saveSystem();
-                // Check where we are deleting from to refresh correct view
                 if(!document.getElementById('studio-panel').classList.contains('hidden')) {
-                     // In studio mode, simplistic refresh:
                      const activeTab = document.querySelector('.studio-tab.active').id;
                      if(activeTab === 'tab-upload') renderGallery(artworks.filter(a => a.artist === currentUser.name));
                      else renderGallery(artworks.filter(a => a.owner === currentUser.name && a.isSold), true);
