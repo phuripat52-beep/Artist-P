@@ -21,7 +21,6 @@
             --danger: #ff4757;
             --warning: #f1c40f;
             --success: #2ed573;
-            --download: #00b894; /* สีปุ่มดาวน์โหลด */
             --gold: #ffa502;
             --glass: rgba(26, 26, 31, 0.95);
             --shadow-md: 0 10px 30px rgba(0,0,0,0.3);
@@ -174,6 +173,7 @@
         .art-card.sold .card-img { filter: grayscale(100%); opacity: 0.5; }
         .art-card.owned .card-img { filter: none !important; opacity: 1 !important; }
 
+        /* Action Buttons Group */
         .action-btn-group {
             position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 10; opacity: 0; transition: 0.3s;
         }
@@ -215,10 +215,6 @@
         
         .buy-btn { width: 100%; padding: 14px; background: var(--gradient-btn); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; font-family: 'Prompt'; font-size: 16px; margin-top: 15px;}
         .buy-btn:hover { opacity: 0.9; transform: translateY(-2px); }
-        
-        /* ปุ่มดาวน์โหลด */
-        .btn-download { background: var(--download); color: white; text-decoration: none; display: flex; justify-content: center; align-items: center; margin-top: 10px; padding: 14px; border-radius: 12px; font-weight: bold; font-family: 'Prompt'; transition: 0.2s; cursor: pointer; }
-        .btn-download:hover { opacity: 0.9; transform: translateY(-2px); }
         
         .form-control { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; background: #1a1a1f; color: white; font-family: 'Sarabun';}
         .form-control:focus { border-color: var(--accent); outline: none; }
@@ -352,9 +348,6 @@
                     </p>
                 <div id="modal-price" style="font-size:36px; color:var(--accent); font-weight:bold; font-family:'Prompt';">฿0</div>
                 <button id="modal-buy-btn" class="buy-btn" onclick="openPayment()">ซื้อผลงานนี้</button>
-                <a id="modal-download-btn" class="btn-download hidden" href="#" download>
-                    <i class="fas fa-download"></i> &nbsp; ดาวน์โหลดผลงาน
-                </a>
             </div>
         </div>
     </div>
@@ -604,7 +597,8 @@
                 if(foundUser.email === 'admin@artspace.com') foundUser.role = 'admin';
                 sessionStorage.setItem('as_session', JSON.stringify(currentUser));
                 updateUI();
-                closeModal('auth-modal'); // Close Immediately, NO ALERT
+                closeModal('auth-modal');
+                alert(`ยินดีต้อนรับ ${currentUser.name}`);
             } else {
                 alert('ข้อมูลไม่ถูกต้อง');
             }
@@ -631,7 +625,7 @@
             currentUser = user;
             isAdmin = (user.role === 'admin');
             closeModal('auth-modal');
-            updateUI(); 
+            updateUI(); // Combine logic
             renderGallery(artworks);
         }
 
@@ -846,33 +840,19 @@
             document.getElementById('modal-desc').innerText = caption;
 
             const btn = document.getElementById('modal-buy-btn');
-            const dlBtn = document.getElementById('modal-download-btn');
-            const isOwned = (currentUser && (item.owner === currentUser.name || item.artist === currentUser.name));
+            const isOwned = (currentUser && item.owner === currentUser.name);
 
             if(item.isSold) {
                 if(isOwned) {
                     btn.innerHTML = '<i class="fas fa-check"></i> คุณเป็นเจ้าของแล้ว';
                     btn.disabled = true;
                     btn.style.background = 'var(--success)';
-                    // Enable Download
-                    dlBtn.href = item.img;
-                    dlBtn.download = `ArtSpace_${item.title}.jpg`;
-                    dlBtn.classList.remove('hidden');
                 } else {
                     btn.innerHTML = 'สินค้าขายแล้ว';
                     btn.disabled = true;
                     btn.style.background = '#333';
-                    dlBtn.classList.add('hidden');
                 }
             } else {
-                // If I created it, I can download too
-                if (currentUser && item.artist === currentUser.name) {
-                    dlBtn.href = item.img;
-                    dlBtn.classList.remove('hidden');
-                } else {
-                    dlBtn.classList.add('hidden');
-                }
-
                 btn.innerHTML = '<i class="fas fa-shopping-cart"></i> ซื้อผลงานนี้';
                 btn.disabled = false;
                 btn.style.background = 'var(--gradient-btn)';
