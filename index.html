@@ -15,7 +15,7 @@
             --accent: #6c5ce7;
             --accent-hover: #5849be;
             --danger: #ff4757;
-            --success: #00b894; /* สีเขียวสำหรับ Success */
+            --success: #00b894;
             --gold: #f1c40f;
             --glass: rgba(255, 255, 255, 0.95);
             --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
@@ -28,7 +28,7 @@
             margin: 0; padding: 0;
             background-color: var(--bg-color);
             color: var(--text-main);
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
         .hidden { display: none !important; }
@@ -123,6 +123,18 @@
         }
         .card-img-container:hover .view-btn { transform: translateY(0); }
 
+        /* SOLD STAMP STYLES */
+        .sold-overlay-badge {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg);
+            border: 4px solid var(--danger); color: var(--danger);
+            font-size: 32px; font-weight: 800; padding: 10px 20px; text-transform: uppercase;
+            font-family: 'Prompt', sans-serif; letter-spacing: 2px;
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(2px);
+            z-index: 5; pointer-events: none; opacity: 0.9;
+        }
+        /* Make sold item grayscale */
+        .art-card.sold .card-img { filter: grayscale(100%); opacity: 0.7; }
+
         .delete-btn {
             position: absolute; top: 10px; right: 10px; 
             background: var(--danger); color: white; border: none;
@@ -171,6 +183,7 @@
             width: 100%; transition: 0.2s; font-family: 'Prompt'; display: flex; justify-content: center; gap: 10px;
         }
         .buy-btn:hover { background: var(--accent-hover); transform: scale(1.02); }
+        .buy-btn:disabled { background: #b2bec3; cursor: not-allowed; transform: none; }
         
         .close-preview { 
             position: absolute; top: 15px; right: 15px; color: #2d3436; font-size: 24px; cursor: pointer; z-index: 100;
@@ -180,7 +193,7 @@
         }
         .close-preview:hover { background: #f1f2f6; transform: scale(1.1); }
 
-        /* Standard Modal Box (Auth / Payment / Success) */
+        /* Standard Modal Box */
         .standard-modal-box {
             background: white; width: 450px; padding: 40px; border-radius: 24px; 
             text-align: center; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -191,7 +204,7 @@
         .close-modal-btn:hover { color: var(--text-main); }
         .form-control { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; }
 
-        /* NEW: Success Modal Styles */
+        /* Success Modal Styles */
         .success-icon {
             width: 80px; height: 80px; background: rgba(0, 184, 148, 0.1); color: var(--success);
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
@@ -276,8 +289,8 @@
     <div id="success-modal" class="modal">
         <div class="standard-modal-box">
             <div class="success-icon"><i class="fas fa-check"></i></div>
-            <h3 class="success-title">การสั่งซื้อเสร็จสิ้น</h3>
-            <p class="success-message">ขอบคุณที่อุดหนุนผลงานศิลปะ!<br>เราได้รับคำสั่งซื้อของคุณแล้ว</p>
+            <h3 class="success-title">การสั่งซื้อเสร็จสิ้น!</h3>
+            <p class="success-message">ขอบคุณที่อุดหนุนผลงานศิลปะ<br>ผลงานนี้เป็นของคุณแล้ว</p>
             <button class="buy-btn" onclick="closeModal('success-modal')" style="background: var(--success);">ตกลง</button>
         </div>
     </div>
@@ -293,7 +306,7 @@
                 <div class="preview-artist"><i class="fas fa-user-circle"></i> <span id="modal-artist">Artist</span></div>
                 <p class="preview-desc">ผลงานชิ้นเอกที่รังสรรค์ด้วยจินตนาการ พร้อมให้คุณเป็นเจ้าของแล้ววันนี้ งานลิขสิทธิ์แท้พร้อมไฟล์ความละเอียดสูง</p>
                 <div id="modal-price" class="preview-price">฿0</div>
-                <button class="buy-btn" onclick="openPayment()"><i class="fas fa-shopping-cart"></i> ซื้อผลงานนี้</button>
+                <button id="modal-buy-btn" class="buy-btn" onclick="openPayment()"><i class="fas fa-shopping-cart"></i> ซื้อผลงานนี้</button>
             </div>
         </div>
     </div>
@@ -352,6 +365,7 @@
                 <button class="filter-btn" onclick="filterGallery('digital', this)">ดิจิทัลอาร์ต</button>
                 <button class="filter-btn" onclick="filterGallery('painting', this)">ภาพวาดมือ</button>
                 <button class="filter-btn" onclick="filterGallery('photo', this)">ภาพถ่าย</button>
+                <button class="filter-btn" onclick="filterGallery('sold', this)" style="color: var(--danger); border-color: var(--danger);">สินค้าที่ขายแล้ว</button>
             </div>
 
             <div class="gallery-grid reveal-element" id="gallery"></div>
@@ -439,30 +453,30 @@
 
         // Default Data
         const defaultArtworks = [
-            { id: 1, title: "Forest Guardian", artist: "Samurai_X", price: 15900, category: "digital", img: "img/1.jpg", sales: 120 },
-            { id: 2, title: "Surreal Tides", artist: "Dreamer_Art", price: 12500, category: "digital", img: "img/2.jpg", sales: 85 },
-            { id: 3, title: "Winter's Mercy", artist: "Bushido_Spirit", price: 25000, category: "digital", img: "img/3.jpg", sales: 200 },
-            { id: 4, title: "The Ronin's Path", artist: "Ink_Master", price: 18000, category: "digital", img: "img/4.jpg", sales: 45 },
-            { id: 5, title: "Sacred Gateway", artist: "Nature_Zen", price: 8900, category: "digital", img: "img/5.jpg", sales: 300 },
-            { id: 6, title: "Cursed Eye", artist: "Anime_God", price: 14500, category: "digital", img: "img/6.jpg", sales: 150 },
-            { id: 7, title: "Crimson Horizon", artist: "Red_Sun", price: 11000, category: "digital", img: "img/7.jpg", sales: 90 },
-            { id: 8, title: "Dragon's Mark", artist: "Gang_Leader", price: 9500, category: "digital", img: "img/8.jpg", sales: 60 },
-            { id: 9, title: "Watercolor Flower", artist: "SoftBrush", price: 4500, category: "painting", img: "img/9.jpg", sales: 40 },
-            { id: 10, title: "Oil Abstract", artist: "PaletteKnife", price: 6200, category: "painting", img: "img/10.jpg", sales: 25 },
-            { id: 11, title: "Classic Portrait", artist: "ClassicMaster", price: 3500, category: "painting", img: "img/11.jpg", sales: 15 },
-            { id: 12, title: "Sunset Vibe", artist: "ColorBlind", price: 5000, category: "painting", img: "img/12.jpg", sales: 70 },
-            { id: 13, title: "Modern Art", artist: "Modernist", price: 4200, category: "painting", img: "img/13.jpg", sales: 30 },
-            { id: 14, title: "Nature Canvas", artist: "EcoArt", price: 5800, category: "painting", img: "img/14.jpg", sales: 55 },
-            { id: 15, title: "Acrylic Flow", artist: "FluidArt", price: 7000, category: "painting", img: "img/15.jpg", sales: 80 },
-            { id: 16, title: "Impressionist", artist: "OldSchool", price: 8500, category: "painting", img: "img/16.jpg", sales: 10 },
-            { id: 17, title: "Mountain View", artist: "NatureLover", price: 8900, category: "photo", img: "img/17.jpg", sales: 110 },
-            { id: 18, title: "City Night", artist: "StreetShooter", price: 25000, category: "photo", img: "img/18.jpg", sales: 180 },
-            { id: 19, title: "Street Life", artist: "CityWalker", price: 9200, category: "photo", img: "img/19.jpg", sales: 65 },
-            { id: 20, title: "Golden Hour", artist: "SunChaser", price: 6500, category: "photo", img: "img/20.jpg", sales: 95 },
-            { id: 21, title: "Minimalist", artist: "ZenPhoto", price: 13500, category: "photo", img: "img/21.jpg", sales: 130 },
-            { id: 22, title: "Portrait B&W", artist: "MonoLens", price: 5500, category: "photo", img: "img/22.jpg", sales: 40 },
-            { id: 23, title: "Urban Decay", artist: "RustyCam", price: 4800, category: "photo", img: "img/23.jpg", sales: 20 },
-            { id: 24, title: "Forest Mist", artist: "GreenEye", price: 7200, category: "photo", img: "img/24.jpg", sales: 50 }
+            { id: 1, title: "Forest Guardian", artist: "Samurai_X", price: 15900, category: "digital", img: "img/1.jpg", sales: 120, isSold: false },
+            { id: 2, title: "Surreal Tides", artist: "Dreamer_Art", price: 12500, category: "digital", img: "img/2.jpg", sales: 85, isSold: false },
+            { id: 3, title: "Winter's Mercy", artist: "Bushido_Spirit", price: 25000, category: "digital", img: "img/3.jpg", sales: 200, isSold: false },
+            { id: 4, title: "The Ronin's Path", artist: "Ink_Master", price: 18000, category: "digital", img: "img/4.jpg", sales: 45, isSold: false },
+            { id: 5, title: "Sacred Gateway", artist: "Nature_Zen", price: 8900, category: "digital", img: "img/5.jpg", sales: 300, isSold: false },
+            { id: 6, title: "Cursed Eye", artist: "Anime_God", price: 14500, category: "digital", img: "img/6.jpg", sales: 150, isSold: false },
+            { id: 7, title: "Crimson Horizon", artist: "Red_Sun", price: 11000, category: "digital", img: "img/7.jpg", sales: 90, isSold: false },
+            { id: 8, title: "Dragon's Mark", artist: "Gang_Leader", price: 9500, category: "digital", img: "img/8.jpg", sales: 60, isSold: false },
+            { id: 9, title: "Watercolor Flower", artist: "SoftBrush", price: 4500, category: "painting", img: "img/9.jpg", sales: 40, isSold: false },
+            { id: 10, title: "Oil Abstract", artist: "PaletteKnife", price: 6200, category: "painting", img: "img/10.jpg", sales: 25, isSold: false },
+            { id: 11, title: "Classic Portrait", artist: "ClassicMaster", price: 3500, category: "painting", img: "img/11.jpg", sales: 15, isSold: false },
+            { id: 12, title: "Sunset Vibe", artist: "ColorBlind", price: 5000, category: "painting", img: "img/12.jpg", sales: 70, isSold: false },
+            { id: 13, title: "Modern Art", artist: "Modernist", price: 4200, category: "painting", img: "img/13.jpg", sales: 30, isSold: false },
+            { id: 14, title: "Nature Canvas", artist: "EcoArt", price: 5800, category: "painting", img: "img/14.jpg", sales: 55, isSold: false },
+            { id: 15, title: "Acrylic Flow", artist: "FluidArt", price: 7000, category: "painting", img: "img/15.jpg", sales: 80, isSold: false },
+            { id: 16, title: "Impressionist", artist: "OldSchool", price: 8500, category: "painting", img: "img/16.jpg", sales: 10, isSold: false },
+            { id: 17, title: "Mountain View", artist: "NatureLover", price: 8900, category: "photo", img: "img/17.jpg", sales: 110, isSold: false },
+            { id: 18, title: "City Night", artist: "StreetShooter", price: 25000, category: "photo", img: "img/18.jpg", sales: 180, isSold: false },
+            { id: 19, title: "Street Life", artist: "CityWalker", price: 9200, category: "photo", img: "img/19.jpg", sales: 65, isSold: false },
+            { id: 20, title: "Golden Hour", artist: "SunChaser", price: 6500, category: "photo", img: "img/20.jpg", sales: 95, isSold: false },
+            { id: 21, title: "Minimalist", artist: "ZenPhoto", price: 13500, category: "photo", img: "img/21.jpg", sales: 130, isSold: false },
+            { id: 22, title: "Portrait B&W", artist: "MonoLens", price: 5500, category: "photo", img: "img/22.jpg", sales: 40, isSold: false },
+            { id: 23, title: "Urban Decay", artist: "RustyCam", price: 4800, category: "photo", img: "img/23.jpg", sales: 20, isSold: false },
+            { id: 24, title: "Forest Mist", artist: "GreenEye", price: 7200, category: "photo", img: "img/24.jpg", sales: 50, isSold: false }
         ];
 
         let artworks = [];
@@ -473,8 +487,10 @@
             const savedArt = localStorage.getItem('artspace_artworks');
             if(savedArt) {
                 artworks = JSON.parse(savedArt);
-                // Fix: Ensure 'sales' property exists for old data
-                artworks.forEach(a => { if(typeof a.sales === 'undefined') a.sales = 0; });
+                artworks.forEach(a => { 
+                    if(typeof a.sales === 'undefined') a.sales = 0; 
+                    if(typeof a.isSold === 'undefined') a.isSold = false; 
+                });
             } else {
                 artworks = [...defaultArtworks];
             }
@@ -525,12 +541,16 @@
             gallery.innerHTML = items.map(item => {
                 const canDelete = isAdmin || (currentUser && item.artist === currentUser);
                 const deleteBtn = canDelete ? `<button class="delete-btn" onclick="deleteArt(${item.id}, event)"><i class="fas fa-trash"></i></button>` : '';
-                let badge = item.category === 'digital' ? 'Digital' : item.category === 'photo' ? 'Photo' : 'Paint';
+                
+                let badgeText = item.category === 'digital' ? 'Digital' : item.category === 'photo' ? 'Photo' : 'Paint';
+                let soldClass = item.isSold ? 'sold' : '';
+                let soldOverlay = item.isSold ? `<div class="sold-overlay-badge">SOLD</div>` : '';
 
                 return `
-                <div class="art-card">
+                <div class="art-card ${soldClass}">
                     <div class="card-img-container" onclick="openPreview(${item.id})">
-                        <span class="category-badge">${badge}</span>
+                        <span class="category-badge">${badgeText}</span>
+                        ${soldOverlay}
                         ${deleteBtn}
                         <div class="card-overlay"><span class="view-btn">ดูรายละเอียด</span></div>
                         <img src="${item.img}" class="card-img" loading="lazy" onerror="this.src='${fallback}'">
@@ -552,12 +572,25 @@
             document.getElementById('modal-title').textContent = item.title;
             document.getElementById('modal-artist').textContent = item.artist;
             document.getElementById('modal-price').textContent = `฿${item.price.toLocaleString()}`;
+            
+            const buyBtn = document.getElementById('modal-buy-btn');
+            if (item.isSold) {
+                buyBtn.innerHTML = '<i class="fas fa-times-circle"></i> สินค้าขายแล้ว';
+                buyBtn.disabled = true;
+                buyBtn.style.background = '#b2bec3';
+            } else {
+                buyBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> ซื้อผลงานนี้';
+                buyBtn.disabled = false;
+                buyBtn.style.background = 'var(--accent)';
+            }
+
             document.getElementById('preview-modal').classList.add('open');
         }
 
         function openPayment() {
             if(!currentUser) {
-                alert('กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ');
+                // Show custom popup instead of alert
+                alert('กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ'); // Using alert as fallback, can be modal if needed
                 closeModal('preview-modal');
                 openAuthModal();
                 return;
@@ -571,11 +604,31 @@
         function confirmPayment(e) {
             e.preventDefault();
             closeModal('payment-modal');
-            // Show Custom Success Modal
-            document.getElementById('success-modal').classList.add('open');
+            
+            // Mark Item as Sold
+            selectedItemForPay.isSold = true;
             selectedItemForPay.sales++;
+            
             saveData();
             renderTopArtists();
+            
+            // Re-render gallery to update the sold item visual
+            // Check current filter to know what to re-render
+            const activeFilter = document.querySelector('.filter-btn.active');
+            if (activeFilter.textContent.includes('สินค้าที่ขายแล้ว')) {
+                filterGallery('sold', activeFilter);
+            } else {
+                // Determine category from button onclick or just reset
+                // Simplify: just re-trigger the current active filter logic
+                // But easiest is just re-render all based on current view logic
+                // For now, let's just reset to All or keep current view?
+                // Let's keep it simple:
+                const category = activeFilter.getAttribute('onclick').split("'")[1]; 
+                filterGallery(category, activeFilter); 
+            }
+
+            // Show Success Modal
+            document.getElementById('success-modal').classList.add('open');
         }
 
         function handleUpload(e) {
@@ -590,7 +643,7 @@
                 reader.onload = function(evt) {
                     const newArt = {
                         id: Date.now(), title: title, artist: currentUser, price: Number(price),
-                        category: cat, img: evt.target.result, sales: 0
+                        category: cat, img: evt.target.result, sales: 0, isSold: false
                     };
                     artworks.unshift(newArt);
                     saveData(); 
@@ -680,13 +733,21 @@
         }
 
         function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+        
         function filterGallery(cat, btn) {
             if(btn) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
             document.getElementById('my-studio-btn').style.background = 'transparent';
             document.getElementById('my-studio-btn').style.color = 'var(--accent)';
-            if(cat === 'all') renderGallery(artworks);
-            else renderGallery(artworks.filter(item => item.category === cat));
+            
+            if(cat === 'sold') {
+                renderGallery(artworks.filter(item => item.isSold === true));
+            } else if(cat === 'all') {
+                renderGallery(artworks); // Show all including sold, but marked
+            } else {
+                renderGallery(artworks.filter(item => item.category === cat));
+            }
         }
+
         function filterMyArtworks() {
             if(!currentUser) return;
             document.getElementById('my-studio-btn').style.background = 'var(--accent)';
