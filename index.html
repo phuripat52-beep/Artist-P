@@ -27,35 +27,36 @@
             margin: 0; padding: 0;
             background-color: var(--bg-color);
             color: var(--text-main);
-            overflow: hidden; /* ซ่อน Scrollbar ตอนเริ่ม */
+            overflow: hidden; /* Lock scroll during intro */
         }
 
         .hidden { display: none !important; }
 
-        /* ================= INTRO ANIMATION (CURTAIN STYLE) ================= */
+        /* ================= INTRO ANIMATION (FIXED SMOOTH) ================= */
         #intro-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: #ffffff; z-index: 9999;
             display: flex; justify-content: center; align-items: center;
-            /* การเลื่อนม่านขึ้น */
-            transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1); 
+            /* Transition for Curtain Effect */
+            transition: transform 1.2s cubic-bezier(0.86, 0, 0.07, 1); 
+            will-change: transform;
         }
-        .curtain-open { transform: translateY(-100%); } /* เลื่อนขึ้นไปข้างบน */
-        
+        .curtain-open { transform: translateY(-100%); } /* Slide Up */
+
         #animCanvas { position: absolute; top: 0; left: 0; }
-        
+
         .skip-hint {
             position: absolute; bottom: 50px; color: #b2bec3;
             font-family: 'Prompt', sans-serif; font-size: 24px; font-weight: 600;
             letter-spacing: 1px; animation: pulse 2s infinite; pointer-events: none;
             z-index: 10000; transition: opacity 0.5s;
         }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
 
         /* ================= MAIN SITE ================= */
         #main-site {
             position: relative; z-index: 1; height: 100vh; overflow-y: auto;
-            opacity: 0; transition: opacity 0.8s ease; /* Fade in เบาๆ ตอนม่านเปิด */
+            opacity: 0; transition: opacity 0.5s ease-in; /* Fade in smoothly */
         }
         .site-visible { opacity: 1 !important; }
 
@@ -241,7 +242,7 @@
     </div>
 
     <script>
-        // ================= 1. INTRO ANIMATION (Curtain Style) =================
+        // ================= 1. INTRO ANIMATION (Fixed & Smooth) =================
         const canvas = document.getElementById('animCanvas');
         const ctx = canvas.getContext('2d');
         const introOverlay = document.getElementById('intro-overlay');
@@ -249,82 +250,90 @@
         const skipHint = document.querySelector('.skip-hint');
         let animId;
 
-        // Resize
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resize); resize();
 
-        // Balls Logic
-        const balls = [];
         const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
-        
-        for(let i=0; i<12; i++) {
+        const balls = [];
+        const particles = [];
+        let phase = 'rolling'; // rolling -> expanding -> finished
+        let frameCount = 0;
+        const timeToHit = 120; // Frames until explosion
+
+        // Init Rolling Balls
+        for(let i=0; i<8; i++) {
+            const angle = (i * (Math.PI * 2) / 8) + Math.random();
+            const dist = Math.max(window.innerWidth, window.innerHeight) * 0.8;
             balls.push({
-                x: cx, y: cy,
-                vx: (Math.random() - 0.5) * 10,
-                vy: (Math.random() - 0.5) * 10,
-                radius: Math.random() * 20 + 10,
-                color: `hsl(${Math.random()*360}, 70%, 60%)`,
-                phase: 'move'
+                x: cx + Math.cos(angle) * dist,
+                y: cy + Math.sin(angle) * dist,
+                vx: (cx - (cx + Math.cos(angle) * dist)) / timeToHit,
+                vy: (cy - (cy + Math.sin(angle) * dist)) / timeToHit,
+                color: ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe', '#fd79a8', '#fab1a0', '#81ecec'][i]
             });
         }
 
-        let frame = 0;
-        function animateIntro() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear screen
-            frame++;
-
-            // Draw Balls
-            balls.forEach(b => {
-                // Movement
-                b.x += b.vx; b.y += b.vy;
-                
-                // Bounce walls
-                if(b.x < 0 || b.x > canvas.width) b.vx *= -1;
-                if(b.y < 0 || b.y > canvas.height) b.vy *= -1;
-
-                // Draw
-                ctx.beginPath();
-                ctx.arc(b.x, b.y, b.radius, 0, Math.PI*2);
-                ctx.fillStyle = b.color;
-                ctx.fill();
-                
-                // Connect lines
-                balls.forEach(b2 => {
-                    const dx = b.x - b2.x; const dy = b.y - b2.y;
-                    const dist = Math.sqrt(dx*dx + dy*dy);
-                    if(dist < 150) {
-                        ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.lineTo(b2.x, b2.y);
-                        ctx.strokeStyle = `rgba(0,0,0,0.1)`; ctx.stroke();
-                    }
+        function createExplosion() {
+            for(let i=0; i<250; i++) {
+                particles.push({
+                    x: cx, y: cy,
+                    vx: (Math.random() - 0.5) * 60,
+                    vy: (Math.random() - 0.5) * 60,
+                    radius: Math.random() * 30 + 5,
+                    color: balls[Math.floor(Math.random()*8)].color,
+                    growth: Math.random() * 2 + 1
                 });
-            });
-
-            // Trigger Curtain Finish
-            if(frame > 180) { // Approx 3 seconds
-                finishIntro();
-                return; 
             }
-            
+        }
+
+        function animateIntro() {
+            if(phase === 'finished') return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // IMPORTANT: Clear screen
+
+            if(phase === 'rolling') {
+                frameCount++;
+                balls.forEach(b => {
+                    b.x += b.vx; b.y += b.vy;
+                    ctx.beginPath(); ctx.arc(b.x, b.y, 80, 0, Math.PI*2); ctx.fillStyle = b.color; ctx.fill();
+                });
+                if(frameCount >= timeToHit) { 
+                    phase = 'expanding'; 
+                    skipHint.style.opacity = '0'; 
+                    createExplosion(); 
+                }
+            }
+            if(phase === 'expanding') {
+                particles.forEach(p => {
+                    p.x += p.vx; p.y += p.vy; p.vx *= 0.95; p.vy *= 0.95; // Friction
+                    p.radius += p.growth;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2); ctx.fillStyle = p.color; ctx.fill();
+                });
+                // Check if filled screen (approx)
+                if(particles[0].radius > Math.max(window.innerWidth, window.innerHeight)) { 
+                    finishIntro(); 
+                    return; 
+                }
+            }
             animId = requestAnimationFrame(animateIntro);
         }
         
-        // Start Animation
+        // Start
         animateIntro();
+        setTimeout(() => { if(!isEntered) finishIntro(); }, 4000); // Safety timeout
 
+        let isEntered = false;
         function finishIntro() {
+            if(isEntered) return;
+            isEntered = true;
             cancelAnimationFrame(animId);
-            // CSS Curtain Effect
-            introOverlay.classList.add('curtain-open'); // Slide Up
             
-            // Show Site Content smoothly
-            setTimeout(() => {
-                mainSite.classList.add('site-visible');
-                document.body.style.overflow = 'auto'; // Enable scroll
-                introOverlay.style.display = 'none'; // Remove overlay after animation
-            }, 1000);
+            // Curtain Effect
+            introOverlay.classList.add('curtain-open');
+            mainSite.classList.add('site-visible');
+            document.body.style.overflow = 'auto'; // Unlock scroll
+            
+            setTimeout(() => { introOverlay.style.display = 'none'; }, 1200); // Remove after anim
         }
-
-        // Spacebar Skip
         document.addEventListener('keydown', (e) => { if(e.code === 'Space') finishIntro(); });
 
 
@@ -337,8 +346,12 @@
         const defaultArt = [
             { id: 1, title: "Forest Guardian", artist: "Admin", owner: "Admin", price: 15900, category: "digital", img: "img/1.jpg", isSold: false, sales: 50 },
             { id: 2, title: "Neon City", artist: "Admin", owner: "Admin", price: 9900, category: "digital", img: "img/2.jpg", isSold: false, sales: 20 },
-            // ... (ใส่ข้อมูลเพิ่มได้ตามเดิม)
-            { id: 3, title: "Winter Spirit", artist: "Admin", owner: "Admin", price: 12000, category: "painting", img: "img/3.jpg", isSold: false, sales: 10 }
+            { id: 3, title: "Winter Spirit", artist: "Admin", owner: "Admin", price: 12000, category: "painting", img: "img/3.jpg", isSold: false, sales: 10 },
+            { id: 4, title: "Ronin Path", artist: "Admin", owner: "Admin", price: 18000, category: "digital", img: "img/4.jpg", isSold: false, sales: 30 },
+            { id: 5, title: "Sacred Gate", artist: "Admin", owner: "Admin", price: 8900, category: "digital", img: "img/5.jpg", isSold: false, sales: 40 },
+            { id: 6, title: "Cursed Eye", artist: "Admin", owner: "Admin", price: 14500, category: "digital", img: "img/6.jpg", isSold: false, sales: 15 },
+            { id: 7, title: "Red Sun", artist: "Admin", owner: "Admin", price: 11000, category: "digital", img: "img/7.jpg", isSold: false, sales: 25 },
+            { id: 8, title: "Dragon Mark", artist: "Admin", owner: "Admin", price: 9500, category: "digital", img: "img/8.jpg", isSold: false, sales: 60 }
         ];
 
         let users = [];
@@ -487,6 +500,13 @@
         // ================= 4. GALLERY & BUYING =================
         function renderGallery(items) {
             const grid = document.getElementById('gallery');
+            const fallback = 'https://placehold.co/600x400/EEE/31343C?text=Art+Space';
+
+            if(items.length === 0) {
+                grid.innerHTML = `<div style="text-align:center; width:100%; color:#aaa; grid-column:1/-1; padding:50px;">ไม่มีข้อมูล</div>`;
+                return;
+            }
+
             grid.innerHTML = items.map(item => {
                 const isOwner = currentUser && (item.owner === currentUser.name || item.artist === currentUser.name);
                 const isAdmin = currentUser && currentUser.role === 'admin';
@@ -504,7 +524,7 @@
                 return `
                 <div class="art-card ${item.isSold ? 'sold' : ''}">
                     ${btnHtml}
-                    <img src="${item.img}" class="card-img">
+                    <img src="${item.img}" class="card-img" onerror="this.src='${fallback}'">
                     <div style="padding:15px;">
                         <h4>${item.title}</h4>
                         <div style="color:#888; font-size:13px;">โดย ${item.artist}</div>
