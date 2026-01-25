@@ -10,21 +10,18 @@
 
         :root {
             /* --- MODERN DARK THEME --- */
-            --bg-color: #0f0f12;       /* พื้นหลังดำเข้ม */
-            --card-bg: #1a1a1f;        /* พื้นหลังการ์ด */
-            --text-main: #ffffff;      /* ตัวหนังสือสีขาว */
-            --text-muted: #a0a0b0;     /* ตัวหนังสือสีเทา */
-            
-            /* Gradient Accent */
+            --bg-color: #0f0f12;
+            --card-bg: #1a1a1f;
+            --text-main: #ffffff;
+            --text-muted: #a0a0b0;
             --accent: #6c5ce7;
             --accent-hover: #5849be;
             --gradient-text: linear-gradient(135deg, #a55eea 0%, #45aaf2 100%);
             --gradient-btn: linear-gradient(90deg, #6c5ce7, #a55eea);
-            
             --danger: #ff4757;
             --success: #2ed573;
             --gold: #ffa502;
-            --glass: rgba(26, 26, 31, 0.9); /* กระจกสีเข้ม */
+            --glass: rgba(26, 26, 31, 0.95);
             --shadow-md: 0 10px 30px rgba(0,0,0,0.3);
             --radius-lg: 24px;
             --radius-md: 16px;
@@ -35,7 +32,7 @@
             margin: 0; padding: 0;
             background-color: var(--bg-color);
             color: var(--text-main);
-            overflow: hidden; /* Lock scroll during intro */
+            overflow: hidden;
         }
 
         .hidden { display: none !important; }
@@ -43,14 +40,15 @@
         /* ================= INTRO ANIMATION ================= */
         #intro-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #ffffff; z-index: 9999;
+            background-color: var(--bg-color);
+            z-index: 9999;
             display: flex; justify-content: center; align-items: center;
             transition: transform 1.0s cubic-bezier(0.86, 0, 0.07, 1);
         }
         .curtain-open { transform: translateY(-100%); }
         #animCanvas { position: absolute; top: 0; left: 0; }
         .skip-hint {
-            position: absolute; bottom: 50px; color: #b2bec3;
+            position: absolute; bottom: 50px; color: var(--text-muted);
             font-family: 'Prompt', sans-serif; font-size: 20px; font-weight: 600;
             letter-spacing: 1px; animation: pulse 2s infinite; pointer-events: none;
             z-index: 10000; transition: opacity 0.5s;
@@ -90,10 +88,11 @@
         .btn-primary { background: var(--gradient-btn); color: white !important; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); border: none;}
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 92, 231, 0.5); }
 
-        /* ================= HERO SECTION (RESTORED & MODERN) ================= */
+        /* ================= HERO SECTION ================= */
         .hero {
             text-align: center; padding: 80px 20px 40px;
             background: radial-gradient(circle at 50% 0%, rgba(108, 92, 231, 0.15) 0%, transparent 70%);
+            transition: all 0.5s ease;
         }
         .hero h1 {
             font-family: 'Prompt', sans-serif; font-size: 64px; margin-bottom: 10px; font-weight: 800;
@@ -169,11 +168,16 @@
         /* Badges */
         .category-badge { position: absolute; top: 10px; left: 10px; padding: 4px 12px; background: rgba(0,0,0,0.6); color: white; font-size: 10px; border-radius: 20px; backdrop-filter: blur(4px); letter-spacing: 1px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
         .sold-overlay-badge { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); border: 4px solid var(--danger); color: var(--danger); font-size: 32px; font-weight: 800; padding: 10px 20px; text-transform: uppercase; font-family: 'Prompt', sans-serif; letter-spacing: 2px; background: rgba(0,0,0, 0.8); backdrop-filter: blur(2px); z-index: 5; pointer-events: none; opacity: 0.9; }
+        
+        /* Grayscale for sold items ONLY when not in 'My Collection' */
         .art-card.sold .card-img { filter: grayscale(100%); opacity: 0.5; }
+        /* Reset for My Collection (Dynamic class will handle this) */
+        .art-card.owned .card-img { filter: none !important; opacity: 1 !important; }
+
         .delete-btn { position: absolute; top: 10px; right: 10px; background: var(--danger); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 10; opacity: 0; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .art-card:hover .delete-btn { opacity: 1; }
 
-        /* ================= MODALS (DARK MODE) ================= */
+        /* ================= MODALS ================= */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); z-index: 6000; display: none;
@@ -338,11 +342,11 @@
         </nav>
 
         <div class="hero reveal-element">
-            <h1>ค้นพบความงาม<br><span>ที่ไร้ขีดจำกัด</span></h1>
-            <p>พื้นที่เสรีสำหรับคนรักศิลปะ ซื้อขายผลงานดิจิทัลและงานคราฟต์ง่ายๆ ในที่เดียว</p>
+            <h1 id="hero-title">ค้นพบความงาม<br><span>ที่ไร้ขีดจำกัด</span></h1>
+            <p id="hero-subtitle">พื้นที่เสรีสำหรับคนรักศิลปะ ซื้อขายผลงานดิจิทัลและงานคราฟต์ง่ายๆ ในที่เดียว</p>
         </div>
 
-        <section class="top-artists-section reveal-element">
+        <section id="top-artists-section" class="top-artists-section reveal-element">
             <div class="section-header">
                 <h2 class="section-title">🏆 3 อันดับ <span>ศิลปินขายดี</span></h2>
             </div>
@@ -372,8 +376,9 @@
                     <input type="file" id="upImage" class="form-control" accept="image/*" required style="margin:0; width:200px;">
                     <button type="submit" class="btn-nav btn-primary" style="border:none;">โพสต์</button>
                 </form>
+
                 <div id="collection-msg" class="hidden" style="text-align: center; color: var(--accent); padding: 20px;">
-                    <i class="fas fa-heart"></i> นี่คือผลงานศิลปะที่คุณเป็นเจ้าของ
+                    <i class="fas fa-heart"></i> นี่คือผลงานศิลปะที่คุณเป็นเจ้าของและสนับสนุนศิลปิน
                 </div>
             </div>
 
@@ -390,7 +395,7 @@
     </div>
 
     <script>
-        // ================= 1. INTRO ANIMATION (Fixed & Smooth) =================
+        // ================= 1. INTRO ANIMATION =================
         const canvas = document.getElementById('animCanvas');
         const ctx = canvas.getContext('2d');
         const introOverlay = document.getElementById('intro-overlay');
@@ -402,131 +407,113 @@
         window.addEventListener('resize', resize); resize();
 
         const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
-        const balls = [];
-        const particles = [];
-        let phase = 'rolling'; // rolling -> expanding -> finished
-        let frameCount = 0;
-        const timeToHit = 120; // Frames until explosion
+        const colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe', '#fd79a8', '#fab1a0', '#81ecec'];
+        let balls = []; let particles = [];
+        let phase = 'rolling'; let frameCount = 0; const timeToHit = 120;
 
-        // Init Rolling Balls
-        for(let i=0; i<8; i++) {
-            const angle = (i * (Math.PI * 2) / 8) + Math.random();
+        for(let i=0; i < 8; i++) {
+            const angle = (i * (Math.PI * 2) / 8);
             const dist = Math.max(window.innerWidth, window.innerHeight) * 0.8;
-            balls.push({
-                x: cx + Math.cos(angle) * dist,
-                y: cy + Math.sin(angle) * dist,
-                vx: (cx - (cx + Math.cos(angle) * dist)) / timeToHit,
-                vy: (cy - (cy + Math.sin(angle) * dist)) / timeToHit,
-                color: ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe', '#fd79a8', '#fab1a0', '#81ecec'][i]
-            });
+            balls.push({ x: cx + Math.cos(angle) * dist, y: cy + Math.sin(angle) * dist, vx: (cx - (cx + Math.cos(angle) * dist)) / timeToHit, vy: (cy - (cy + Math.sin(angle) * dist)) / timeToHit, color: colors[i % colors.length] });
         }
 
         function createExplosion() {
-            for(let i=0; i<250; i++) {
-                particles.push({
-                    x: cx, y: cy,
-                    vx: (Math.random() - 0.5) * 60,
-                    vy: (Math.random() - 0.5) * 60,
-                    radius: Math.random() * 30 + 5,
-                    color: balls[Math.floor(Math.random()*8)].color,
-                    growth: Math.random() * 2 + 1
-                });
+            for (let i = 0; i < 250; i++) {
+                const color = balls[Math.floor(Math.random() * balls.length)].color;
+                particles.push({ x: cx, y: cy, vx: (Math.random() - 0.5) * 60, vy: (Math.random() - 0.5) * 60, radius: Math.random() * 40 + 10, color: color, growthRate: Math.random() * 4 + 3 });
             }
         }
 
-        function animateIntro() {
-            if(phase === 'finished') return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // IMPORTANT: Clear screen
+        function animate() {
+            if (phase === 'finished') return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if(phase === 'rolling') {
+            if (phase === 'rolling') {
                 frameCount++;
-                balls.forEach(b => {
-                    b.x += b.vx; b.y += b.vy;
-                    ctx.beginPath(); ctx.arc(b.x, b.y, 80, 0, Math.PI*2); ctx.fillStyle = b.color; ctx.fill();
+                balls.forEach(ball => {
+                    ball.x += ball.vx; ball.y += ball.vy;
+                    ctx.save(); ctx.shadowColor = "rgba(0,0,0,0.15)"; ctx.shadowBlur = 25; ctx.shadowOffsetY = 5;
+                    ctx.beginPath(); ctx.arc(ball.x, ball.y, 85, 0, Math.PI * 2); ctx.fillStyle = ball.color; ctx.fill(); ctx.restore();
                 });
-                if(frameCount >= timeToHit) { 
-                    phase = 'expanding'; 
-                    skipHint.style.opacity = '0'; 
-                    createExplosion(); 
-                }
+                if (frameCount >= timeToHit) { phase = 'expanding'; skipHint.style.opacity = '0'; createExplosion(); }
             }
-            if(phase === 'expanding') {
+            if (phase === 'expanding') {
                 particles.forEach(p => {
-                    p.x += p.vx; p.y += p.vy; p.vx *= 0.95; p.vy *= 0.95; // Friction
-                    p.radius += p.growth;
-                    ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2); ctx.fillStyle = p.color; ctx.fill();
+                    p.x += p.vx; p.y += p.vy; p.vx *= 0.94; p.vy *= 0.94;
+                    p.radius += p.growthRate * 2; p.growthRate *= 1.03; 
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill();
                 });
-                if(particles[0].radius > Math.max(window.innerWidth, window.innerHeight)) { 
-                    finishIntro(); 
-                    return; 
-                }
+                const maxSize = particles.reduce((max, p) => p.radius > max ? p.radius : max, 0);
+                if (maxSize > Math.sqrt(canvas.width**2 + canvas.height**2) * 0.8) { enterSite(); return; }
             }
-            animId = requestAnimationFrame(animateIntro);
+            animationFrameId = requestAnimationFrame(animate);
         }
-        
-        // Start
-        animateIntro();
-        setTimeout(() => { if(!isEntered) finishIntro(); }, 4000); // Safety timeout
+        animate();
+        setTimeout(() => { if (!isEntered) enterSite(); }, 4000); 
 
         let isEntered = false;
-        function finishIntro() {
-            if(isEntered) return;
-            isEntered = true;
-            cancelAnimationFrame(animId);
-            
-            // Curtain Effect
+        function enterSite() {
+            if (isEntered) return;
+            isEntered = true; phase = 'finished'; cancelAnimationFrame(animationFrameId);
             introOverlay.classList.add('curtain-open');
-            mainSite.classList.add('site-visible');
-            document.body.style.overflow = 'auto'; // Unlock scroll
-            
+            mainSite.style.visibility = 'visible'; mainSite.style.opacity = '1';
+            document.body.style.overflowY = 'auto'; 
             document.querySelectorAll('.reveal-element').forEach((el, index) => {
-                setTimeout(() => { el.classList.add('reveal-active'); }, 300 + (index * 100));
+                setTimeout(() => { el.classList.add('reveal-active'); }, 300 + (index * 150));
             });
-            setTimeout(() => { introOverlay.style.display = 'none'; }, 1200); 
+            setTimeout(() => { introOverlay.style.display = 'none'; }, 1500);
         }
-        document.addEventListener('keydown', (e) => { if(e.code === 'Space') finishIntro(); });
+        document.addEventListener('keydown', (e) => { if (e.code === 'Space') enterSite(); });
 
-
-        // ================= 2. DATA SYSTEM (LocalStorage) =================
-        const defaultUsers = [
-            { email: 'admin@artspace.com', pass: 'admin888', name: 'Admin', role: 'admin' },
-            { email: 'user@test.com', pass: '123456', name: 'Test User', role: 'member' }
-        ];
-        
-        const defaultArt = [
-            { id: 1, title: "Forest Guardian", artist: "Samurai_X", owner: "Samurai_X", price: 15900, category: "digital", img: "img/1.jpg", isSold: false, sales: 50 },
-            { id: 2, title: "Neon City", artist: "HackerOne", owner: "HackerOne", price: 9900, category: "digital", img: "img/2.jpg", isSold: false, sales: 20 },
-            { id: 3, title: "Winter Spirit", artist: "NeoNinja", owner: "NeoNinja", price: 12000, category: "painting", img: "img/3.jpg", isSold: false, sales: 10 },
-            { id: 4, title: "Ronin Path", artist: "InkMaster", owner: "InkMaster", price: 18000, category: "digital", img: "img/4.jpg", isSold: false, sales: 30 },
-            { id: 5, title: "Sacred Gate", artist: "ZenPhoto", owner: "ZenPhoto", price: 8900, category: "digital", img: "img/5.jpg", isSold: false, sales: 40 },
-            { id: 6, title: "Cursed Eye", artist: "AnimeGod", owner: "AnimeGod", price: 14500, category: "digital", img: "img/6.jpg", isSold: false, sales: 15 },
-            { id: 7, title: "Red Sun", artist: "RedSun", owner: "RedSun", price: 11000, category: "digital", img: "img/7.jpg", isSold: false, sales: 25 },
-            { id: 8, title: "Dragon Mark", artist: "GangLeader", owner: "GangLeader", price: 9500, category: "digital", img: "img/8.jpg", isSold: false, sales: 60 }
-        ];
-
+        // ================= GLOBAL DATA =================
+        let currentUser = null; 
+        let isAdmin = false;
+        let selectedItemForPay = null;
         let users = [];
         let artworks = [];
-        let currentUser = null;
 
+        const defaultUsers = [
+            { email: 'admin@artspace.com', pass: 'admin888', name: 'Admin', role: 'admin' }
+        ];
+        const defaultArtworks = [
+            { id: 1, title: "Forest Guardian", artist: "Samurai_X", price: 15900, category: "digital", img: "img/1.jpg", sales: 120, isSold: false, owner: null },
+            { id: 2, title: "Surreal Tides", artist: "Dreamer_Art", price: 12500, category: "digital", img: "img/2.jpg", sales: 85, isSold: false, owner: null },
+            { id: 3, title: "Winter's Mercy", artist: "Bushido_Spirit", price: 25000, category: "digital", img: "img/3.jpg", sales: 200, isSold: false, owner: null },
+            { id: 4, title: "The Ronin's Path", artist: "Ink_Master", price: 18000, category: "digital", img: "img/4.jpg", sales: 45, isSold: false, owner: null },
+            { id: 5, title: "Sacred Gateway", artist: "Nature_Zen", price: 8900, category: "digital", img: "img/5.jpg", sales: 300, isSold: false, owner: null },
+            { id: 6, title: "Cursed Eye", artist: "Anime_God", price: 14500, category: "digital", img: "img/6.jpg", sales: 150, isSold: false, owner: null },
+            { id: 7, title: "Crimson Horizon", artist: "Red_Sun", price: 11000, category: "digital", img: "img/7.jpg", sales: 90, isSold: false, owner: null },
+            { id: 8, title: "Dragon's Mark", artist: "Gang_Leader", price: 9500, category: "digital", img: "img/8.jpg", sales: 60, isSold: false, owner: null },
+            { id: 9, title: "Watercolor Flower", artist: "SoftBrush", price: 4500, category: "painting", img: "img/9.jpg", sales: 40, isSold: false, owner: null },
+            { id: 10, title: "Oil Abstract", artist: "PaletteKnife", price: 6200, category: "painting", img: "img/10.jpg", sales: 25, isSold: false, owner: null },
+            { id: 11, title: "Classic Portrait", artist: "ClassicMaster", price: 3500, category: "painting", img: "img/11.jpg", sales: 15, isSold: false, owner: null },
+            { id: 12, title: "Sunset Vibe", artist: "ColorBlind", price: 5000, category: "painting", img: "img/12.jpg", sales: 70, isSold: false, owner: null },
+            { id: 13, title: "Modern Art", artist: "Modernist", price: 4200, category: "painting", img: "img/13.jpg", sales: 30, isSold: false, owner: null },
+            { id: 14, title: "Nature Canvas", artist: "EcoArt", price: 5800, category: "painting", img: "img/14.jpg", sales: 55, isSold: false, owner: null },
+            { id: 15, title: "Acrylic Flow", artist: "FluidArt", price: 7000, category: "painting", img: "img/15.jpg", sales: 80, isSold: false, owner: null },
+            { id: 16, title: "Impressionist", artist: "OldSchool", price: 8500, category: "painting", img: "img/16.jpg", sales: 10, isSold: false, owner: null },
+            { id: 17, title: "Mountain View", artist: "NatureLover", price: 8900, category: "photo", img: "img/17.jpg", sales: 110, isSold: false, owner: null },
+            { id: 18, title: "City Night", artist: "StreetShooter", price: 25000, category: "photo", img: "img/18.jpg", sales: 180, isSold: false, owner: null },
+            { id: 19, title: "Street Life", artist: "CityWalker", price: 9200, category: "photo", img: "img/19.jpg", sales: 65, isSold: false, owner: null },
+            { id: 20, title: "Golden Hour", artist: "SunChaser", price: 6500, category: "photo", img: "img/20.jpg", sales: 95, isSold: false, owner: null },
+            { id: 21, title: "Minimalist", artist: "ZenPhoto", price: 13500, category: "photo", img: "img/21.jpg", sales: 130, isSold: false, owner: null },
+            { id: 22, title: "Portrait B&W", artist: "MonoLens", price: 5500, category: "photo", img: "img/22.jpg", sales: 40, isSold: false, owner: null },
+            { id: 23, title: "Urban Decay", artist: "RustyCam", price: 4800, category: "photo", img: "img/23.jpg", sales: 20, isSold: false, owner: null },
+            { id: 24, title: "Forest Mist", artist: "GreenEye", price: 7200, category: "photo", img: "img/24.jpg", sales: 50, isSold: false, owner: null }
+        ];
+
+        // ================= SYSTEM LOGIC =================
         function initSystem() {
             if(localStorage.getItem('as_users')) {
                 users = JSON.parse(localStorage.getItem('as_users'));
                 artworks = JSON.parse(localStorage.getItem('as_artworks'));
             } else {
                 users = [...defaultUsers];
-                artworks = [...defaultArt];
+                artworks = [...defaultArtworks];
                 saveSystem();
             }
-            
-            // Check Session
-            const session = sessionStorage.getItem('as_session');
-            if(session) {
-                currentUser = JSON.parse(session);
-                updateUI();
-            }
-            
-            renderGallery(artworks);
             renderTopArtists();
+            renderGallery(artworks);
         }
 
         function saveSystem() {
@@ -535,144 +522,101 @@
         }
 
         function systemReset() {
-            if(confirm('🔴 ล้างระบบทั้งหมด? (Factory Reset)')) {
+            if(confirm('🔴 ยืนยันรีเซ็ตระบบทั้งหมด? ข้อมูลผู้ใช้และรูปใหม่จะหายไป')) {
                 localStorage.clear();
-                sessionStorage.clear();
                 location.reload();
             }
         }
 
-        // ================= 3. AUTH & USER MANAGEMENT (FIXED TOGGLE) =================
-        function openAuthModal(mode='login') {
-            document.getElementById('auth-modal').classList.add('open');
-            toggleAuth(mode);
-        }
-
-        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-        function toggleAuth(mode) {
-            if(mode === 'register') {
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('register-section').classList.remove('hidden');
-                document.getElementById('auth-title').innerText = 'สมัครสมาชิกใหม่';
-            } else {
-                document.getElementById('login-section').classList.remove('hidden');
-                document.getElementById('register-section').classList.add('hidden');
-                document.getElementById('auth-title').innerText = 'เข้าสู่ระบบ';
-            }
-        }
-
+        // ================= AUTH =================
         function handleRegister(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value;
             const email = document.getElementById('regEmail').value;
             const pass = document.getElementById('regPass').value;
 
-            if(users.find(u => u.email === email)) {
-                alert('อีเมลนี้ถูกใช้แล้ว'); return;
-            }
+            if(users.find(u => u.email === email)) { alert('อีเมลนี้ถูกใช้แล้ว'); return; }
 
             const newUser = { email, pass, name, role: 'member' };
             users.push(newUser);
             saveSystem();
-            
-            // Auto Login
-            currentUser = newUser;
-            sessionStorage.setItem('as_session', JSON.stringify(currentUser));
-            updateUI();
-            closeModal('auth-modal');
-            alert('สร้างบัญชีสำเร็จ!');
+            loginUser(newUser);
         }
 
         function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
+            const user = users.find(u => u.email === email && u.pass === pass);
+            if(user) loginUser(user);
+            else alert('ข้อมูลไม่ถูกต้อง');
+        }
+
+        function loginUser(user) {
+            currentUser = user;
+            isAdmin = (user.role === 'admin');
+            closeModal('auth-modal');
             
-            const foundUser = users.find(u => u.email === email && u.pass === pass);
-            if(foundUser) {
-                currentUser = foundUser;
-                sessionStorage.setItem('as_session', JSON.stringify(currentUser));
-                updateUI();
-                closeModal('auth-modal');
-                alert(`ยินดีต้อนรับ ${currentUser.name}`);
-            } else {
-                alert('ข้อมูลไม่ถูกต้อง');
+            document.getElementById('guest-nav').classList.add('hidden');
+            document.getElementById('user-nav').classList.remove('hidden');
+            document.getElementById('user-nav').style.display = 'flex';
+            document.getElementById('display-name').textContent = user.name;
+            document.getElementById('avatar-circle').textContent = user.name.charAt(0).toUpperCase();
+            
+            if(isAdmin) {
+                document.getElementById('admin-panel').classList.remove('hidden');
+                document.getElementById('admin-reset-btn').classList.remove('hidden');
+                renderAdminUserList();
             }
+
+            alert(`ยินดีต้อนรับคุณ ${user.name}`);
+            renderGallery(artworks);
         }
 
         function logout() {
-            if(confirm('ออกจากระบบ?')) {
-                currentUser = null;
-                sessionStorage.removeItem('as_session');
-                location.reload();
-            }
-        }
-
-        function updateUI() {
-            if(currentUser) {
-                document.getElementById('guest-nav').classList.add('hidden');
-                document.getElementById('user-nav').classList.remove('hidden');
-                document.getElementById('display-name').innerText = currentUser.name;
-                document.getElementById('display-role').innerText = currentUser.role === 'admin' ? 'Administrator' : 'Member';
-                
-                // Admin Features
-                if(currentUser.role === 'admin') {
-                    document.getElementById('admin-reset-btn').classList.remove('hidden');
-                    document.getElementById('admin-panel').classList.remove('hidden');
-                    renderUserList();
-                }
-            }
-        }
-
-        function renderUserList() {
-            const container = document.getElementById('user-list-container');
-            container.innerHTML = users.map((u, i) => `
-                <div class="admin-user-row">
-                    <span style="color:#ddd;">👤 ${u.name} (${u.email}) - ${u.role}</span>
-                    ${u.role !== 'admin' ? `<button onclick="deleteUser(${i})" style="color:var(--danger); border:none; background:none; cursor:pointer;">ลบ</button>` : ''}
-                </div>
-            `).join('');
-        }
-
-        function deleteUser(index) {
-            if(confirm('ลบบัญชีผู้ใช้นี้?')) {
-                users.splice(index, 1);
-                saveSystem();
-                renderUserList();
-            }
+            if(confirm('ออกจากระบบ?')) location.reload();
         }
 
         function deleteAccount() {
             if(confirm('ยืนยันลบบัญชีของคุณถาวร?')) {
                 users = users.filter(u => u.email !== currentUser.email);
                 saveSystem();
-                currentUser = null;
-                sessionStorage.clear();
                 location.reload();
             }
         }
 
-        // ================= 4. GALLERY & BUYING =================
-        function renderGallery(items) {
-            const grid = document.getElementById('gallery');
-            const fallback = 'https://placehold.co/600x400/333/FFF?text=Image+Not+Found';
+        // ================= ADMIN =================
+        function renderAdminUserList() {
+            const list = document.getElementById('admin-user-list');
+            list.innerHTML = users.map((u, i) => `
+                <div class="user-item">
+                    <span>👤 ${u.name} (${u.email}) - ${u.role}</span>
+                    ${u.role !== 'admin' ? `<button onclick="adminDeleteUser(${i})" style="color:var(--danger); border:none; background:none; cursor:pointer;">ลบ</button>` : ''}
+                </div>
+            `).join('');
+        }
 
-            if(items.length === 0) {
-                grid.innerHTML = `<div style="text-align:center; width:100%; color:#555; grid-column:1/-1; padding:50px;">ไม่มีข้อมูล</div>`;
-                return;
+        function adminDeleteUser(index) {
+            if(confirm('ลบผู้ใช้นี้?')) {
+                users.splice(index, 1);
+                saveSystem();
+                renderAdminUserList();
             }
+        }
 
-            grid.innerHTML = items.map(item => {
-                const isOwner = currentUser && (item.owner === currentUser.name || item.artist === currentUser.name);
-                const isAdmin = currentUser && currentUser.role === 'admin';
-                const canDelete = isOwner || isAdmin;
+        // ================= GALLERY & STUDIO =================
+        function renderGallery(items, isCollection = false) {
+            const gallery = document.getElementById('gallery');
+            const fallback = 'https://placehold.co/600x400/EEE/31343C?text=Image+Not+Found';
+            
+            gallery.innerHTML = items.map(item => {
+                const canDelete = (currentUser && currentUser.role === 'admin') || (currentUser && item.artist === currentUser.name);
+                const deleteBtn = canDelete ? `<button class="delete-btn" onclick="deleteArt(${item.id}, event)"><i class="fas fa-trash"></i></button>` : '';
                 
-                let btnHtml = '';
-                if(canDelete) btnHtml = `<button class="delete-btn" onclick="deleteArt(${item.id}, event)"><i class="fas fa-trash"></i></button>`;
+                // --- LOGIC: Hide SOLD stamp if in My Collection mode ---
+                let soldClass = (item.isSold && !isCollection) ? 'sold' : (isCollection ? 'owned' : '');
+                let soldOverlay = (item.isSold && !isCollection) ? `<div class="sold-overlay-badge">SOLD</div>` : '';
                 
-                let soldClass = item.isSold ? 'sold' : '';
-                let soldOverlay = item.isSold ? `<div class="sold-overlay-badge">SOLD</div>` : '';
                 let badgeText = item.category === 'digital' ? 'Digital' : item.category === 'photo' ? 'Photo' : 'Paint';
 
                 return `
@@ -680,7 +624,7 @@
                     <div class="card-img-container" onclick="openPreview(${item.id})">
                         <span class="category-badge">${badgeText}</span>
                         ${soldOverlay}
-                        ${btnHtml}
+                        ${deleteBtn}
                         <div class="card-overlay"><span class="view-btn">ดูรายละเอียด</span></div>
                         <img src="${item.img}" class="card-img" loading="lazy" onerror="this.src='${fallback}'">
                     </div>
@@ -693,98 +637,21 @@
             }).join('');
         }
 
-        let selectedItemForPay = null;
-        function openPreview(id) {
-            const item = artworks.find(a => a.id === id);
-            if(!item) return;
-            selectedItemForPay = item;
-            
-            document.getElementById('modal-img').src = item.img;
-            document.getElementById('modal-title').textContent = item.title;
-            document.getElementById('modal-artist').textContent = item.artist;
-            document.getElementById('modal-price').textContent = `฿${item.price.toLocaleString()}`;
-            
-            const btn = document.getElementById('modal-buy-btn');
-            if(item.isSold) {
-                btn.innerHTML = 'สินค้าขายแล้ว';
-                btn.disabled = true;
-                btn.style.background = '#333';
-            } else {
-                btn.innerHTML = '<i class="fas fa-shopping-cart"></i> ซื้อผลงานนี้';
-                btn.disabled = false;
-                btn.style.background = 'var(--gradient-btn)';
-            }
-            
-            document.getElementById('preview-modal').classList.add('open');
-        }
-
-        function openPayment() {
-            if(!currentUser) { alert('กรุณาเข้าสู่ระบบ'); return; }
-            closeModal('preview-modal');
-            document.getElementById('pay-item-name').textContent = `รายการ: ${selectedItemForPay.title}`;
-            document.getElementById('pay-amount').value = `฿${selectedItemForPay.price.toLocaleString()}`;
-            document.getElementById('payment-modal').classList.add('open');
-        }
-
-        function confirmPayment(e) {
-            e.preventDefault();
-            closeModal('payment-modal');
-            
-            selectedItemForPay.isSold = true;
-            selectedItemForPay.owner = currentUser.name; // Transfer Ownership
-            selectedItemForPay.sales++;
-            saveSystem();
-            renderTopArtists();
-            
-            // Refresh view
-            const activeFilter = document.querySelector('.filter-btn.active');
-            if(activeFilter.textContent.includes('ขายแล้ว')) filterGallery('sold', activeFilter);
-            else filterGallery('all', document.querySelector('.filter-btn'));
-
-            document.getElementById('success-modal').classList.add('open');
-        }
-
-        function handleUpload(e) {
-            e.preventDefault();
+        function openMyStudio() {
             if(!currentUser) return;
             
-            const file = document.getElementById('upImage').files[0];
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const newArt = {
-                    id: Date.now(),
-                    title: document.getElementById('upTitle').value,
-                    price: Number(document.getElementById('upPrice').value),
-                    category: document.getElementById('upCategory').value,
-                    artist: currentUser.name,
-                    owner: currentUser.name, 
-                    img: evt.target.result,
-                    isSold: false,
-                    sales: 0
-                };
-                artworks.unshift(newArt);
-                saveSystem();
-                renderGallery(artworks);
-                e.target.reset();
-                alert('ลงผลงานสำเร็จ!');
-            }
-            reader.readAsDataURL(file);
-        }
+            // 1. Hide Top Artists Section
+            document.getElementById('top-artists-section').classList.add('hidden');
+            
+            // 2. Change Header Text
+            document.getElementById('hero-title').innerHTML = `พื้นที่สร้างสรรค์<br><span>และคลังสะสมของคุณ</span>`;
+            document.getElementById('hero-subtitle').textContent = "จัดการผลงานศิลปะของคุณได้ง่ายๆ ที่นี่";
 
-        function deleteArt(id, event) {
-            event.stopPropagation();
-            if(confirm('ลบผลงานนี้?')) {
-                artworks = artworks.filter(a => a.id !== id);
-                saveSystem();
-                renderGallery(artworks);
-            }
-        }
-
-        // ================= 5. STUDIO & FILTER =================
-        function openMyStudio() {
+            // 3. Show Studio Panel
             document.getElementById('studio-panel').classList.remove('hidden');
             switchStudioTab('upload');
-            // Highlight Button
+            
+            // 4. Highlight Button
             document.getElementById('my-studio-btn').style.borderColor = 'var(--accent)';
             document.getElementById('my-studio-btn').style.color = 'var(--accent)';
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -792,24 +659,27 @@
 
         function switchStudioTab(tab) {
             document.querySelectorAll('.studio-tab').forEach(t => t.classList.remove('active'));
-            
             if(tab === 'upload') {
                 document.getElementById('tab-upload').classList.add('active');
                 document.getElementById('upload-form').classList.remove('hidden');
                 document.getElementById('collection-msg').classList.add('hidden');
-                // Show items uploaded by user
-                renderGallery(artworks.filter(a => a.artist === currentUser.name));
+                renderGallery(artworks.filter(a => a.artist === currentUser.name), false);
             } else {
                 document.getElementById('tab-collection').classList.add('active');
                 document.getElementById('upload-form').classList.add('hidden');
                 document.getElementById('collection-msg').classList.remove('hidden');
-                // Show items bought by user
-                renderGallery(artworks.filter(a => a.owner === currentUser.name && a.isSold));
+                // Show items bought by user -> Pass true for 'isCollection' to hide SOLD stamps
+                renderGallery(artworks.filter(a => a.owner === currentUser.name && a.isSold), true);
             }
         }
 
         function filterGallery(cat, btn) {
+            // Reset View logic if navigating away from studio
             document.getElementById('studio-panel').classList.add('hidden'); 
+            document.getElementById('top-artists-section').classList.remove('hidden'); // Show Top Artists again
+            document.getElementById('hero-title').innerHTML = `ค้นพบความงาม<br><span>ที่ไร้ขีดจำกัด</span>`;
+            document.getElementById('hero-subtitle').textContent = "พื้นที่เสรีสำหรับคนรักศิลปะ ซื้อขายผลงานดิจิทัลและงานคราฟต์ง่ายๆ ในที่เดียว";
+
             document.getElementById('my-studio-btn').style.borderColor = 'transparent';
             document.getElementById('my-studio-btn').style.color = 'var(--text-muted)';
 
@@ -840,6 +710,132 @@
         }
 
         function resetView() { location.reload(); }
+
+        // ================= 3. AUTH & USER MANAGEMENT (FIXED TOGGLE) =================
+        function openAuthModal(mode='login') {
+            document.getElementById('auth-modal').classList.add('open');
+            toggleAuth(mode);
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+        function toggleAuth(mode) {
+            if(mode === 'register') {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('register-section').classList.remove('hidden');
+                document.getElementById('auth-title').innerText = 'สมัครสมาชิกใหม่';
+            } else {
+                document.getElementById('login-section').classList.remove('hidden');
+                document.getElementById('register-section').classList.add('hidden');
+                document.getElementById('auth-title').innerText = 'เข้าสู่ระบบ';
+            }
+        }
+
+        function openPreview(id) {
+            const item = artworks.find(a => a.id === id);
+            if(!item) return;
+            selectedItemForPay = item;
+            
+            document.getElementById('modal-img').src = item.img;
+            document.getElementById('modal-title').textContent = item.title;
+            document.getElementById('modal-artist').textContent = item.artist;
+            document.getElementById('modal-price').textContent = `฿${item.price.toLocaleString()}`;
+            
+            const btn = document.getElementById('modal-buy-btn');
+            // If viewing in collection mode (owned), show "You own this" or disable button
+            // If normal mode and sold, show Sold
+            const isOwned = (currentUser && item.owner === currentUser.name);
+
+            if(item.isSold) {
+                if(isOwned) {
+                    btn.innerHTML = '<i class="fas fa-check"></i> คุณเป็นเจ้าของแล้ว';
+                    btn.disabled = true;
+                    btn.style.background = 'var(--success)';
+                } else {
+                    btn.innerHTML = 'สินค้าขายแล้ว';
+                    btn.disabled = true;
+                    btn.style.background = '#333';
+                }
+            } else {
+                btn.innerHTML = '<i class="fas fa-shopping-cart"></i> ซื้อผลงานนี้';
+                btn.disabled = false;
+                btn.style.background = 'var(--gradient-btn)';
+            }
+            
+            document.getElementById('preview-modal').classList.add('open');
+        }
+
+        function openPayment() {
+            if(!currentUser) { alert('กรุณาเข้าสู่ระบบ'); return; }
+            closeModal('preview-modal');
+            document.getElementById('pay-item-name').textContent = `รายการ: ${selectedItemForPay.title}`;
+            document.getElementById('pay-amount').value = `฿${selectedItemForPay.price.toLocaleString()}`;
+            document.getElementById('payment-modal').classList.add('open');
+        }
+
+        function confirmPayment(e) {
+            e.preventDefault();
+            closeModal('payment-modal');
+            
+            // Mark Sold & Transfer Ownership
+            selectedItemForPay.isSold = true;
+            selectedItemForPay.owner = currentUser.name; 
+            selectedItemForPay.sales++;
+            
+            saveSystem();
+            renderTopArtists();
+            
+            // If in studio, reload studio collection. Else reload general gallery
+            if(!document.getElementById('studio-panel').classList.contains('hidden')) {
+                switchStudioTab('collection');
+            } else {
+                filterGallery('all', document.querySelector('.filter-btn'));
+            }
+
+            document.getElementById('success-modal').classList.add('open');
+        }
+
+        function handleUpload(e) {
+            e.preventDefault();
+            const file = document.getElementById('upImage').files[0];
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const newArt = {
+                    id: Date.now(),
+                    title: document.getElementById('upTitle').value,
+                    price: Number(document.getElementById('upPrice').value),
+                    category: document.getElementById('upCategory').value,
+                    artist: currentUser.name,
+                    owner: currentUser.name,
+                    img: evt.target.result,
+                    isSold: false,
+                    sales: 0
+                };
+                artworks.unshift(newArt);
+                saveSystem();
+                renderGallery(artworks.filter(a => a.artist === currentUser.name));
+                e.target.reset();
+                alert('ลงผลงานสำเร็จ!');
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function deleteArt(id, event) {
+            event.stopPropagation();
+            if(confirm('ลบผลงานนี้?')) {
+                artworks = artworks.filter(a => a.id !== id);
+                saveSystem();
+                // Check where we are deleting from to refresh correct view
+                if(!document.getElementById('studio-panel').classList.contains('hidden')) {
+                     // In studio mode, simplistic refresh:
+                     const activeTab = document.querySelector('.studio-tab.active').id;
+                     if(activeTab === 'tab-upload') renderGallery(artworks.filter(a => a.artist === currentUser.name));
+                     else renderGallery(artworks.filter(a => a.owner === currentUser.name && a.isSold), true);
+                } else {
+                    renderGallery(artworks);
+                }
+            }
+        }
 
         // START
         initSystem();
