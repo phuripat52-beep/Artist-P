@@ -16,8 +16,8 @@
             --accent-hover: #5849be;
             --danger: #ff4757;
             --gold: #f1c40f;
-            --glass: rgba(255, 255, 255, 0.9);
-            --shadow-md: 0 10px 30px rgba(0,0,0,0.06);
+            --glass: rgba(255, 255, 255, 0.95);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
             --radius-lg: 24px;
             --radius-md: 16px;
         }
@@ -27,36 +27,10 @@
             margin: 0; padding: 0;
             background-color: var(--bg-color);
             color: var(--text-main);
-            overflow: hidden; /* ซ่อน Scrollbar ตอนเริ่มเพราะมี Intro */
+            overflow-x: hidden;
         }
 
         .hidden { display: none !important; }
-
-        /* ================= INTRO ANIMATION ================= */
-        #intro-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--bg-color); z-index: 9999;
-            display: flex; justify-content: center; align-items: center;
-            transition: transform 1.2s cubic-bezier(0.86, 0, 0.07, 1); 
-        }
-        .curtain-open { transform: translateY(-100%); }
-        #animCanvas { position: absolute; top: 0; left: 0; }
-        .skip-hint {
-            position: absolute; bottom: 50px; color: #b2bec3;
-            font-family: 'Prompt', sans-serif; font-size: 28px; font-weight: 600;
-            letter-spacing: 1px; animation: pulse 2s infinite; pointer-events: none;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10000;
-            transition: opacity 0.5s;
-        }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
-
-        /* ================= MAIN SITE (ซ่อนก่อน Intro จบ) ================= */
-        #main-site {
-            position: relative; z-index: 1; height: 100vh; overflow-y: auto;
-            visibility: hidden; opacity: 0; transition: opacity 0.5s ease;
-        }
-        .reveal-element { opacity: 0; transform: translateY(50px); transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); }
-        .reveal-active { opacity: 1; transform: translateY(0); }
 
         /* ================= NAVIGATION ================= */
         nav {
@@ -64,6 +38,7 @@
             background: var(--glass); backdrop-filter: blur(12px);
             padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
         .logo { font-family: 'Prompt', sans-serif; font-size: 24px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; cursor: pointer;}
         .logo span { color: var(--accent); }
@@ -106,13 +81,12 @@
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
             font-weight: bold; font-family: 'Prompt'; box-shadow: 0 4px 10px rgba(241, 196, 15, 0.4);
         }
-        .rank-2 .rank-badge { background: #b2bec3; } /* Silver */
-        .rank-3 .rank-badge { background: #d35400; } /* Bronze */
+        .rank-2 .rank-badge { background: #b2bec3; }
+        .rank-3 .rank-badge { background: #d35400; }
         
         .artist-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .artist-name { font-weight: 600; font-size: 18px; margin-bottom: 5px; font-family: 'Prompt'; }
         .artist-sales { font-size: 14px; color: var(--text-muted); }
-        .artist-sales i { color: var(--accent); }
 
         /* ================= GALLERY ================= */
         .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px 100px; }
@@ -135,7 +109,6 @@
         .card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; background-color: #f1f2f6; }
         .art-card:hover .card-img { transform: scale(1.05); }
         
-        /* Overlay on Hover */
         .card-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.3); opacity: 0; transition: 0.3s;
@@ -163,7 +136,13 @@
         .card-title { font-family: 'Prompt'; font-weight: 600; font-size: 16px; margin: 0 0 5px 0; }
         .card-price { font-family: 'Prompt'; font-weight: 700; color: var(--accent); font-size: 18px; margin-top: 10px; }
 
-        /* ================= MODAL & PREVIEW ================= */
+        .category-badge {
+            position: absolute; top: 10px; left: 10px; padding: 4px 10px;
+            background: rgba(0,0,0,0.6); color: white; font-size: 10px; border-radius: 20px;
+            backdrop-filter: blur(4px); text-transform: uppercase; letter-spacing: 1px; z-index: 2;
+        }
+
+        /* ================= MODALS ================= */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); z-index: 2000; display: none;
@@ -172,21 +151,18 @@
         }
         .modal.open { display: flex; opacity: 1; }
         
+        /* Preview Modal */
         .preview-box {
             background: white; border-radius: 20px; overflow: hidden; max-width: 900px; width: 100%;
             display: flex; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideUp 0.4s ease;
-            position: relative; /* สำคัญ: เพื่อให้ปุ่มปิดอ้างอิงตำแหน่งจากกล่องนี้ */
+            position: relative;
         }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
         .preview-img { flex: 1.5; background: #f1f2f6; display: flex; align-items: center; justify-content: center; }
         .preview-img img { max-width: 100%; max-height: 500px; object-fit: contain; }
         
         .preview-info { flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
         .preview-title { font-family: 'Prompt'; font-size: 32px; font-weight: 700; margin-bottom: 10px; }
-        .preview-artist { color: var(--text-muted); font-size: 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;}
-        .preview-desc { color: #636e72; line-height: 1.6; margin-bottom: 30px; }
-        .preview-price { font-size: 36px; color: var(--accent); font-weight: bold; font-family: 'Prompt'; margin-bottom: 30px; }
         
         .buy-btn {
             background: var(--accent); color: white; border: none; padding: 15px;
@@ -195,48 +171,42 @@
         }
         .buy-btn:hover { background: var(--accent-hover); transform: scale(1.02); }
         
-        /* แก้ไขปุ่มปิดให้มาอยู่ในกล่อง */
         .close-preview { 
-            position: absolute; 
-            top: 15px; 
-            right: 15px; 
-            color: #2d3436; /* สีเข้มเพื่อให้เห็นชัดบนพื้นขาว */
-            font-size: 24px; 
-            cursor: pointer; 
-            z-index: 100;
-            background: rgba(255, 255, 255, 0.8); /* พื้นหลังจางๆ เผื่อกรณีรูปทับ */
-            width: 40px; 
-            height: 40px; 
-            border-radius: 50%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            transition: 0.2s;
+            position: absolute; top: 15px; right: 15px; color: #2d3436; font-size: 24px; cursor: pointer; z-index: 100;
+            background: rgba(255, 255, 255, 0.8); width: 40px; height: 40px; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; transition: 0.2s;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .close-preview:hover {
-            background: #f1f2f6;
-            transform: scale(1.1);
-        }
+        .close-preview:hover { background: #f1f2f6; transform: scale(1.1); }
 
-        /* ================= AUTH FORM ================= */
-        .auth-container {
-            background: white; width: 400px; padding: 40px; border-radius: 24px; text-align: center; position: relative;
+        /* Auth & Payment Modal */
+        .standard-modal-box {
+            background: white; width: 450px; padding: 40px; border-radius: 24px; 
+            text-align: center; position: relative; animation: slideUp 0.3s ease;
         }
-        /* ปุ่มปิดของ Modal Login */
-        .close-auth {
+        .close-modal-btn {
             position: absolute; top: 15px; right: 15px; font-size: 20px; cursor: pointer; color: #b2bec3; transition: 0.2s;
         }
-        .close-auth:hover { color: var(--text-main); }
-
+        .close-modal-btn:hover { color: var(--text-main); }
         .form-control { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .preview-box { flex-direction: column; }
-            .preview-img img { max-height: 300px; }
-            .top-grid { flex-direction: column; align-items: center; }
+        /* Bank Details */
+        .bank-card {
+            background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+            color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px;
+            text-align: left; box-shadow: 0 10px 20px rgba(9, 132, 227, 0.2);
         }
+        .bank-name { font-size: 14px; opacity: 0.9; }
+        .bank-number { font-size: 24px; font-family: 'Prompt'; font-weight: bold; margin: 10px 0; letter-spacing: 2px; }
+        .bank-owner { font-size: 16px; font-weight: 500; }
+
+        /* Delete Account Button */
+        .delete-account-btn {
+            color: var(--danger); font-size: 12px; cursor: pointer; text-decoration: underline; margin-top: 10px;
+        }
+
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @media (max-width: 768px) { .preview-box { flex-direction: column; } .preview-img img { max-height: 300px; } }
     </style>
 </head>
 <body>
@@ -247,9 +217,9 @@
     </div>
 
     <div id="auth-modal" class="modal">
-        <div class="auth-container">
-            <div class="close-auth" onclick="closeModal('auth-modal')"><i class="fas fa-times"></i></div>
-            <h2 style="margin-bottom: 20px; font-family: 'Prompt';">ยินดีต้อนรับ</h2>
+        <div class="standard-modal-box">
+            <div class="close-modal-btn" onclick="closeModal('auth-modal')"><i class="fas fa-times"></i></div>
+            <h2 style="margin-bottom: 20px; font-family: 'Prompt';">เข้าสู่ระบบ</h2>
             
             <div id="login-section">
                 <form onsubmit="handleLogin(event)">
@@ -272,6 +242,28 @@
         </div>
     </div>
 
+    <div id="payment-modal" class="modal">
+        <div class="standard-modal-box">
+            <div class="close-modal-btn" onclick="closeModal('payment-modal')"><i class="fas fa-times"></i></div>
+            <h2 style="margin-bottom: 10px; font-family: 'Prompt';">ชำระเงิน</h2>
+            <p style="color:#636e72; margin-bottom:20px;" id="pay-item-name">รายการ: ...</p>
+            
+            <div class="bank-card">
+                <div class="bank-name"><i class="fas fa-university"></i> ธนาคารอาร์ตสเปซ (ArtSpace Bank)</div>
+                <div class="bank-number">123-4-56789-0</div>
+                <div class="bank-owner">บจก. อาร์ตสเปซ สตูดิโอ</div>
+            </div>
+
+            <form onsubmit="confirmPayment(event)">
+                <div style="text-align: left; margin-bottom: 5px; color: #636e72; font-size: 14px;">แนบสลิปโอนเงิน:</div>
+                <input type="file" class="form-control" accept="image/*" required>
+                <div style="text-align: left; margin-bottom: 5px; color: #636e72; font-size: 14px;">ยอดชำระ:</div>
+                <input type="text" id="pay-amount" class="form-control" readonly style="background: #f1f2f6; color: var(--accent); font-weight: bold;">
+                <button type="submit" class="buy-btn"><i class="fas fa-check-circle"></i> ยืนยันการชำระเงิน</button>
+            </form>
+        </div>
+    </div>
+
     <div id="preview-modal" class="modal">
         <div class="preview-box">
             <div class="close-preview" onclick="closeModal('preview-modal')"><i class="fas fa-times"></i></div>
@@ -283,7 +275,7 @@
                 <div class="preview-artist"><i class="fas fa-user-circle"></i> <span id="modal-artist">Artist</span></div>
                 <p class="preview-desc">ผลงานชิ้นเอกที่รังสรรค์ด้วยจินตนาการ พร้อมให้คุณเป็นเจ้าของแล้ววันนี้ งานลิขสิทธิ์แท้พร้อมไฟล์ความละเอียดสูง</p>
                 <div id="modal-price" class="preview-price">฿0</div>
-                <button class="buy-btn" onclick="buyItem()"><i class="fas fa-shopping-cart"></i> ซื้อผลงานนี้</button>
+                <button class="buy-btn" onclick="openPayment()"><i class="fas fa-shopping-cart"></i> ซื้อผลงานนี้</button>
             </div>
         </div>
     </div>
@@ -308,7 +300,7 @@
                 <div class="user-profile">
                     <div style="text-align: right;">
                         <div id="display-name" style="font-weight: bold; font-size: 14px;">User</div>
-                        <div id="display-role" style="font-size: 12px; color: #636e72;">Member</div>
+                        <div class="delete-account-btn" onclick="deleteAccount()">ลบบัญชีผู้ใช้</div>
                     </div>
                     <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold;" id="avatar-circle">U</div>
                 </div>
@@ -351,11 +343,7 @@
     </div>
 
     <script>
-        // ================= GLOBAL VARIABLES =================
-        let currentUser = null; 
-        let isAdmin = false;
-
-        // ================= INTRO ANIMATION LOGIC =================
+        // ================= INTRO ANIMATION =================
         const canvas = document.getElementById('animCanvas');
         const ctx = canvas.getContext('2d');
         const introOverlay = document.getElementById('intro-overlay');
@@ -375,22 +363,14 @@
         for(let i=0; i < totalBalls; i++) {
             const angle = (i * segmentAngle) + (Math.random() * segmentAngle * 0.8); 
             const dist = Math.max(window.innerWidth, window.innerHeight) * 0.85; 
-            balls.push({
-                x: cx + Math.cos(angle) * dist, y: cy + Math.sin(angle) * dist,
-                vx: (cx - (cx + Math.cos(angle) * dist)) / timeToHit,
-                vy: (cy - (cy + Math.sin(angle) * dist)) / timeToHit,
-                color: colors[i % colors.length]
-            });
+            balls.push({ x: cx + Math.cos(angle) * dist, y: cy + Math.sin(angle) * dist, vx: (cx - (cx + Math.cos(angle) * dist)) / timeToHit, vy: (cy - (cy + Math.sin(angle) * dist)) / timeToHit, color: colors[i % colors.length] });
         }
 
         let particles = [];
         function createExplosion() {
             for (let i = 0; i < 250; i++) {
                 const color = balls[Math.floor(Math.random() * balls.length)].color;
-                particles.push({
-                    x: cx, y: cy, vx: (Math.random() - 0.5) * 60, vy: (Math.random() - 0.5) * 60,
-                    radius: Math.random() * 40 + 10, color: color, growthRate: Math.random() * 4 + 3
-                });
+                particles.push({ x: cx, y: cy, vx: (Math.random() - 0.5) * 60, vy: (Math.random() - 0.5) * 60, radius: Math.random() * 40 + 10, color: color, growthRate: Math.random() * 4 + 3 });
             }
         }
 
@@ -432,9 +412,13 @@
         }
         document.addEventListener('keydown', (e) => { if (e.code === 'Space') enterSite(); });
 
-        // ================= MOCK DATA (With New Names) =================
-        let artworks = [
-            // Digital Art (1-8)
+        // ================= GLOBAL VARIABLES & MOCK DATA =================
+        let currentUser = null; 
+        let isAdmin = false;
+        let selectedItemForPay = null;
+
+        // Default Data
+        const defaultArtworks = [
             { id: 1, title: "Forest Guardian", artist: "Samurai_X", price: 15900, category: "digital", img: "img/1.jpg", sales: 120 },
             { id: 2, title: "Surreal Tides", artist: "Dreamer_Art", price: 12500, category: "digital", img: "img/2.jpg", sales: 85 },
             { id: 3, title: "Winter's Mercy", artist: "Bushido_Spirit", price: 25000, category: "digital", img: "img/3.jpg", sales: 200 },
@@ -443,8 +427,6 @@
             { id: 6, title: "Cursed Eye", artist: "Anime_God", price: 14500, category: "digital", img: "img/6.jpg", sales: 150 },
             { id: 7, title: "Crimson Horizon", artist: "Red_Sun", price: 11000, category: "digital", img: "img/7.jpg", sales: 90 },
             { id: 8, title: "Dragon's Mark", artist: "Gang_Leader", price: 9500, category: "digital", img: "img/8.jpg", sales: 60 },
-            
-            // Painting (9-16)
             { id: 9, title: "Watercolor Flower", artist: "SoftBrush", price: 4500, category: "painting", img: "img/9.jpg", sales: 40 },
             { id: 10, title: "Oil Abstract", artist: "PaletteKnife", price: 6200, category: "painting", img: "img/10.jpg", sales: 25 },
             { id: 11, title: "Classic Portrait", artist: "ClassicMaster", price: 3500, category: "painting", img: "img/11.jpg", sales: 15 },
@@ -453,8 +435,6 @@
             { id: 14, title: "Nature Canvas", artist: "EcoArt", price: 5800, category: "painting", img: "img/14.jpg", sales: 55 },
             { id: 15, title: "Acrylic Flow", artist: "FluidArt", price: 7000, category: "painting", img: "img/15.jpg", sales: 80 },
             { id: 16, title: "Impressionist", artist: "OldSchool", price: 8500, category: "painting", img: "img/16.jpg", sales: 10 },
-            
-            // Photography (17-24)
             { id: 17, title: "Mountain View", artist: "NatureLover", price: 8900, category: "photo", img: "img/17.jpg", sales: 110 },
             { id: 18, title: "City Night", artist: "StreetShooter", price: 25000, category: "photo", img: "img/18.jpg", sales: 180 },
             { id: 19, title: "Street Life", artist: "CityWalker", price: 9200, category: "photo", img: "img/19.jpg", sales: 65 },
@@ -465,16 +445,41 @@
             { id: 24, title: "Forest Mist", artist: "GreenEye", price: 7200, category: "photo", img: "img/24.jpg", sales: 50 }
         ];
 
-        // ================= APP LOGIC =================
+        let artworks = [];
+
+        // ================= PERSISTENT SYSTEM (LocalStorage) =================
         function init() {
+            // Load Artworks
+            const savedArt = localStorage.getItem('artspace_artworks');
+            if(savedArt) {
+                artworks = JSON.parse(savedArt);
+            } else {
+                artworks = [...defaultArtworks];
+            }
+
+            // Load User Session
+            const savedUser = localStorage.getItem('artspace_user');
+            if(savedUser) {
+                const session = JSON.parse(savedUser);
+                loginSuccess(session.name, session.isAdmin, false); // false = no welcome alert
+            }
+
             renderTopArtists();
             renderGallery(artworks);
         }
 
+        function saveData() {
+            localStorage.setItem('artspace_artworks', JSON.stringify(artworks));
+        }
+
+        function saveSession(name, isSuper) {
+            localStorage.setItem('artspace_user', JSON.stringify({ name: name, isAdmin: isSuper }));
+        }
+
+        // ================= LOGIC =================
         function renderTopArtists() {
             const sorted = [...artworks].sort((a, b) => b.sales - a.sales).slice(0, 3);
             const container = document.getElementById('top-artists-grid');
-            
             container.innerHTML = sorted.map((item, index) => `
                 <div class="artist-rank-card rank-${index + 1}" onclick="openPreview(${item.id})">
                     <div class="rank-badge">${index + 1}</div>
@@ -497,9 +502,7 @@
 
             gallery.innerHTML = items.map(item => {
                 const canDelete = isAdmin || (currentUser && item.artist === currentUser);
-                const deleteBtn = canDelete ? 
-                    `<button class="delete-btn" onclick="deleteArt(${item.id}, event)"><i class="fas fa-trash"></i></button>` : '';
-
+                const deleteBtn = canDelete ? `<button class="delete-btn" onclick="deleteArt(${item.id}, event)"><i class="fas fa-trash"></i></button>` : '';
                 let badge = item.category === 'digital' ? 'Digital' : item.category === 'photo' ? 'Photo' : 'Paint';
 
                 return `
@@ -507,84 +510,87 @@
                     <div class="card-img-container" onclick="openPreview(${item.id})">
                         <span class="category-badge">${badge}</span>
                         ${deleteBtn}
-                        <div class="card-overlay">
-                            <span class="view-btn">ดูรายละเอียด</span>
-                        </div>
+                        <div class="card-overlay"><span class="view-btn">ดูรายละเอียด</span></div>
                         <img src="${item.img}" class="card-img" loading="lazy" onerror="this.src='${fallback}'">
                     </div>
                     <div class="card-body">
                         <h4 class="card-title">${item.title}</h4>
-                        <div style="font-size:13px; color:#636e72;">
-                            <i class="fas fa-user-circle"></i> ${item.artist}
-                        </div>
+                        <div style="font-size:13px; color:#636e72;"><i class="fas fa-user-circle"></i> ${item.artist}</div>
                         <div class="card-price">฿${item.price.toLocaleString()}</div>
                     </div>
-                </div>
-                `;
+                </div>`;
             }).join('');
         }
 
         function openPreview(id) {
             const item = artworks.find(a => a.id === id);
             if(!item) return;
-
+            selectedItemForPay = item;
             document.getElementById('modal-img').src = item.img;
             document.getElementById('modal-title').textContent = item.title;
             document.getElementById('modal-artist').textContent = item.artist;
             document.getElementById('modal-price').textContent = `฿${item.price.toLocaleString()}`;
-            
-            const modal = document.getElementById('preview-modal');
-            modal.classList.add('open');
+            document.getElementById('preview-modal').classList.add('open');
         }
 
-        function buyItem() {
+        function openPayment() {
             if(!currentUser) {
                 alert('กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ');
                 closeModal('preview-modal');
                 openAuthModal();
                 return;
             }
-            alert('ขอบคุณที่สนับสนุนผลงานศิลปะ! ระบบจะพาท่านไปยังหน้าชำระเงิน...');
             closeModal('preview-modal');
+            document.getElementById('pay-item-name').textContent = `รายการ: ${selectedItemForPay.title}`;
+            document.getElementById('pay-amount').value = `฿${selectedItemForPay.price.toLocaleString()}`;
+            document.getElementById('payment-modal').classList.add('open');
         }
 
-        function filterGallery(cat, btn) {
-            document.getElementById('my-studio-btn').style.background = 'transparent';
-            document.getElementById('my-studio-btn').style.color = 'var(--accent)';
+        function confirmPayment(e) {
+            e.preventDefault();
+            alert('ได้รับข้อมูลการชำระเงินแล้ว! กรุณารอการตรวจสอบสักครู่...');
+            closeModal('payment-modal');
+            // Mock sale increment
+            selectedItemForPay.sales++;
+            saveData();
+            renderTopArtists();
+        }
 
-            if(btn) {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+        function handleUpload(e) {
+            e.preventDefault();
+            const title = document.getElementById('upTitle').value;
+            const price = document.getElementById('upPrice').value;
+            const cat = document.getElementById('upCategory').value;
+            const file = document.getElementById('upImage').files[0];
+
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const newArt = {
+                        id: Date.now(), title: title, artist: currentUser, price: Number(price),
+                        category: cat, img: evt.target.result, sales: 0
+                    };
+                    artworks.unshift(newArt);
+                    saveData(); // Save to Storage
+                    renderGallery(artworks);
+                    e.target.reset();
+                    alert('ลงผลงานเรียบร้อย!');
+                }
+                reader.readAsDataURL(file);
             }
+        }
 
-            if(cat === 'all') {
+        function deleteArt(id, event) {
+            event.stopPropagation();
+            if(confirm('ยืนยันที่จะลบผลงานนี้?')) {
+                artworks = artworks.filter(item => item.id !== id);
+                saveData(); // Update Storage
                 renderGallery(artworks);
-            } else {
-                const filtered = artworks.filter(item => item.category === cat);
-                renderGallery(filtered);
+                renderTopArtists();
             }
         }
 
-        function filterMyArtworks() {
-            if(!currentUser) return;
-            const btn = document.getElementById('my-studio-btn');
-            btn.style.background = 'var(--accent)';
-            btn.style.color = 'white';
-            
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            const myWorks = artworks.filter(item => item.artist === currentUser);
-            renderGallery(myWorks);
-        }
-
-        function searchGallery() {
-            const term = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = artworks.filter(item => 
-                item.title.toLowerCase().includes(term) || 
-                item.artist.toLowerCase().includes(term)
-            );
-            renderGallery(filtered);
-        }
-
+        // ================= AUTH =================
         function openAuthModal(mode = 'login') {
             document.getElementById('auth-modal').classList.add('open');
             if(mode === 'register') {
@@ -605,12 +611,8 @@
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
-
-            if(email === 'admin@artspace.com' && pass === 'admin888') {
-                loginSuccess("Admin", true);
-            } else {
-                loginSuccess("Somchai Arts", false);
-            }
+            if(email === 'admin@artspace.com' && pass === 'admin888') loginSuccess("Admin", true);
+            else loginSuccess("Somchai Arts", false);
         }
 
         function handleRegister(e) {
@@ -619,91 +621,68 @@
             loginSuccess(name, false);
         }
 
-        function loginSuccess(name, isSuperUser) {
+        function loginSuccess(name, isSuperUser, showAlert = true) {
             currentUser = name;
             isAdmin = isSuperUser;
+            saveSession(name, isSuperUser); // Persist Session
             closeModal('auth-modal');
 
             document.getElementById('guest-nav').classList.add('hidden');
             document.getElementById('user-nav').classList.remove('hidden');
             document.getElementById('user-nav').style.display = 'flex';
-            
             document.getElementById('display-name').textContent = name;
             document.getElementById('avatar-circle').textContent = name.charAt(0).toUpperCase();
-            document.getElementById('display-role').textContent = isAdmin ? 'Administrator' : 'Artist Member';
-            document.getElementById('display-role').style.color = isAdmin ? 'var(--danger)' : '#636e72';
-
             document.getElementById('upload-section').classList.remove('hidden');
 
-            alert(`ยินดีต้อนรับคุณ ${name}`);
-            renderGallery(artworks);
+            if(showAlert) alert(`ยินดีต้อนรับคุณ ${name}`);
+            renderGallery(artworks); 
         }
 
         function logout() {
             if(confirm('ยืนยันการออกจากระบบ?')) {
                 currentUser = null;
                 isAdmin = false;
+                localStorage.removeItem('artspace_user'); // Clear Session
                 document.getElementById('guest-nav').classList.remove('hidden');
                 document.getElementById('user-nav').classList.add('hidden');
                 document.getElementById('upload-section').classList.add('hidden');
                 document.getElementById('user-nav').style.display = 'none';
-                
                 resetView();
             }
         }
 
-        function handleUpload(e) {
-            e.preventDefault();
-            const title = document.getElementById('upTitle').value;
-            const price = document.getElementById('upPrice').value;
-            const cat = document.getElementById('upCategory').value;
-            const file = document.getElementById('upImage').files[0];
-
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    const newArt = {
-                        id: Date.now(), 
-                        title: title,
-                        artist: currentUser,
-                        price: Number(price),
-                        category: cat,
-                        img: evt.target.result,
-                        sales: 0
-                    };
-                    artworks.unshift(newArt);
-                    renderGallery(artworks);
-                    e.target.reset();
-                    alert('ลงผลงานเรียบร้อย!');
-                }
-                reader.readAsDataURL(file);
+        function deleteAccount() {
+            if(confirm('⚠️ คำเตือน: คุณต้องการลบบัญชีผู้ใช้ถาวรใช่หรือไม่? (การกระทำนี้ไม่สามารถย้อนกลับได้)')) {
+                localStorage.removeItem('artspace_user'); // Clear Session
+                // Optional: Clear works created by user
+                // artworks = artworks.filter(item => item.artist !== currentUser);
+                // saveData();
+                location.reload(); // Refresh page to reset state
             }
         }
 
-        function deleteArt(id, event) {
-            event.stopPropagation();
-            if(confirm('ยืนยันที่จะลบผลงานนี้?')) {
-                artworks = artworks.filter(item => item.id !== id);
-                const isMyStudio = document.getElementById('my-studio-btn').style.background !== 'transparent';
-                if(isMyStudio) {
-                    filterMyArtworks();
-                } else {
-                    renderGallery(artworks);
-                }
-                renderTopArtists();
-            }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+        function filterGallery(cat, btn) {
+            if(btn) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+            document.getElementById('my-studio-btn').style.background = 'transparent';
+            document.getElementById('my-studio-btn').style.color = 'var(--accent)';
+            if(cat === 'all') renderGallery(artworks);
+            else renderGallery(artworks.filter(item => item.category === cat));
         }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('open');
+        function filterMyArtworks() {
+            if(!currentUser) return;
+            document.getElementById('my-studio-btn').style.background = 'var(--accent)';
+            document.getElementById('my-studio-btn').style.color = 'white';
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            renderGallery(artworks.filter(item => item.artist === currentUser));
         }
-
-        function resetView() {
-            filterGallery('all', document.querySelector('.filter-btn'));
+        function searchGallery() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            renderGallery(artworks.filter(item => item.title.toLowerCase().includes(term) || item.artist.toLowerCase().includes(term)));
         }
+        function resetView() { filterGallery('all', document.querySelector('.filter-btn')); }
 
-        init();
-
+        init(); // Start App
     </script>
 </body>
 </html>
