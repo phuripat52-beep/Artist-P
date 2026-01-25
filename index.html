@@ -27,10 +27,36 @@
             margin: 0; padding: 0;
             background-color: var(--bg-color);
             color: var(--text-main);
-            overflow-x: hidden;
+            overflow: hidden; /* ซ่อน Scrollbar ตอนเริ่ม */
         }
 
         .hidden { display: none !important; }
+
+        /* ================= INTRO ANIMATION ================= */
+        #intro-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: transform 1.2s cubic-bezier(0.86, 0, 0.07, 1); 
+        }
+        .curtain-open { transform: translateY(-100%); }
+        #animCanvas { position: absolute; top: 0; left: 0; }
+        .skip-hint {
+            position: absolute; bottom: 50px; color: #b2bec3;
+            font-family: 'Prompt', sans-serif; font-size: 28px; font-weight: 600;
+            letter-spacing: 1px; animation: pulse 2s infinite; pointer-events: none;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10000;
+            transition: opacity 0.5s;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
+
+        /* ================= MAIN SITE ================= */
+        #main-site {
+            position: relative; z-index: 1; height: 100vh; overflow-y: auto;
+            visibility: hidden; opacity: 0; transition: opacity 0.5s ease;
+        }
+        .reveal-element { opacity: 0; transform: translateY(50px); transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); }
+        .reveal-active { opacity: 1; transform: translateY(0); }
 
         /* ================= NAVIGATION ================= */
         nav {
@@ -310,8 +336,7 @@
 
         <section class="top-artists-section reveal-element">
             <h2 class="section-title">🏆 3 อันดับ <span>ศิลปินยอดขายสูงสุด</span></h2>
-            <div class="top-grid" id="top-artists-grid">
-                </div>
+            <div class="top-grid" id="top-artists-grid"></div>
         </section>
 
         <div class="container">
@@ -337,13 +362,12 @@
                 <button class="filter-btn" onclick="filterGallery('photo', this)">ภาพถ่าย</button>
             </div>
 
-            <div class="gallery-grid reveal-element" id="gallery">
-                </div>
+            <div class="gallery-grid reveal-element" id="gallery"></div>
         </div>
     </div>
 
     <script>
-        // ================= INTRO ANIMATION =================
+        // ================= ANIMATION LOGIC =================
         const canvas = document.getElementById('animCanvas');
         const ctx = canvas.getContext('2d');
         const introOverlay = document.getElementById('intro-overlay');
@@ -376,7 +400,9 @@
 
         function animate() {
             if (phase === 'finished') return;
-            if (phase === 'rolling') ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Clear entire canvas every frame to prevent trails
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
             if (phase === 'rolling') {
                 frameCount++;
                 balls.forEach(ball => {
@@ -399,6 +425,9 @@
         }
         animate();
 
+        // Safety Timeout (กันเหนียวถ้าอนิเมชั่นค้าง)
+        setTimeout(() => { if (!isEntered) enterSite(); }, 4000);
+
         let isEntered = false;
         function enterSite() {
             if (isEntered) return;
@@ -412,7 +441,7 @@
         }
         document.addEventListener('keydown', (e) => { if (e.code === 'Space') enterSite(); });
 
-        // ================= GLOBAL VARIABLES & MOCK DATA =================
+        // ================= GLOBAL VARIABLES & DATA =================
         let currentUser = null; 
         let isAdmin = false;
         let selectedItemForPay = null;
@@ -453,6 +482,8 @@
             const savedArt = localStorage.getItem('artspace_artworks');
             if(savedArt) {
                 artworks = JSON.parse(savedArt);
+                // Fix: Ensure 'sales' property exists for old data
+                artworks.forEach(a => { if(typeof a.sales === 'undefined') a.sales = 0; });
             } else {
                 artworks = [...defaultArtworks];
             }
@@ -550,7 +581,6 @@
             e.preventDefault();
             alert('ได้รับข้อมูลการชำระเงินแล้ว! กรุณารอการตรวจสอบสักครู่...');
             closeModal('payment-modal');
-            // Mock sale increment
             selectedItemForPay.sales++;
             saveData();
             renderTopArtists();
@@ -571,7 +601,7 @@
                         category: cat, img: evt.target.result, sales: 0
                     };
                     artworks.unshift(newArt);
-                    saveData(); // Save to Storage
+                    saveData(); 
                     renderGallery(artworks);
                     e.target.reset();
                     alert('ลงผลงานเรียบร้อย!');
@@ -584,13 +614,12 @@
             event.stopPropagation();
             if(confirm('ยืนยันที่จะลบผลงานนี้?')) {
                 artworks = artworks.filter(item => item.id !== id);
-                saveData(); // Update Storage
+                saveData(); 
                 renderGallery(artworks);
                 renderTopArtists();
             }
         }
 
-        // ================= AUTH =================
         function openAuthModal(mode = 'login') {
             document.getElementById('auth-modal').classList.add('open');
             if(mode === 'register') {
@@ -624,7 +653,7 @@
         function loginSuccess(name, isSuperUser, showAlert = true) {
             currentUser = name;
             isAdmin = isSuperUser;
-            saveSession(name, isSuperUser); // Persist Session
+            saveSession(name, isSuperUser); 
             closeModal('auth-modal');
 
             document.getElementById('guest-nav').classList.add('hidden');
@@ -642,7 +671,7 @@
             if(confirm('ยืนยันการออกจากระบบ?')) {
                 currentUser = null;
                 isAdmin = false;
-                localStorage.removeItem('artspace_user'); // Clear Session
+                localStorage.removeItem('artspace_user');
                 document.getElementById('guest-nav').classList.remove('hidden');
                 document.getElementById('user-nav').classList.add('hidden');
                 document.getElementById('upload-section').classList.add('hidden');
@@ -653,11 +682,8 @@
 
         function deleteAccount() {
             if(confirm('⚠️ คำเตือน: คุณต้องการลบบัญชีผู้ใช้ถาวรใช่หรือไม่? (การกระทำนี้ไม่สามารถย้อนกลับได้)')) {
-                localStorage.removeItem('artspace_user'); // Clear Session
-                // Optional: Clear works created by user
-                // artworks = artworks.filter(item => item.artist !== currentUser);
-                // saveData();
-                location.reload(); // Refresh page to reset state
+                localStorage.removeItem('artspace_user'); 
+                location.reload(); 
             }
         }
 
@@ -682,7 +708,7 @@
         }
         function resetView() { filterGallery('all', document.querySelector('.filter-btn')); }
 
-        init(); // Start App
+        init(); 
     </script>
 </body>
 </html>
