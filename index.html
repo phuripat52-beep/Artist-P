@@ -15,6 +15,7 @@
             --accent: #6c5ce7;
             --accent-hover: #5849be;
             --danger: #ff4757;
+            --success: #00b894; /* สีเขียวสำหรับ Success */
             --gold: #f1c40f;
             --glass: rgba(255, 255, 255, 0.95);
             --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
@@ -27,36 +28,10 @@
             margin: 0; padding: 0;
             background-color: var(--bg-color);
             color: var(--text-main);
-            overflow: hidden; /* ซ่อน Scrollbar ตอนเริ่ม */
+            overflow: hidden;
         }
 
         .hidden { display: none !important; }
-
-        /* ================= INTRO ANIMATION ================= */
-        #intro-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--bg-color); z-index: 9999;
-            display: flex; justify-content: center; align-items: center;
-            transition: transform 1.2s cubic-bezier(0.86, 0, 0.07, 1); 
-        }
-        .curtain-open { transform: translateY(-100%); }
-        #animCanvas { position: absolute; top: 0; left: 0; }
-        .skip-hint {
-            position: absolute; bottom: 50px; color: #b2bec3;
-            font-family: 'Prompt', sans-serif; font-size: 28px; font-weight: 600;
-            letter-spacing: 1px; animation: pulse 2s infinite; pointer-events: none;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10000;
-            transition: opacity 0.5s;
-        }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
-
-        /* ================= MAIN SITE ================= */
-        #main-site {
-            position: relative; z-index: 1; height: 100vh; overflow-y: auto;
-            visibility: hidden; opacity: 0; transition: opacity 0.5s ease;
-        }
-        .reveal-element { opacity: 0; transform: translateY(50px); transition: all 1s cubic-bezier(0.25, 1, 0.5, 1); }
-        .reveal-active { opacity: 1; transform: translateY(0); }
 
         /* ================= NAVIGATION ================= */
         nav {
@@ -205,16 +180,25 @@
         }
         .close-preview:hover { background: #f1f2f6; transform: scale(1.1); }
 
-        /* Auth & Payment Modal */
+        /* Standard Modal Box (Auth / Payment / Success) */
         .standard-modal-box {
             background: white; width: 450px; padding: 40px; border-radius: 24px; 
-            text-align: center; position: relative; animation: slideUp 0.3s ease;
+            text-align: center; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .close-modal-btn {
             position: absolute; top: 15px; right: 15px; font-size: 20px; cursor: pointer; color: #b2bec3; transition: 0.2s;
         }
         .close-modal-btn:hover { color: var(--text-main); }
         .form-control { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; }
+
+        /* NEW: Success Modal Styles */
+        .success-icon {
+            width: 80px; height: 80px; background: rgba(0, 184, 148, 0.1); color: var(--success);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 40px; margin: 0 auto 20px auto; animation: bounce 0.6s ease;
+        }
+        .success-title { font-family: 'Prompt'; font-size: 24px; font-weight: bold; margin-bottom: 10px; color: var(--text-main); }
+        .success-message { color: #636e72; margin-bottom: 30px; }
 
         /* Bank Details */
         .bank-card {
@@ -226,12 +210,11 @@
         .bank-number { font-size: 24px; font-family: 'Prompt'; font-weight: bold; margin: 10px 0; letter-spacing: 2px; }
         .bank-owner { font-size: 16px; font-weight: 500; }
 
-        /* Delete Account Button */
-        .delete-account-btn {
-            color: var(--danger); font-size: 12px; cursor: pointer; text-decoration: underline; margin-top: 10px;
-        }
+        .delete-account-btn { color: var(--danger); font-size: 12px; cursor: pointer; text-decoration: underline; margin-top: 10px; }
 
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
         @media (max-width: 768px) { .preview-box { flex-direction: column; } .preview-img img { max-height: 300px; } }
     </style>
 </head>
@@ -287,6 +270,15 @@
                 <input type="text" id="pay-amount" class="form-control" readonly style="background: #f1f2f6; color: var(--accent); font-weight: bold;">
                 <button type="submit" class="buy-btn"><i class="fas fa-check-circle"></i> ยืนยันการชำระเงิน</button>
             </form>
+        </div>
+    </div>
+
+    <div id="success-modal" class="modal">
+        <div class="standard-modal-box">
+            <div class="success-icon"><i class="fas fa-check"></i></div>
+            <h3 class="success-title">การสั่งซื้อเสร็จสิ้น</h3>
+            <p class="success-message">ขอบคุณที่อุดหนุนผลงานศิลปะ!<br>เราได้รับคำสั่งซื้อของคุณแล้ว</p>
+            <button class="buy-btn" onclick="closeModal('success-modal')" style="background: var(--success);">ตกลง</button>
         </div>
     </div>
 
@@ -400,8 +392,7 @@
 
         function animate() {
             if (phase === 'finished') return;
-            // Clear entire canvas every frame to prevent trails
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear screen every frame
 
             if (phase === 'rolling') {
                 frameCount++;
@@ -425,7 +416,7 @@
         }
         animate();
 
-        // Safety Timeout (กันเหนียวถ้าอนิเมชั่นค้าง)
+        // Safety Timeout (กันเหนียว)
         setTimeout(() => { if (!isEntered) enterSite(); }, 4000);
 
         let isEntered = false;
@@ -579,8 +570,9 @@
 
         function confirmPayment(e) {
             e.preventDefault();
-            alert('ได้รับข้อมูลการชำระเงินแล้ว! กรุณารอการตรวจสอบสักครู่...');
             closeModal('payment-modal');
+            // Show Custom Success Modal
+            document.getElementById('success-modal').classList.add('open');
             selectedItemForPay.sales++;
             saveData();
             renderTopArtists();
