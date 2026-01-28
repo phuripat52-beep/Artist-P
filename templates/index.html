@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtSpace - อาณาจักรงานศิลป์</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div id="intro-overlay">
+        <canvas id="animCanvas"></canvas>
+        <div class="skip-hint">กด Spacebar เพื่อข้าม</div>
+    </div>
+
+    <button id="admin-reset-btn" class="reset-btn-float hidden" onclick="systemReset()">
+        <i class="fas fa-sync-alt"></i> รีเซ็ตระบบ (Factory Reset)
+    </button>
+
+    <div id="auth-modal" class="modal">
+        <div class="modal-box">
+            <div class="close-modal" onclick="closeModal('auth-modal')"><i class="fas fa-times"></i></div>
+            <h2 id="auth-title" style="margin-bottom: 20px; font-family: 'Prompt';">เข้าสู่ระบบ</h2>
+            <div id="login-section">
+                <form onsubmit="handleLogin(event)">
+                    <input type="email" id="loginEmail" class="form-control" placeholder="อีเมล (admin@artspace.com)" required>
+                    <input type="password" id="loginPass" class="form-control" placeholder="รหัสผ่าน (admin888)" required>
+                    <button type="submit" class="buy-btn">เข้าสู่ระบบ</button>
+                </form>
+                <p style="margin-top: 15px; font-size: 14px; color: var(--text-muted);">
+                    ยังไม่มีบัญชี? <span class="link-text" onclick="toggleAuth('register')">สมัครสมาชิก</span>
+                </p>
+            </div>
+            <div id="register-section" class="hidden">
+                <form onsubmit="handleRegister(event)">
+                    <input type="text" id="regName" class="form-control" placeholder="ชื่อที่ใช้แสดง (Display Name)" required>
+                    <input type="email" id="regEmail" class="form-control" placeholder="อีเมล" required>
+                    <input type="password" id="regPass" class="form-control" placeholder="รหัสผ่าน" required>
+                    <button type="submit" class="buy-btn" style="background: var(--success);">สร้างบัญชี</button>
+                </form>
+                <p style="margin-top: 15px; font-size: 14px; color: var(--text-muted);">
+                    มีบัญชีแล้ว? <span class="link-text" onclick="toggleAuth('login')">เข้าสู่ระบบ</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="payment-modal" class="modal">
+        <div class="modal-box">
+            <div class="close-modal" onclick="closeModal('payment-modal')"><i class="fas fa-times"></i></div>
+            <h2 style="margin-bottom: 10px; font-family: 'Prompt';">ชำระเงิน</h2>
+            <p style="color:var(--text-muted); margin-bottom:20px;" id="pay-item-name">รายการ: ...</p>
+            <div class="bank-card">
+                <div style="opacity:0.8; font-size:14px;">ธนาคารอาร์ตสเปซ</div>
+                <div style="font-size:24px; font-weight:bold; margin:10px 0; letter-spacing:2px; font-family:'Prompt';">123-4-56789-0</div>
+                <div>บจก. อาร์ตสเปซ สตูดิโอ</div>
+            </div>
+            <form onsubmit="confirmPayment(event)">
+                <div style="text-align:left; font-size:14px; margin-bottom:5px; color:#aaa;">แนบสลิปโอนเงิน:</div>
+                <input type="file" id="pay-slip" class="form-control" accept="image/*" required>
+                <div style="text-align:left; font-size:14px; margin-bottom:5px; color:#aaa;">ยอดชำระ:</div>
+                <input type="text" id="pay-amount" class="form-control" readonly style="background: #333; font-weight: bold; color:var(--accent);">
+                <button type="submit" class="buy-btn">ยืนยันการชำระเงิน</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="edit-modal" class="modal">
+        <div class="modal-box">
+            <div class="close-modal" onclick="closeModal('edit-modal')"><i class="fas fa-times"></i></div>
+            <h2 style="margin-bottom: 20px; font-family: 'Prompt';">✏️ แก้ไขผลงาน</h2>
+            <form onsubmit="confirmEdit(event)">
+                <input type="hidden" id="edit-id">
+                <label style="color:var(--text-muted);">ราคาใหม่ (บาท):</label>
+                <input type="number" id="edit-price" class="form-control" required>
+                <label style="color:var(--text-muted);">คำบรรยาย (Caption):</label>
+                <textarea id="edit-caption" class="form-control" rows="4" placeholder="เขียนคำบรรยาย..."></textarea>
+                <button type="submit" class="buy-btn" style="background: var(--warning); color: #333;">บันทึกการแก้ไข</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="success-modal" class="modal">
+        <div class="modal-box">
+            <div style="font-size: 50px; color: var(--success); margin-bottom: 20px;"><i class="fas fa-check-circle"></i></div>
+            <h3 style="font-family: 'Prompt'; font-size: 24px; margin-bottom: 10px;">สำเร็จ!</h3>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">ดำเนินการเรียบร้อยแล้ว</p>
+            <button class="buy-btn" onclick="closeModal('success-modal')" style="background: var(--success);">ตกลง</button>
+        </div>
+    </div>
+
+    <div id="preview-modal" class="modal">
+        <div class="preview-box">
+            <div class="close-modal" onclick="closeModal('preview-modal')" style="z-index:100; color:#333; background:rgba(255,255,255,0.8); width:40px; height:40px; border-radius:50%; display:flex; justify-content:center; align-items:center; top:15px; right:15px;"><i class="fas fa-times"></i></div>
+            <div class="preview-img">
+                <img id="modal-img" src="" alt="">
+            </div>
+            <div class="preview-info">
+                <h2 id="modal-title" class="preview-title">Title</h2>
+                <div style="color:var(--text-muted); margin-bottom:20px; display:flex; align-items:center; gap:10px;">
+                    <i class="fas fa-user-circle"></i> <span id="modal-artist">Artist</span>
+                </div>
+                <p id="modal-desc" style="color:var(--text-muted); line-height:1.6; margin-bottom:30px;"></p>
+                <div id="modal-price" style="font-size:36px; color:var(--accent); font-weight:bold; font-family:'Prompt';">฿0</div>
+                <button id="modal-buy-btn" class="buy-btn" onclick="openPayment()">ซื้อผลงานนี้</button>
+                <a id="modal-download-btn" class="btn-download hidden" href="#" download>
+                    <i class="fas fa-download"></i> &nbsp; ดาวน์โหลดผลงาน
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-site">
+        <nav>
+            <div class="logo" onclick="resetView()"><i class="fas fa-palette"></i> Art<span>Space</span></div>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="ค้นหาศิลปิน, ชื่อภาพ..." onkeyup="searchGallery()">
+            </div>
+            <div id="guest-nav">
+                <button class="btn-nav" onclick="openAuthModal()">เข้าสู่ระบบ</button>
+                <button class="btn-nav btn-primary" onclick="openAuthModal('register')">สมัครสมาชิก</button>
+            </div>
+            <div id="user-nav" class="hidden" style="display: flex; align-items: center; gap: 15px;">
+                <button class="btn-nav" id="my-studio-btn" onclick="openMyStudio()" style="border: 1px solid var(--accent); color: var(--accent);">
+                    <i class="fas fa-store"></i> ร้านของฉัน
+                </button>
+                <div style="text-align:right;">
+                    <div id="display-name" style="font-weight:bold;">User</div>
+                    <div id="display-role" style="font-size:12px; color:var(--text-muted);">Member</div>
+                    <div class="delete-account-btn" onclick="deleteAccount()">ลบบัญชีผู้ใช้</div>
+                </div>
+                <button class="btn-nav" onclick="logout()" style="color:var(--danger);"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </nav>
+
+        <div class="hero reveal-element">
+            <h1 id="hero-title">ค้นพบความงาม<br><span>ที่ไร้ขีดจำกัด</span></h1>
+            <p id="hero-subtitle">พื้นที่เสรีสำหรับคนรักศิลปะ ซื้อขายผลงานดิจิทัลและงานคราฟต์ง่ายๆ ในที่เดียว</p>
+        </div>
+
+        <section id="top-artists-section" class="top-artists-section reveal-element">
+            <div class="section-header">
+                <h2 class="section-title">🏆 3 อันดับ <span>ศิลปินขายดี</span></h2>
+            </div>
+            <div class="top-grid" id="top-artists-grid"></div>
+        </section>
+
+        <div class="container">
+            <div id="admin-panel" class="hidden" style="background:var(--card-bg); padding:20px; border-radius:15px; margin-bottom:30px; border:1px solid #333;">
+                <h3>🛡️ จัดการผู้ใช้งาน (Admin Only)</h3>
+                <div id="user-list-container" style="margin-top:15px;"></div>
+            </div>
+
+            <div id="studio-panel" class="hidden" style="background:var(--card-bg); padding:20px; border-radius:15px; margin-bottom:30px; border:1px solid #333;">
+                <div class="studio-tabs">
+                    <div class="studio-tab active" id="tab-upload" onclick="switchStudioTab('upload')">📤 ลงผลงานขาย</div>
+                    <div class="studio-tab" id="tab-collection" onclick="switchStudioTab('collection')">🛍️ คลังของฉัน (ซื้อแล้ว)</div>
+                </div>
+                
+                <form id="upload-form" onsubmit="handleUpload(event)" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <input type="text" id="upTitle" class="form-control" placeholder="ชื่อ" required style="margin:0; width:150px;">
+                    <input type="number" id="upPrice" class="form-control" placeholder="ราคา" required style="margin:0; width:100px;">
+                    <select id="upCategory" class="form-control" style="margin:0; width:120px;">
+                        <option value="digital">Digital</option>
+                        <option value="painting">Painting</option>
+                        <option value="photo">Photo</option>
+                    </select>
+                    <input type="file" id="upImage" class="form-control" accept="image/*" required style="margin:0; width:200px;">
+                    <button type="submit" class="btn-nav btn-primary" style="border:none;">โพสต์</button>
+                </form>
+
+                <div id="collection-msg" class="hidden" style="text-align: center; color: var(--accent); padding: 20px;">
+                    <i class="fas fa-heart"></i> นี่คือผลงานศิลปะที่คุณเป็นเจ้าของและสนับสนุนศิลปิน
+                </div>
+            </div>
+
+            <div class="filters reveal-element">
+                <button class="filter-btn active" onclick="filterGallery('all', this)">ทั้งหมด</button>
+                <button class="filter-btn" onclick="filterGallery('digital', this)">ดิจิทัล</button>
+                <button class="filter-btn" onclick="filterGallery('painting', this)">ภาพวาด</button>
+                <button class="filter-btn" onclick="filterGallery('photo', this)">ภาพถ่าย</button>
+                <button class="filter-btn" onclick="filterGallery('sold', this)" style="color:var(--danger); border-color:var(--danger);">สินค้าขายแล้ว</button>
+            </div>
+
+            <div class="gallery-grid reveal-element" id="gallery"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
