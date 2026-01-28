@@ -205,7 +205,7 @@
         .buy-btn { width: 100%; padding: 14px; background: var(--gradient-btn); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; font-family: 'Prompt'; font-size: 16px; margin-top: 15px;}
         .buy-btn:hover { opacity: 0.9; transform: translateY(-2px); }
         
-        /* NEW: Download Button Style */
+        /* Download Button Style */
         .btn-download { background: var(--download); color: white; text-decoration: none; display: flex; justify-content: center; align-items: center; margin-top: 10px; padding: 14px; border-radius: 12px; font-weight: bold; font-family: 'Prompt'; transition: 0.2s; cursor: pointer; }
         .btn-download:hover { opacity: 0.9; transform: translateY(-2px); }
 
@@ -226,7 +226,7 @@
         .link-text:hover { text-decoration: underline; }
         .admin-user-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; color: #ccc;}
 
-        /* NEW: Delete Account Button Style */
+        /* Delete Account Button Style */
         .delete-account-btn {
             color: var(--danger); font-size: 11px; cursor: pointer; margin-top: 5px;
             border: 1px solid var(--danger); padding: 2px 8px; border-radius: 4px; display: inline-block; transition: 0.2s;
@@ -578,8 +578,7 @@
                 if(foundUser.email === 'admin@artspace.com') foundUser.role = 'admin';
                 sessionStorage.setItem('as_session', JSON.stringify(currentUser));
                 updateUI();
-                closeModal('auth-modal');
-                // No Alert - Smooth login
+                closeModal('auth-modal'); // Close Immediately, NO ALERT
             } else {
                 alert('ข้อมูลไม่ถูกต้อง');
             }
@@ -680,71 +679,6 @@
             }).join('');
         }
 
-        function openMyStudio() {
-            if(!currentUser) return;
-            document.getElementById('top-artists-section').classList.add('hidden');
-            document.getElementById('hero-title').innerHTML = `พื้นที่สร้างสรรค์<br><span>และคลังสะสมของคุณ</span>`;
-            document.getElementById('hero-subtitle').textContent = "จัดการผลงานศิลปะของคุณได้ง่ายๆ ที่นี่";
-            document.getElementById('studio-panel').classList.remove('hidden');
-            switchStudioTab('upload');
-            
-            document.getElementById('my-studio-btn').style.borderColor = 'var(--accent)';
-            document.getElementById('my-studio-btn').style.color = 'var(--accent)';
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        }
-
-        function switchStudioTab(tab) {
-            document.querySelectorAll('.studio-tab').forEach(t => t.classList.remove('active'));
-            if(tab === 'upload') {
-                document.getElementById('tab-upload').classList.add('active');
-                document.getElementById('upload-form').classList.remove('hidden');
-                document.getElementById('collection-msg').classList.add('hidden');
-                renderGallery(artworks.filter(a => a.artist === currentUser.name), false);
-            } else {
-                document.getElementById('tab-collection').classList.add('active');
-                document.getElementById('upload-form').classList.add('hidden');
-                document.getElementById('collection-msg').classList.remove('hidden');
-                renderGallery(artworks.filter(a => a.owner === currentUser.name && a.isSold), true);
-            }
-        }
-
-        function filterGallery(cat, btn) {
-            document.getElementById('studio-panel').classList.add('hidden'); 
-            document.getElementById('top-artists-section').classList.remove('hidden'); 
-            document.getElementById('hero-title').innerHTML = `ค้นพบความงาม<br><span>ที่ไร้ขีดจำกัด</span>`;
-            document.getElementById('hero-subtitle').textContent = "พื้นที่เสรีสำหรับคนรักศิลปะ ซื้อขายผลงานดิจิทัลและงานคราฟต์ง่ายๆ ในที่เดียว";
-
-            document.getElementById('my-studio-btn').style.borderColor = 'transparent';
-            document.getElementById('my-studio-btn').style.color = 'var(--text-muted)';
-
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            if(btn) btn.classList.add('active');
-
-            if(cat === 'all') renderGallery(artworks);
-            else if(cat === 'sold') renderGallery(artworks.filter(a => a.isSold));
-            else renderGallery(artworks.filter(a => a.category === cat));
-        }
-
-        function renderTopArtists() {
-            const sorted = [...artworks].sort((a,b) => b.sales - a.sales).slice(0,3);
-            document.getElementById('top-artists-grid').innerHTML = sorted.map((a,i) => `
-                <div class="artist-rank-card">
-                    <div class="rank-badge">${i+1}</div>
-                    <img src="${a.img}" class="artist-img">
-                    <div class="artist-name">${a.artist}</div>
-                    <div class="artist-sales">ขายแล้ว ${a.sales} ชิ้น</div>
-                </div>
-            `).join('');
-        }
-
-        function searchGallery() {
-            const term = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = artworks.filter(a => a.title.toLowerCase().includes(term) || a.artist.toLowerCase().includes(term));
-            renderGallery(filtered);
-        }
-
-        function resetView() { location.reload(); }
-
         // ================= MODALS & PREVIEW =================
         function openAuthModal(mode='login') {
             document.getElementById('auth-modal').classList.add('open');
@@ -799,17 +733,23 @@
                     dlBtn.classList.add('hidden');
                 }
             } else {
-                // If I am the artist (creator), I can download too
+                // If I am the artist (creator)
                 if (currentUser && item.artist === currentUser.name) {
+                    // Allow download
                     dlBtn.href = item.img;
                     dlBtn.classList.remove('hidden');
+                    
+                    // PREVENT BUYING OWN WORK
+                    btn.innerHTML = '<i class="fas fa-paint-brush"></i> ผลงานของคุณ';
+                    btn.disabled = true;
+                    btn.style.background = '#b2bec3';
                 } else {
+                    // Normal buyer
                     dlBtn.classList.add('hidden');
+                    btn.innerHTML = '<i class="fas fa-shopping-cart"></i> ซื้อผลงานนี้';
+                    btn.disabled = false;
+                    btn.style.background = 'var(--gradient-btn)';
                 }
-
-                btn.innerHTML = '<i class="fas fa-shopping-cart"></i> ซื้อผลงานนี้';
-                btn.disabled = false;
-                btn.style.background = 'var(--gradient-btn)';
             }
             
             document.getElementById('preview-modal').classList.add('open');
@@ -884,6 +824,69 @@
                     renderGallery(artworks);
                 }
             }
+        }
+
+        function openMyStudio() {
+            if(!currentUser) return;
+            document.getElementById('top-artists-section').classList.add('hidden');
+            document.getElementById('hero-title').innerHTML = `พื้นที่สร้างสรรค์<br><span>และคลังสะสมของคุณ</span>`;
+            document.getElementById('hero-subtitle').textContent = "จัดการผลงานศิลปะของคุณได้ง่ายๆ ที่นี่";
+            document.getElementById('studio-panel').classList.remove('hidden');
+            switchStudioTab('upload');
+            
+            document.getElementById('my-studio-btn').style.borderColor = 'var(--accent)';
+            document.getElementById('my-studio-btn').style.color = 'var(--accent)';
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        }
+
+        function switchStudioTab(tab) {
+            document.querySelectorAll('.studio-tab').forEach(t => t.classList.remove('active'));
+            if(tab === 'upload') {
+                document.getElementById('tab-upload').classList.add('active');
+                document.getElementById('upload-form').classList.remove('hidden');
+                document.getElementById('collection-msg').classList.add('hidden');
+                renderGallery(artworks.filter(a => a.artist === currentUser.name), false);
+            } else {
+                document.getElementById('tab-collection').classList.add('active');
+                document.getElementById('upload-form').classList.add('hidden');
+                document.getElementById('collection-msg').classList.remove('hidden');
+                renderGallery(artworks.filter(a => a.owner === currentUser.name && a.isSold), true);
+            }
+        }
+
+        function filterGallery(cat, btn) {
+            document.getElementById('studio-panel').classList.add('hidden'); 
+            document.getElementById('top-artists-section').classList.remove('hidden'); 
+            document.getElementById('hero-title').innerHTML = `ค้นพบความงาม<br><span>ที่ไร้ขีดจำกัด</span>`;
+            document.getElementById('hero-subtitle').textContent = "พื้นที่เสรีสำหรับคนรักศิลปะ ซื้อขายผลงานดิจิทัลและงานคราฟต์ง่ายๆ ในที่เดียว";
+
+            document.getElementById('my-studio-btn').style.borderColor = 'transparent';
+            document.getElementById('my-studio-btn').style.color = 'var(--text-muted)';
+
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+
+            if(cat === 'all') renderGallery(artworks);
+            else if(cat === 'sold') renderGallery(artworks.filter(a => a.isSold));
+            else renderGallery(artworks.filter(a => a.category === cat));
+        }
+
+        function renderTopArtists() {
+            const sorted = [...artworks].sort((a,b) => b.sales - a.sales).slice(0,3);
+            document.getElementById('top-artists-grid').innerHTML = sorted.map((a,i) => `
+                <div class="artist-rank-card">
+                    <div class="rank-badge">${i+1}</div>
+                    <img src="${a.img}" class="artist-img">
+                    <div class="artist-name">${a.artist}</div>
+                    <div class="artist-sales">ขายแล้ว ${a.sales} ชิ้น</div>
+                </div>
+            `).join('');
+        }
+
+        function searchGallery() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = artworks.filter(a => a.title.toLowerCase().includes(term) || a.artist.toLowerCase().includes(term));
+            renderGallery(filtered);
         }
 
         // START
