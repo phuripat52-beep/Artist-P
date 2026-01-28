@@ -1,0 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&family=Prompt:wght@400;600;700;800&display=swap');
+
+:root {
+    /* --- MODERN DARK THEME --- */
+    --bg-color: #0f0f12;
+    --card-bg: #1a1a1f;
+    --text-main: #ffffff;
+    --text-muted: #a0a0b0;
+    --accent: #6c5ce7;
+    --accent-hover: #5849be;
+    --gradient-text: linear-gradient(135deg, #a55eea 0%, #45aaf2 100%);
+    --gradient-btn: linear-gradient(90deg, #6c5ce7, #a55eea);
+    --danger: #ff4757;
+    --warning: #f1c40f;
+    --success: #2ed573;
+    --download: #00b894; /* สีปุ่มดาวน์โหลด */
+    --gold: #ffa502;
+    --glass: rgba(26, 26, 31, 0.95);
+    --shadow-md: 0 10px 30px rgba(0,0,0,0.3);
+    --radius-lg: 24px;
+    --radius-md: 16px;
+}
+
+body {
+    font-family: 'Sarabun', sans-serif;
+    margin: 0; padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    overflow: hidden;
+}
+
+.hidden { display: none !important; }
+
+/* ================= INTRO ANIMATION ================= */
+#intro-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: var(--bg-color);
+    z-index: 9999;
+    display: flex; justify-content: center; align-items: center;
+    transition: transform 1.0s cubic-bezier(0.86, 0, 0.07, 1);
+}
+.curtain-open { transform: translateY(-100%); }
+#animCanvas { position: absolute; top: 0; left: 0; }
+.skip-hint {
+    position: absolute; bottom: 50px; color: var(--text-muted);
+    font-family: 'Prompt', sans-serif; font-size: 20px; font-weight: 600;
+    letter-spacing: 1px; animation: pulse 2s infinite; pointer-events: none;
+    z-index: 10000; transition: opacity 0.5s;
+}
+@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+/* ================= MAIN SITE ================= */
+#main-site {
+    position: relative; z-index: 1; height: 100vh; overflow-y: auto;
+    opacity: 0; transition: opacity 0.8s ease;
+}
+.site-visible { opacity: 1 !important; }
+.reveal-element { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+.reveal-active { opacity: 1; transform: translateY(0); }
+
+/* ================= NAVIGATION ================= */
+nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--glass); backdrop-filter: blur(12px);
+    padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.logo { font-family: 'Prompt', sans-serif; font-size: 26px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 10px; cursor: pointer; letter-spacing: -1px;}
+.logo span { background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.search-bar input {
+    width: 350px; padding: 12px 25px; border-radius: 50px; border: 1px solid #333;
+    background: #25252b; color: white; outline: none; transition: 0.3s;
+}
+.search-bar input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(108, 92, 231, 0.2); }
+
+.btn-nav {
+    background: transparent; border: 1px solid transparent; padding: 8px 16px; border-radius: 12px;
+    font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-family: 'Prompt';
+}
+.btn-nav:hover { color: var(--text-main); }
+.btn-primary { background: var(--gradient-btn); color: white !important; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); border: none;}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 92, 231, 0.5); }
+
+/* ================= HERO SECTION ================= */
+.hero {
+    text-align: center; padding: 80px 20px 40px;
+    background: radial-gradient(circle at 50% 0%, rgba(108, 92, 231, 0.15) 0%, transparent 70%);
+    transition: all 0.5s ease;
+}
+.hero h1 {
+    font-family: 'Prompt', sans-serif; font-size: 64px; margin-bottom: 10px; font-weight: 800;
+    line-height: 1.1; letter-spacing: -2px;
+}
+.hero h1 span {
+    background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero p {
+    color: var(--text-muted); font-size: 20px; font-weight: 300; margin-top: 15px;
+}
+
+/* ================= TOP ARTISTS ================= */
+.section-header { text-align: center; margin: 40px 0 30px; }
+.section-title { font-family: 'Prompt'; font-size: 24px; font-weight: 700; color: var(--text-main); }
+
+.top-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-bottom: 50px; }
+.artist-rank-card {
+    background: var(--card-bg); padding: 20px; border-radius: 20px; width: 220px;
+    box-shadow: var(--shadow-md); position: relative; transition: 0.3s;
+    display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255,255,255,0.05);
+}
+.artist-rank-card:hover { transform: translateY(-10px); border-color: var(--accent); }
+
+.rank-badge {
+    position: absolute; top: -15px; background: var(--gold); color: #000; width: 35px; height: 35px;
+    border-radius: 50%; display: flex; justify-content: center; align-items: center;
+    font-weight: bold; font-family: 'Prompt'; box-shadow: 0 4px 10px rgba(255, 165, 2, 0.4);
+}
+.artist-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 3px solid var(--card-bg); }
+.artist-name { font-weight: 600; font-size: 18px; margin-bottom: 5px; font-family: 'Prompt'; }
+
+/* ================= GALLERY ================= */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px 100px; }
+
+.filters { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
+.filter-btn {
+    padding: 10px 25px; border-radius: 30px; border: 1px solid #333; background: var(--card-bg);
+    color: var(--text-muted); font-family: 'Prompt'; cursor: pointer; transition: 0.3s;
+}
+.filter-btn:hover, .filter-btn.active { background: var(--text-main); color: #000; border-color: var(--text-main); }
+
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; }
+
+.art-card {
+    background: var(--card-bg); border-radius: var(--radius-md); overflow: hidden;
+    box-shadow: var(--shadow-md); transition: all 0.3s ease; position: relative;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.art-card:hover { transform: translateY(-8px); box-shadow: 0 15px 40px rgba(108, 92, 231, 0.15); }
+
+.card-img-container { position: relative; height: 280px; overflow: hidden; cursor: pointer; }
+.card-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+.art-card:hover .card-img { transform: scale(1.05); }
+
+.card-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); opacity: 0; transition: 0.3s;
+    display: flex; justify-content: center; align-items: center; gap: 10px;
+}
+.card-img-container:hover .card-overlay { opacity: 1; }
+.view-btn {
+    background: white; color: black; padding: 10px 20px;
+    border-radius: 30px; font-weight: bold; font-size: 14px;
+    transform: translateY(20px); transition: 0.3s;
+}
+.card-img-container:hover .view-btn { transform: translateY(0); }
+
+.card-body { padding: 20px; }
+.card-title { font-family: 'Prompt'; font-weight: 600; font-size: 16px; margin: 0 0 5px 0; }
+.card-price { font-family: 'Prompt'; font-weight: 700; color: var(--accent); font-size: 18px; margin-top: 10px; }
+
+/* Badges & Actions */
+.category-badge { position: absolute; top: 10px; left: 10px; padding: 4px 12px; background: rgba(0,0,0,0.6); color: white; font-size: 10px; border-radius: 20px; backdrop-filter: blur(4px); letter-spacing: 1px; z-index: 2; border: 1px solid rgba(255,255,255,0.2); }
+.sold-overlay-badge { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); border: 4px solid var(--danger); color: var(--danger); font-size: 32px; font-weight: 800; padding: 10px 20px; text-transform: uppercase; font-family: 'Prompt', sans-serif; letter-spacing: 2px; background: rgba(0,0,0, 0.8); backdrop-filter: blur(2px); z-index: 5; pointer-events: none; opacity: 0.9; }
+
+.art-card.sold .card-img { filter: grayscale(100%); opacity: 0.5; }
+.art-card.owned .card-img { filter: none !important; opacity: 1 !important; }
+
+.delete-btn { position: absolute; top: 10px; right: 10px; background: var(--danger); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 10; opacity: 0; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+.art-card:hover .delete-btn { opacity: 1; }
+
+/* ================= MODALS ================= */
+.modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); z-index: 6000; display: none;
+    justify-content: center; align-items: center; padding: 20px;
+    opacity: 0; transition: opacity 0.3s; backdrop-filter: blur(8px);
+}
+.modal.open { display: flex; opacity: 1; }
+
+.modal-box { 
+    background: #25252b; width: 450px; padding: 40px; border-radius: 24px; 
+    text-align: center; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255,255,255,0.1); color: white;
+}
+
+.preview-box {
+    background: #25252b; border-radius: 20px; overflow: hidden; max-width: 900px; width: 100%;
+    display: flex; box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: slideUp 0.4s ease; position: relative;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.preview-img { flex: 1.5; background: #000; display: flex; align-items: center; justify-content: center; }
+.preview-img img { max-width: 100%; max-height: 500px; object-fit: contain; }
+.preview-info { flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: center; color: white; }
+.preview-title { font-family: 'Prompt'; font-size: 32px; font-weight: 700; margin-bottom: 10px; }
+
+.buy-btn { width: 100%; padding: 14px; background: var(--gradient-btn); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; font-family: 'Prompt'; font-size: 16px; margin-top: 15px;}
+.buy-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+/* Download Button Style */
+.btn-download { background: var(--download); color: white; text-decoration: none; display: flex; justify-content: center; align-items: center; margin-top: 10px; padding: 14px; border-radius: 12px; font-weight: bold; font-family: 'Prompt'; transition: 0.2s; cursor: pointer; }
+.btn-download:hover { opacity: 0.9; transform: translateY(-2px); }
+
+.form-control { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; background: #1a1a1f; color: white; font-family: 'Sarabun';}
+.form-control:focus { border-color: var(--accent); outline: none; }
+
+.close-modal { position: absolute; top: 20px; right: 20px; font-size: 20px; cursor: pointer; color: #666; transition: 0.2s; }
+.close-modal:hover { color: white; }
+
+/* Misc */
+.reset-btn-float { position: fixed; bottom: 20px; right: 20px; background: var(--danger); color: white; border: none; padding: 12px 20px; border-radius: 50px; box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4); cursor: pointer; z-index: 7000; font-family: 'Prompt'; font-weight: bold; transition: 0.3s; }
+.reset-btn-float:hover { transform: scale(1.05); }
+.bank-card { background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%); color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: left; }
+.studio-tabs { display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+.studio-tab { cursor: pointer; font-family: 'Prompt'; font-weight: bold; color: #666; padding-bottom: 5px; }
+.studio-tab.active { color: var(--accent); border-bottom: 3px solid var(--accent); }
+.link-text { color: var(--accent); cursor: pointer; text-decoration: none; font-weight: bold; }
+.link-text:hover { text-decoration: underline; }
+.admin-user-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; color: #ccc;}
+
+/* Delete Account Button Style */
+.delete-account-btn {
+    color: var(--danger); font-size: 11px; cursor: pointer; margin-top: 5px;
+    border: 1px solid var(--danger); padding: 2px 8px; border-radius: 4px; display: inline-block; transition: 0.2s;
+}
+.delete-account-btn:hover { background: var(--danger); color: white; }
+
+/* Animations */
+@keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (max-width: 768px) { .preview-box { flex-direction: column; } .preview-img img { max-height: 300px; } .hero h1 { font-size: 40px; } }
